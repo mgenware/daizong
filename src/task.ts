@@ -1,3 +1,5 @@
+export type RunItemType = string | string[];
+
 export default interface Task {
-  run?: string[];
+  run?: RunItemType[];
 }

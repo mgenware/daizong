@@ -55,17 +55,39 @@ if (!taskInput) {
   if (!cmds) {
     throw new Error(`No "run" field defined in task "${taskInput}"`);
   }
-  // eslint-disable-next-line no-console
-  console.log('>> ' + chalk.yellow(cmds.join(' ')));
-  await spawn(
-    cmds,
-    (data) => {
-      // eslint-disable-next-line no-console
-      console.log(data.toString());
-    },
-    (data) => {
-      // eslint-disable-next-line no-console
-      console.log(chalk.red(data.toString()));
-    },
-  );
+
+  if (!Array.isArray(cmds)) {
+    throw new Error(
+      `The value of "run" field should be an array. Got ${JSON.stringify(
+        cmds,
+      )}`,
+    );
+  }
+
+  if (cmds.length === 0) {
+    throw new Error(`The value of "run" field is empty`);
+  }
+
+  let cmdsToRun: string[][];
+  if (typeof cmds[0] === 'string') {
+    cmdsToRun = [cmds] as string[][];
+  } else {
+    cmdsToRun = cmds as string[][];
+  }
+
+  for (const cmds of cmdsToRun) {
+    // eslint-disable-next-line no-console
+    console.log('>> ' + chalk.yellow(cmds.join(' ')));
+    await spawn(
+      cmds,
+      (data) => {
+        // eslint-disable-next-line no-console
+        console.log(data.toString());
+      },
+      (data) => {
+        // eslint-disable-next-line no-console
+        console.log(chalk.red(data.toString()));
+      },
+    );
+  }
 })();

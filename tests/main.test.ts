@@ -12,19 +12,29 @@ function splitString(str: string): string[] {
 async function t(
   configName: string,
   taskName: string,
-  cmd: string,
-  expected: string,
+  cmd: string[],
+  expected: string[],
 ) {
   const output = await execAsync(
     `node "./dist/main.js" -c "./tests/cfgs/${configName}.js" ${taskName}`,
   );
   const outputString = output.stdout || '';
-  assert.deepEqual(
-    splitString(outputString),
-    splitString(`>> ${cmd}\n${expected}\n\n`),
-  );
+  const expectedList: string[] = [];
+  for (let i = 0; i < cmd.length; i++) {
+    expectedList.push(`>> ${cmd[i]}`);
+    expectedList.push(expected[i]);
+    expectedList.push('');
+  }
+  // An extra newline at the end of process output.
+  expectedList.push('');
+  // Split output into lines to avoid newline difference among different platforms.
+  assert.deepEqual(splitString(outputString), expectedList);
 }
 
 it('Single cmd', async () => {
-  await t(confBasic, 'single_cmd', 'echo hi', 'hi');
+  await t(confBasic, 'single_cmd', ['echo hi'], ['hi']);
+});
+
+it('Multiple cmds', async () => {
+  await t(confBasic, 'multiple_cmds', ['echo 1', 'echo 2'], ['1', '2']);
 });
