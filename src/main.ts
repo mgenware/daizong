@@ -51,11 +51,14 @@ if (!taskInput) {
   }
 
   // Run the specified task.
-  if (!task.run) {
+  const cmds = task.run;
+  if (!cmds) {
     throw new Error(`No "run" field defined in task "${taskInput}"`);
   }
+  // eslint-disable-next-line no-console
+  console.log('>> ' + chalk.yellow(cmds.join(' ')));
   await spawn(
-    task.run,
+    cmds,
     (data) => {
       // eslint-disable-next-line no-console
       console.log(data.toString());
