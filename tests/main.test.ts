@@ -5,6 +5,10 @@ import * as assert from 'assert';
 const execAsync = promisify(exec);
 const confBasic = 'basic';
 
+function splitString(str: string): string[] {
+  return str.split(/\r?\n/);
+}
+
 async function t(
   configName: string,
   taskName: string,
@@ -14,7 +18,11 @@ async function t(
   const output = await execAsync(
     `node "./dist/main.js" -c "./tests/cfgs/${configName}.js" ${taskName}`,
   );
-  assert.equal(output, `>> ${cmd}\n${expected}\n\n`);
+  const outputString = output.stdout || '';
+  assert.deepEqual(
+    splitString(outputString),
+    splitString(`>> ${cmd}\n${expected}\n\n`),
+  );
 }
 
 it('Single cmd', async () => {
