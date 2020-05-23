@@ -10,10 +10,10 @@ const explorer = cosmiconfig(pkgName);
 
 const cli = parseArgs(
   `
-	Usage
-	  $ ${pkgName} <task>
+  Usage
+    $ ${pkgName} <task>
 
-	Options
+  Options
     --config, -c  Explicitly specify the config file
     
 `,
@@ -27,26 +27,14 @@ const cli = parseArgs(
   },
 );
 
-const taskInput = cli.input?.[0];
-if (!taskInput) {
-  throw new Error('No task given');
-}
-
-(async () => {
-  const res = await (cli.flags.config
-    ? explorer.load(cli.flags.config)
-    : explorer.search());
-  if (res?.isEmpty) {
-    throw new Error(`No config file found at "${res.filepath}"`);
-  }
-  const config = res?.config || {};
-  const taskNames = Object.keys(config);
-  const task = config[taskInput] as Task;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function run(config: any, taskName: string) {
+  const task = config[taskName] as Task | undefined;
   if (!task) {
     throw new Error(
-      `Task "${taskInput}" not defined. Valid tasks are ${taskNames.join(
-        ', ',
-      )}`,
+      `Task "${taskInput}" not defined. Valid tasks are ${Object.keys(
+        config,
+      ).join(', ')}`,
     );
   }
 
@@ -69,6 +57,20 @@ if (!taskInput) {
   }
 
   for (const cmds of cmdsToRun) {
+    const cmdName = cmds[0];
+    if (!cmdName) {
+      throw new Error(
+        `Unexpected empty command name at "${JSON.stringify(cmds)}"`,
+      );
+    }
+
+    // Check if this command is a task.
+    if (cmdName.startsWith('#')) {
+      const targetTaskName = cmdName.substr(1);
+      await run(config, targetTaskName);
+      continue;
+    }
+
     // eslint-disable-next-line no-console
     console.log('>> ' + chalk.yellow(cmds.join(' ')));
     await spawn(
@@ -83,4 +85,20 @@ if (!taskInput) {
       },
     );
   }
+}
+
+const taskInput = cli.input?.[0];
+if (!taskInput) {
+  throw new Error('No task given');
+}
+
+(async () => {
+  const res = await (cli.flags.config
+    ? explorer.load(cli.flags.config)
+    : explorer.search());
+  if (res?.isEmpty) {
+    throw new Error(`No config file found at "${res.filepath}"`);
+  }
+  const config = res?.config || {};
+  await run(config, taskInput);
 })();

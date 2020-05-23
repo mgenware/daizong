@@ -56,3 +56,20 @@ it('Delay', async () => {
     ['haha'],
   );
 });
+
+it('Nested 1', async () => {
+  await t(
+    confBasic,
+    'combo1',
+    ['echo start', 'echo hi', 'echo end'],
+    ['start', 'hi', 'end'],
+  );
+});
+
+it('Nested 2', async () => {
+  await t(confBasic, 'combo2', ['echo hi'], ['hi']);
+});
+
+it('Nested 3', async () => {
+  await t(confBasic, 'combo3', ['echo hi'], ['hi']);
+});

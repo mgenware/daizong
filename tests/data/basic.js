@@ -15,7 +15,7 @@ module.exports = {
     run: ['node', './tests/data/delay.js', '1000', 'haha'],
   },
   combo1: {
-    run: [['echo', 'start'], ['#combo2'][('echo', 'end')]],
+    run: [['echo', 'start'], '#combo2', 'echo end'],
   },
   combo2: {
     run: '#combo3',
