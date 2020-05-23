@@ -45,6 +45,8 @@ async function run(config: any, taskName: string): Promise<void> {
   }
 
   const cmdFieldValue = typeof task.cmd === 'string' ? [task.cmd] : task.cmd;
+  const isParallel = task.parallel;
+  const parallelPromises: Promise<void>[] = [];
   if (cmdFieldValue.length === 0) {
     throw new Error('The value of "cmd" field is empty');
   }
@@ -68,18 +70,17 @@ async function run(config: any, taskName: string): Promise<void> {
     }
 
     // Check if this command is a task.
+    let promise: Promise<void>;
     if (cmdName.startsWith('#')) {
       const targetTaskName = cmdName.substr(1);
       if (!targetTaskName) {
         throw new Error(`"${cmdName}" is not a valid task name`);
       }
-      // eslint-disable-next-line no-await-in-loop
-      await run(config, targetTaskName);
+      promise = run(config, targetTaskName);
     } else {
       // eslint-disable-next-line no-console
       console.log(`>> ${chalk.yellow(cmdString)}`);
-      // eslint-disable-next-line no-await-in-loop
-      await spawn(
+      promise = spawn(
         cmdList,
         (data) => {
           // eslint-disable-next-line no-console
@@ -91,6 +92,15 @@ async function run(config: any, taskName: string): Promise<void> {
         },
       );
     }
+    if (isParallel) {
+      parallelPromises.push(promise);
+    } else {
+      // eslint-disable-next-line no-await-in-loop
+      await promise;
+    }
+  }
+  if (isParallel) {
+    await Promise.all(parallelPromises);
   }
 }
 

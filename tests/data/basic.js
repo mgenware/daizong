@@ -20,4 +20,12 @@ module.exports = {
   s3: {
     cmd: '#single_cmd',
   },
+  p1: {
+    cmd: [
+      ['node', './tests/data/delay.js', '1500', 'slowest'],
+      '#delay1',
+      '#s2',
+    ],
+    parallel: true,
+  },
 };
