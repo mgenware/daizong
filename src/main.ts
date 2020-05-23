@@ -51,18 +51,11 @@ if (!taskInput) {
   }
 
   // Run the specified task.
-  const cmds = task.run;
-  if (!cmds) {
+  if (!task.run) {
     throw new Error(`No "run" field defined in task "${taskInput}"`);
   }
 
-  if (!Array.isArray(cmds)) {
-    throw new Error(
-      `The value of "run" field should be an array. Got ${JSON.stringify(
-        cmds,
-      )}`,
-    );
-  }
+  const cmds = typeof task.run === 'string' ? [task.run] : task.run;
 
   if (cmds.length === 0) {
     throw new Error(`The value of "run" field is empty`);

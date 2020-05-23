@@ -16,7 +16,7 @@ async function t(
   expected: string[],
 ) {
   const output = await execAsync(
-    `node "./dist/main.js" -c "./tests/cfgs/${configName}.js" ${taskName}`,
+    `node "./dist/main.js" -c "./tests/data/${configName}.js" ${taskName}`,
   );
   const outputString = output.stdout || '';
   const expectedList: string[] = [];
@@ -35,6 +35,24 @@ it('Single cmd', async () => {
   await t(confBasic, 'single_cmd', ['echo hi'], ['hi']);
 });
 
+it('Single cmd as a string', async () => {
+  await t(
+    confBasic,
+    'single_cmd_str',
+    [['node', './tests/data/delay.js', '1000', 'haha'].join(' ')],
+    ['haha'],
+  );
+});
+
 it('Multiple cmds', async () => {
   await t(confBasic, 'multiple_cmds', ['echo 1', 'echo 2'], ['1', '2']);
+});
+
+it('Delay', async () => {
+  await t(
+    confBasic,
+    'delay1',
+    [['node', './tests/data/delay.js', '1000', 'haha'].join(' ')],
+    ['haha'],
+  );
 });
