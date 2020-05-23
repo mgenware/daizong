@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 
-export default function (
+export default function spawnMain(
   cmd: string[],
   stdout: (data: Buffer) => void,
   stderr: (data: Buffer) => void,
@@ -21,7 +21,7 @@ export default function (
     });
 
     child.on('close', (code) => {
-      if (code == 0) {
+      if (code === 0) {
         resolve();
       } else {
         const error = new Error(`Process exited with code ${code}`);

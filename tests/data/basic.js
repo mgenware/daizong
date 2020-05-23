@@ -1,26 +1,23 @@
 module.exports = {
   single_cmd: {
-    run: ['echo', 'hi'],
+    cmd: ['echo', 'hi'],
   },
   single_cmd_str: {
-    run: 'node ./tests/data/delay.js 1000 haha',
+    cmd: 'node ./tests/data/delay.js 1000 haha',
   },
   multiple_cmds: {
-    run: [
-      ['echo', '1'],
-      ['echo', '2'],
-    ],
+    cmd: [['echo', '1'], ['echo 2']],
   },
   delay1: {
-    run: ['node', './tests/data/delay.js', '1000', 'haha'],
+    cmd: ['node', './tests/data/delay.js', '1000', 'haha'],
   },
-  combo1: {
-    run: [['echo', 'start'], '#combo2', 'echo end'],
+  s1: {
+    cmd: [['echo', 'start'], '#s2', 'echo end'],
   },
-  combo2: {
-    run: '#combo3',
+  s2: {
+    cmd: '#s3',
   },
-  combo3: {
-    run: '#single_cmd',
+  s3: {
+    cmd: '#single_cmd',
   },
 };

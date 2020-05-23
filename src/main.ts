@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import { cosmiconfig } from 'cosmiconfig';
 import * as parseArgs from 'meow';
-import spawn from './spawn';
 import * as chalk from 'chalk';
-import Task from './task';
+import spawn from './spawn';
+import Task, { CmdItemType } from './task';
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkgName = require('../package.json').name;
 const explorer = cosmiconfig(pkgName);
@@ -28,62 +29,68 @@ const cli = parseArgs(
 );
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function run(config: any, taskName: string) {
+async function run(config: any, taskName: string): Promise<void> {
   const task = config[taskName] as Task | undefined;
   if (!task) {
     throw new Error(
-      `Task "${taskInput}" not defined. Valid tasks are ${Object.keys(
+      `Task "${taskName}" not defined. Valid tasks are ${Object.keys(
         config,
       ).join(', ')}`,
     );
   }
 
   // Run the specified task.
-  if (!task.run) {
-    throw new Error(`No "run" field defined in task "${taskInput}"`);
+  if (!task.cmd) {
+    throw new Error(`No "cmd" field defined in task "${taskName}"`);
   }
 
-  const cmds = typeof task.run === 'string' ? [task.run] : task.run;
-
-  if (cmds.length === 0) {
-    throw new Error(`The value of "run" field is empty`);
+  const cmdFieldValue = typeof task.cmd === 'string' ? [task.cmd] : task.cmd;
+  if (cmdFieldValue.length === 0) {
+    throw new Error('The value of "cmd" field is empty');
   }
 
-  let cmdsToRun: string[][];
-  if (typeof cmds[0] === 'string') {
-    cmdsToRun = [cmds] as string[][];
+  let cmdsToRun: CmdItemType[];
+  if (typeof cmdFieldValue[0] === 'string') {
+    // Single command to run, e.g. ['echo', 'a'].
+    cmdsToRun = [cmdFieldValue as string[]];
   } else {
-    cmdsToRun = cmds as string[][];
+    // Multiple commands to run, e.g. [ ['echo', 'a'], ['echo', 'b'] ].
+    cmdsToRun = cmdFieldValue;
   }
 
-  for (const cmds of cmdsToRun) {
-    const cmdName = cmds[0];
+  for (const rawCmdValue of cmdsToRun) {
+    const cmdList =
+      typeof rawCmdValue === 'string' ? [rawCmdValue] : rawCmdValue;
+    const cmdString = cmdList.join(' ');
+    const cmdName = cmdList[0];
     if (!cmdName) {
-      throw new Error(
-        `Unexpected empty command name at "${JSON.stringify(cmds)}"`,
-      );
+      throw new Error(`Unexpected empty command name at "${cmdString}"`);
     }
 
     // Check if this command is a task.
     if (cmdName.startsWith('#')) {
       const targetTaskName = cmdName.substr(1);
+      if (!targetTaskName) {
+        throw new Error(`"${cmdName}" is not a valid task name`);
+      }
+      // eslint-disable-next-line no-await-in-loop
       await run(config, targetTaskName);
-      continue;
+    } else {
+      // eslint-disable-next-line no-console
+      console.log(`>> ${chalk.yellow(cmdString)}`);
+      // eslint-disable-next-line no-await-in-loop
+      await spawn(
+        cmdList,
+        (data) => {
+          // eslint-disable-next-line no-console
+          console.log(data.toString());
+        },
+        (data) => {
+          // eslint-disable-next-line no-console
+          console.log(chalk.red(data.toString()));
+        },
+      );
     }
-
-    // eslint-disable-next-line no-console
-    console.log('>> ' + chalk.yellow(cmds.join(' ')));
-    await spawn(
-      cmds,
-      (data) => {
-        // eslint-disable-next-line no-console
-        console.log(data.toString());
-      },
-      (data) => {
-        // eslint-disable-next-line no-console
-        console.log(chalk.red(data.toString()));
-      },
-    );
   }
 }
 
