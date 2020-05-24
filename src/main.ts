@@ -28,8 +28,12 @@ const cli = parseArgs(
   },
 );
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function run(config: any, taskName: string): Promise<void> {
+async function run(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  config: any,
+  taskName: string,
+  inheritedEnv: Record<string, string>,
+): Promise<void> {
   const task = config[taskName] as Task | undefined;
   if (!task) {
     throw new Error(
@@ -45,7 +49,12 @@ async function run(config: any, taskName: string): Promise<void> {
   }
 
   const cmdFieldValue = typeof task.cmd === 'string' ? [task.cmd] : task.cmd;
-  const isParallel = task.parallel;
+  const { parallel, env: definedEnv } = task;
+  const env = {
+    ...inheritedEnv,
+    ...definedEnv,
+  };
+
   const parallelPromises: Promise<void>[] = [];
   if (cmdFieldValue.length === 0) {
     throw new Error('The value of "cmd" field is empty');
@@ -76,12 +85,13 @@ async function run(config: any, taskName: string): Promise<void> {
       if (!targetTaskName) {
         throw new Error(`"${cmdName}" is not a valid task name`);
       }
-      promise = run(config, targetTaskName);
+      promise = run(config, targetTaskName, env);
     } else {
       // eslint-disable-next-line no-console
       console.log(`>> ${chalk.yellow(cmdString)}`);
       promise = spawn(
         cmdList,
+        env,
         (data) => {
           // eslint-disable-next-line no-console
           console.log(data.toString());
@@ -92,14 +102,14 @@ async function run(config: any, taskName: string): Promise<void> {
         },
       );
     }
-    if (isParallel) {
+    if (parallel) {
       parallelPromises.push(promise);
     } else {
       // eslint-disable-next-line no-await-in-loop
       await promise;
     }
   }
-  if (isParallel) {
+  if (parallel) {
     await Promise.all(parallelPromises);
   }
 }
@@ -117,5 +127,5 @@ if (!taskInput) {
     throw new Error(`No config file found at "${res.filepath}"`);
   }
   const config = res?.config || {};
-  await run(config, taskInput);
+  await run(config, taskInput, {});
 })();

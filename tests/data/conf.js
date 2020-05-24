@@ -28,4 +28,21 @@ module.exports = {
     ],
     parallel: true,
   },
+  env1: {
+    cmd: ['node', './tests/data/env.js', 'aaa'],
+    env: {
+      aaa: '123',
+    },
+  },
+  env2: {
+    cmd: ['node', './tests/data/env.js', 'a', 'b'],
+    env: { b: '3' },
+  },
+  env_cascading: {
+    cmd: '#env2',
+    env: {
+      a: '1',
+      b: '2',
+    },
+  },
 };

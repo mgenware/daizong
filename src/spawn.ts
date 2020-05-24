@@ -2,6 +2,8 @@ import { spawn } from 'child_process';
 
 export default function spawnMain(
   cmd: string[],
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  env: object | undefined,
   stdout: (data: Buffer) => void,
   stderr: (data: Buffer) => void,
 ): Promise<void> {
@@ -10,9 +12,15 @@ export default function spawnMain(
   }
 
   const name = cmd[0];
-  const args = cmd.length > 1 ? cmd.slice(1) : undefined;
+  const args = cmd.length > 1 ? cmd.slice(1) : [];
   return new Promise((resolve, reject) => {
-    const child = spawn(name, args, { shell: process.platform === 'win32' });
+    const child = spawn(name, args, {
+      shell: process.platform === 'win32',
+      env: {
+        ...process.env,
+        ...env,
+      },
+    });
     child.stdout.on('data', (data) => {
       stdout(data);
     });

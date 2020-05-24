@@ -3,7 +3,7 @@ import { exec } from 'child_process';
 import * as assert from 'assert';
 
 const execAsync = promisify(exec);
-const confBasic = 'basic';
+const confBasic = 'conf';
 
 function splitString(str: string): string[] {
   return str.split(/\r?\n/);
@@ -116,6 +116,30 @@ hi
 haha
 
 slowest
+
+`,
+  );
+});
+
+it('ENV set in config', async () => {
+  await t(
+    confBasic,
+    'env1',
+    `>> node ./tests/data/env.js aaa
+123
+
+`,
+  );
+});
+
+it('ENV cascading', async () => {
+  await t(
+    confBasic,
+    'env_cascading',
+    `>> node ./tests/data/env.js a b
+1
+
+3
 
 `,
   );
