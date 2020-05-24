@@ -4,9 +4,9 @@ import * as parseArgs from 'meow';
 import * as chalk from 'chalk';
 import spawn from './spawn';
 import Task, { CmdItemType } from './task';
-
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkgName = require('../package.json').name;
+
 const explorer = cosmiconfig(pkgName);
 
 const cli = parseArgs(
