@@ -1,31 +1,51 @@
-import { spawn } from 'child_process';
+import { spawn, exec } from 'child_process';
 
 export default function spawnMain(
   cmd: string[],
   // eslint-disable-next-line @typescript-eslint/ban-types
   env: object | undefined,
-  stdout: (data: Buffer) => void,
-  stderr: (data: Buffer) => void,
+  useExec: boolean,
+  stdoutCallback: (s: string) => void,
+  stderrCallback: (s: string) => void,
 ): Promise<void> {
   if (!cmd || !cmd.length) {
     throw new Error('Argument "cmd" cannot be empty');
   }
 
   const name = cmd[0];
+  const newEnv = {
+    ...process.env,
+    ...env,
+  };
+  if (useExec) {
+    return new Promise((resolve, reject) => {
+      exec(name, { env: newEnv }, (error, stdout, stderr) => {
+        if (stdout) {
+          stdoutCallback(stdout);
+        }
+        if (stderr) {
+          stderrCallback(stderr);
+        }
+        if (error) {
+          reject(stderr);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
   const args = cmd.length > 1 ? cmd.slice(1) : [];
   return new Promise((resolve, reject) => {
     const child = spawn(name, args, {
       shell: process.platform === 'win32',
-      env: {
-        ...process.env,
-        ...env,
-      },
+      env: newEnv,
     });
     child.stdout.on('data', (data) => {
-      stdout(data);
+      stdoutCallback(data.toString());
     });
     child.stderr.on('data', (data) => {
-      stderr(data);
+      stderrCallback(data.toString());
     });
 
     child.on('close', (code) => {

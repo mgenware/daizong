@@ -2,8 +2,8 @@
 import { cosmiconfig } from 'cosmiconfig';
 import * as parseArgs from 'meow';
 import * as chalk from 'chalk';
-import spawn from './spawn';
-import Task, { CmdItemType } from './task';
+import spawnProcess from './spawn';
+import Cmd, { isSingleCmd } from './cmd';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkgName = require('../package.json').name;
 
@@ -30,92 +30,92 @@ const cli = parseArgs(
 
 async function run(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  config: any,
-  taskName: string,
+  config: Record<string, Cmd>,
+  cmdDisplayName: string,
+  cmd: Cmd,
   inheritedEnv: Record<string, string>,
 ): Promise<void> {
-  const task = config[taskName] as Task | undefined;
-  if (!task) {
-    throw new Error(
-      `Task "${taskName}" not defined. Valid tasks are ${Object.keys(
-        config,
-      ).join(', ')}`,
-    );
-  }
-
+  const cmdValue = cmd.cmd;
   // Run the specified task.
-  if (!task.cmd) {
-    throw new Error(`No "cmd" field defined in task "${taskName}"`);
+  if (!cmdValue) {
+    throw new Error(`No "cmd" field defined in command "${cmdDisplayName}"`);
   }
 
-  const cmdFieldValue = typeof task.cmd === 'string' ? [task.cmd] : task.cmd;
-  const { parallel, env: definedEnv } = task;
+  // eslint-disable-next-line no-console
+  console.log(`>> ${cmdDisplayName}`);
+
+  const { parallel, env: definedEnv } = cmd;
   const env = {
     ...inheritedEnv,
     ...definedEnv,
   };
+  const singleCmd = isSingleCmd(cmdDisplayName, cmdValue);
+  if (singleCmd) {
+    // This is a single command, `cmd` value could either be a string or an array of strings.
 
-  const parallelPromises: Promise<void>[] = [];
-  if (cmdFieldValue.length === 0) {
-    throw new Error('The value of "cmd" field is empty');
-  }
-
-  let cmdsToRun: CmdItemType[];
-  if (typeof cmdFieldValue[0] === 'string') {
-    // Single command to run, e.g. ['echo', 'a'].
-    cmdsToRun = [cmdFieldValue as string[]];
-  } else {
-    // Multiple commands to run, e.g. [ ['echo', 'a'], ['echo', 'b'] ].
-    cmdsToRun = cmdFieldValue;
-  }
-
-  for (const rawCmdValue of cmdsToRun) {
-    const cmdList =
-      typeof rawCmdValue === 'string' ? [rawCmdValue] : rawCmdValue;
-    const cmdString = cmdList.join(' ');
-    const cmdName = cmdList[0];
-    if (!cmdName) {
-      throw new Error(`Unexpected empty command name at "${cmdString}"`);
-    }
-
-    // Check if this command is a task.
     let promise: Promise<void>;
-    if (cmdName.startsWith('#')) {
-      const targetTaskName = cmdName.substr(1);
-      if (!targetTaskName) {
-        throw new Error(`"${cmdName}" is not a valid task name`);
+    // Check if this command is calling another command.
+    if (typeof cmdValue === 'string' && cmdValue.startsWith('#')) {
+      const childCmdName = cmdValue.substr(1);
+      if (!childCmdName) {
+        throw new Error(`"${cmdValue}" is not a valid task name`);
       }
-      promise = run(config, targetTaskName, env);
+      const childCmd = config[childCmdName];
+      if (!childCmd) {
+        throw new Error(`Command not found "${childCmdName}"`);
+      }
+      promise = run(config, cmdValue, childCmd, env);
     } else {
+      const args =
+        typeof cmdValue === 'string' ? [cmdValue] : (cmdValue as string[]);
+      const cmdString = args.join(' ');
+
       // eslint-disable-next-line no-console
       console.log(`>> ${chalk.yellow(cmdString)}`);
-      promise = spawn(
-        cmdList,
+      promise = spawnProcess(
+        args,
         env,
-        (data) => {
+        // Use `exec` if `cmd` is a string.
+        typeof cmdValue === 'string',
+        (s) => {
           // eslint-disable-next-line no-console
-          console.log(data.toString());
+          console.log(s);
         },
-        (data) => {
+        (s) => {
           // eslint-disable-next-line no-console
-          console.log(chalk.red(data.toString()));
+          console.log(chalk.red(s));
         },
       );
     }
-    if (parallel) {
-      parallelPromises.push(promise);
-    } else {
-      // eslint-disable-next-line no-await-in-loop
-      await promise;
+    await promise;
+  } else {
+    const cmdList = cmd.cmd as Cmd[];
+    const parallelPromises: Promise<void>[] = [];
+
+    let childNumber = 0;
+    for (const childCmd of cmdList) {
+      childNumber++;
+      const promise = run(
+        config,
+        `${cmdDisplayName}-${childNumber}`,
+        childCmd,
+        env,
+      );
+      if (parallel) {
+        parallelPromises.push(promise);
+      } else {
+        // eslint-disable-next-line no-await-in-loop
+        await promise;
+      }
     }
-  }
-  if (parallel) {
-    await Promise.all(parallelPromises);
+    if (parallel) {
+      await Promise.all(parallelPromises);
+    }
   }
 }
 
-const taskInput = cli.input?.[0];
-if (!taskInput) {
+const startingCmd = cli.input?.[0];
+if (!startingCmd) {
   throw new Error('No task given');
 }
 
@@ -127,5 +127,13 @@ if (!taskInput) {
     throw new Error(`No config file found at "${res.filepath}"`);
   }
   const config = res?.config || {};
-  await run(config, taskInput, {});
+  const cmd = config[startingCmd] as Cmd | undefined;
+  if (!cmd) {
+    throw new Error(
+      `Task "${startingCmd}" not defined. Valid tasks are ${Object.keys(
+        config,
+      ).join(', ')}`,
+    );
+  }
+  await run(config, `#${startingCmd}`, cmd, {});
 })();

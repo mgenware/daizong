@@ -6,13 +6,13 @@ module.exports = {
     cmd: 'node ./tests/data/delay.js 1000 haha',
   },
   multiple_cmds: {
-    cmd: [['echo', '1'], ['echo 2']],
+    cmd: [{ cmd: ['echo', '1'] }, { cmd: 'echo 2' }],
   },
   delay1: {
     cmd: ['node', './tests/data/delay.js', '1000', 'haha'],
   },
   s1: {
-    cmd: [['echo', 'start'], '#s2', 'echo end'],
+    cmd: [{ cmd: ['echo', 'start'] }, { cmd: '#s2' }, { cmd: 'echo end' }],
   },
   s2: {
     cmd: '#s3',
@@ -22,9 +22,9 @@ module.exports = {
   },
   p1: {
     cmd: [
-      ['node', './tests/data/delay.js', '1500', 'slowest'],
-      '#delay1',
-      '#s2',
+      { cmd: ['node', './tests/data/delay.js', '1500', 'slowest'] },
+      { cmd: '#delay1' },
+      { cmd: '#s2' },
     ],
     parallel: true,
   },

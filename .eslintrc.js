@@ -16,7 +16,7 @@ module.exports = {
       'LabeledStatement',
       'WithStatement',
     ],
-    // We'll let prettier handle operator linebreaks.
+    // We'll let prettier handle operator line breaks.
     'operator-linebreak': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],

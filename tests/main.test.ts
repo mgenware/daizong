@@ -22,7 +22,8 @@ it('Single cmd', async () => {
   await t(
     confBasic,
     'single_cmd',
-    `>> echo hi
+    `>> #single_cmd
+>> echo hi
 hi
 
 `,
@@ -33,7 +34,8 @@ it('Single cmd as a string', async () => {
   await t(
     confBasic,
     'single_cmd_str',
-    `>> node ./tests/data/delay.js 1000 haha
+    `>> #single_cmd_str
+>> node ./tests/data/delay.js 1000 haha
 haha
 
 `,
@@ -44,9 +46,12 @@ it('Multiple cmds', async () => {
   await t(
     confBasic,
     'multiple_cmds',
-    `>> echo 1
+    `>> #multiple_cmds
+>> #multiple_cmds-1
+>> echo 1
 1
 
+>> #multiple_cmds-2
 >> echo 2
 2
 
@@ -58,7 +63,8 @@ it('Delay', async () => {
   await t(
     confBasic,
     'delay1',
-    `>> node ./tests/data/delay.js 1000 haha
+    `>> #delay1
+>> node ./tests/data/delay.js 1000 haha
 haha
 
 `,
@@ -69,12 +75,19 @@ it('Nested 1', async () => {
   await t(
     confBasic,
     's1',
-    `>> echo start
+    `>> #s1
+>> #s1-1
+>> echo start
 start
 
+>> #s1-2
+>> #s2
+>> #s3
+>> #single_cmd
 >> echo hi
 hi
 
+>> #s1-3
 >> echo end
 end
 
@@ -86,7 +99,10 @@ it('Nested 2', async () => {
   await t(
     confBasic,
     's2',
-    `>> echo hi
+    `>> #s2
+>> #s3
+>> #single_cmd
+>> echo hi
 hi
 
 `,
@@ -97,7 +113,9 @@ it('Nested 3', async () => {
   await t(
     confBasic,
     's3',
-    `>> echo hi
+    `>> #s3
+>> #single_cmd
+>> echo hi
 hi
 
 `,
@@ -108,8 +126,16 @@ it('Parallel', async () => {
   await t(
     confBasic,
     'p1',
-    `>> node ./tests/data/delay.js 1500 slowest
+    `>> #p1
+>> #p1-1
+>> node ./tests/data/delay.js 1500 slowest
+>> #p1-2
+>> #delay1
 >> node ./tests/data/delay.js 1000 haha
+>> #p1-3
+>> #s2
+>> #s3
+>> #single_cmd
 >> echo hi
 hi
 
@@ -125,7 +151,8 @@ it('ENV set in config', async () => {
   await t(
     confBasic,
     'env1',
-    `>> node ./tests/data/env.js aaa
+    `>> #env1
+>> node ./tests/data/env.js aaa
 123
 
 `,
@@ -136,7 +163,9 @@ it('ENV cascading', async () => {
   await t(
     confBasic,
     'env_cascading',
-    `>> node ./tests/data/env.js a b
+    `>> #env_cascading
+>> #env2
+>> node ./tests/data/env.js a b
 1
 
 3
