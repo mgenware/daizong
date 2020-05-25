@@ -2,6 +2,7 @@
 import { cosmiconfig } from 'cosmiconfig';
 import * as parseArgs from 'meow';
 import * as chalk from 'chalk';
+import * as nodepath from 'path';
 import spawnProcess from './spawn';
 import Cmd, { isSingleCmd } from './cmd';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -140,8 +141,8 @@ if (!startingCmd) {
     ? explorer.load(flags.config)
     : explorer.search());
 
-  if (explorerRes?.isEmpty) {
-    throw new Error(`No config file found at "${explorerRes.filepath}"`);
+  if (!explorerRes || explorerRes.isEmpty) {
+    throw new Error(`No config file found at "${nodepath.resolve('.')}"`);
   }
   if (flags.verbose) {
     // eslint-disable-next-line no-console
