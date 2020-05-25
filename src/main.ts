@@ -5,7 +5,7 @@ import * as chalk from 'chalk';
 import spawnProcess from './spawn';
 import Cmd, { isSingleCmd } from './cmd';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const pkgName = require('../package.json').name;
+const { name: pkgName, version: pkgVersion } = require('../package.json');
 
 const explorer = cosmiconfig(pkgName);
 
@@ -15,7 +15,9 @@ const cli = parseArgs(
     $ ${pkgName} <task>
 
   Options
-    --config, -c  Explicitly specify the config file
+    --config, -c   Explicitly specify the config file
+    --verbose      Print verbose information during execution
+    --version, -v  Print version information
     
 `,
   {
@@ -24,9 +26,23 @@ const cli = parseArgs(
         type: 'string',
         alias: 'c',
       },
+      verbose: {
+        type: 'boolean',
+      },
+      version: {
+        type: 'boolean',
+        alias: 'v',
+      },
     },
   },
 );
+
+const { flags } = cli;
+if (flags.version) {
+  // eslint-disable-next-line no-console
+  console.log(pkgVersion);
+  process.exit();
+}
 
 async function run(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -120,8 +136,8 @@ if (!startingCmd) {
 }
 
 (async () => {
-  const res = await (cli.flags.config
-    ? explorer.load(cli.flags.config)
+  const res = await (flags.config
+    ? explorer.load(flags.config)
     : explorer.search());
   if (res?.isEmpty) {
     throw new Error(`No config file found at "${res.filepath}"`);

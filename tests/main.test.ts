@@ -2,6 +2,9 @@ import { promisify } from 'util';
 import { exec } from 'child_process';
 import * as assert from 'assert';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { version: pkgVersion } = require('../package.json');
+
 const execAsync = promisify(exec);
 const confBasic = 'conf';
 
@@ -17,6 +20,15 @@ async function t(configName: string, taskName: string, expected: string) {
   // Split output into lines to avoid newline difference among different platforms.
   assert.deepEqual(splitString(outputString), splitString(expected));
 }
+
+it('-v', async () => {
+  await t(
+    confBasic,
+    '-v',
+    `${pkgVersion}
+`,
+  );
+});
 
 it('Single cmd', async () => {
   await t(
