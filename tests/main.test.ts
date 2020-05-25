@@ -1,5 +1,6 @@
 import { promisify } from 'util';
 import { exec } from 'child_process';
+import * as nodepath from 'path';
 import * as assert from 'assert';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -181,6 +182,19 @@ it('ENV cascading', async () => {
 1
 
 3
+
+`,
+  );
+});
+
+it('--verbose', async () => {
+  await t(
+    confBasic,
+    '--verbose single_cmd',
+    `🚙 Loaded config file at "${nodepath.resolve('tests/data/conf.js')}"
+>> #single_cmd
+>> echo hi
+hi
 
 `,
   );

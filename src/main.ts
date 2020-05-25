@@ -136,13 +136,18 @@ if (!startingCmd) {
 }
 
 (async () => {
-  const res = await (flags.config
+  const explorerRes = await (flags.config
     ? explorer.load(flags.config)
     : explorer.search());
-  if (res?.isEmpty) {
-    throw new Error(`No config file found at "${res.filepath}"`);
+
+  if (explorerRes?.isEmpty) {
+    throw new Error(`No config file found at "${explorerRes.filepath}"`);
   }
-  const config = res?.config || {};
+  if (flags.verbose) {
+    // eslint-disable-next-line no-console
+    console.log(`🚙 Loaded config file at "${explorerRes?.filepath}"`);
+  }
+  const config = explorerRes?.config || {};
   const cmd = config[startingCmd] as Cmd | undefined;
   if (!cmd) {
     throw new Error(
