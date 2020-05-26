@@ -38,7 +38,6 @@ it('Single cmd', async () => {
     `>> #single_cmd
 >> echo hi
 hi
-
 `,
   );
 });
@@ -50,7 +49,6 @@ it('Single cmd as a string', async () => {
     `>> #single_cmd_str
 >> node ./tests/data/delay.js 1000 haha
 haha
-
 `,
   );
 });
@@ -62,10 +60,8 @@ it('Multiple cmds', async () => {
     `>> #multiple_cmds
 >> echo 1
 1
-
 >> echo 2
 2
-
 `,
   );
 });
@@ -77,7 +73,6 @@ it('Delay', async () => {
     `>> #delay1
 >> node ./tests/data/delay.js 1000 haha
 haha
-
 `,
   );
 });
@@ -95,10 +90,8 @@ start
 >> #single_cmd
 >> echo hi
 hi
-
 >> echo end
 end
-
 `,
   );
 });
@@ -112,7 +105,6 @@ it('Nested 2', async () => {
 >> #single_cmd
 >> echo hi
 hi
-
 `,
   );
 });
@@ -125,7 +117,6 @@ it('Nested 3', async () => {
 >> #single_cmd
 >> echo hi
 hi
-
 `,
   );
 });
@@ -143,11 +134,8 @@ it('Parallel', async () => {
 >> #single_cmd
 >> echo hi
 hi
-
 haha
-
 slowest
-
 `,
   );
 });
@@ -159,7 +147,6 @@ it('ENV set in config', async () => {
     `>> #env1
 >> node ./tests/data/env.js aaa
 123
-
 `,
   );
 });
@@ -172,22 +159,7 @@ it('ENV cascading', async () => {
 >> #env2
 >> node ./tests/data/env.js a b
 1
-
 3
-
-`,
-  );
-});
-
-it('--verbose', async () => {
-  await t(
-    confBasic,
-    '--verbose single_cmd',
-    `🚙 Loaded config file at "${nodepath.resolve('tests/data/conf.js')}"
->> #single_cmd
->> echo hi
-hi
-
 `,
   );
 });

@@ -79,14 +79,8 @@ async function run(
       promise = spawnProcess(
         command,
         inheritedEnv,
-        (s) => {
-          // eslint-disable-next-line no-console
-          console.log(s);
-        },
-        (s) => {
-          // eslint-disable-next-line no-console
-          console.log(chalk.red(s));
-        },
+        (data) => process.stdout.write(data),
+        (data) => process.stdout.write(data),
       );
     }
     await promise;

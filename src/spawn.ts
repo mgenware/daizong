@@ -4,8 +4,8 @@ export default function spawnMain(
   cmd: string,
   // eslint-disable-next-line @typescript-eslint/ban-types
   env: object | undefined,
-  stdoutCallback: (s: string) => void,
-  stderrCallback: (s: string) => void,
+  stdoutCallback: (data: Buffer) => void,
+  stderrCallback: (data: Buffer) => void,
 ): Promise<void> {
   if (!cmd || !cmd.length) {
     throw new Error('Argument "cmd" cannot be empty');
@@ -22,10 +22,10 @@ export default function spawnMain(
       env: newEnv,
     });
     child.stdout.on('data', (data) => {
-      stdoutCallback(data.toString());
+      stdoutCallback(data);
     });
     child.stderr.on('data', (data) => {
-      stderrCallback(data.toString());
+      stderrCallback(data);
     });
 
     child.on('close', (code) => {
