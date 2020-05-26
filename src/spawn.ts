@@ -20,12 +20,6 @@ export default function spawnMain(
       env: newEnv,
       stdio: 'inherit',
     });
-    // child.stdout.on('data', (data) => {
-    //   stdoutCallback(data);
-    // });
-    // child.stderr.on('data', (data) => {
-    //   stderrCallback(data);
-    // });
 
     child.on('close', (code) => {
       if (code === 0) {
