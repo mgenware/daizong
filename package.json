@@ -1,6 +1,6 @@
 {
   "name": "daizong",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Command runner. Better package.json scripts.",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
