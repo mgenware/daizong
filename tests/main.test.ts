@@ -1,6 +1,5 @@
 import { promisify } from 'util';
 import { exec } from 'child_process';
-import * as nodepath from 'path';
 import * as assert from 'assert';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -84,7 +83,6 @@ it('Nested 1', async () => {
     `>> #s1
 >> echo start
 start
-
 >> #s2
 >> #s3
 >> #single_cmd

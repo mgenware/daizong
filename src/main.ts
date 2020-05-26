@@ -76,12 +76,7 @@ async function run(
     } else {
       // eslint-disable-next-line no-console
       console.log(`>> ${chalk.yellow(command)}`);
-      promise = spawnProcess(
-        command,
-        inheritedEnv,
-        (data) => process.stdout.write(data),
-        (data) => process.stdout.write(data),
-      );
+      promise = spawnProcess(command, inheritedEnv);
     }
     await promise;
     return;
