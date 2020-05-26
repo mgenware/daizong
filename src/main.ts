@@ -45,6 +45,13 @@ if (flags.version) {
   process.exit();
 }
 
+function verboseLog(s: string) {
+  if (flags.verbose) {
+    // eslint-disable-next-line no-console
+    console.log(`🚙 ${s}`);
+  }
+}
+
 async function run(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   config: Record<string, Cmd>,
@@ -135,17 +142,21 @@ if (!startingCmd) {
   if (!explorerRes || explorerRes.isEmpty) {
     throw new Error(`No config file found at "${nodepath.resolve('.')}"`);
   }
-  if (flags.verbose) {
-    // eslint-disable-next-line no-console
-    console.log(`🚙 Loaded config file at "${explorerRes?.filepath}"`);
-  }
+
   const config = explorerRes?.config || {};
+  verboseLog(
+    `Loaded config file at "${explorerRes?.filepath}"
+${JSON.stringify(config)}
+`,
+  );
+
   const cmd = config[startingCmd] as Cmd | undefined;
   if (!cmd) {
+    const taskNames = Object.keys(config);
     throw new Error(
-      `Task "${startingCmd}" not defined. Valid tasks are ${Object.keys(
-        config,
-      ).join(', ')}`,
+      `Task "${startingCmd}" not defined. Valid tasks are ${
+        taskNames.length ? taskNames.join(', ') : '<empty>'
+      }`,
     );
   }
   await run(config, `#${startingCmd}`, cmd, {});
