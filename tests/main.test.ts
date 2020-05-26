@@ -60,11 +60,9 @@ it('Multiple cmds', async () => {
     confBasic,
     'multiple_cmds',
     `>> #multiple_cmds
->> #multiple_cmds-1
 >> echo 1
 1
 
->> #multiple_cmds-2
 >> echo 2
 2
 
@@ -89,18 +87,15 @@ it('Nested 1', async () => {
     confBasic,
     's1',
     `>> #s1
->> #s1-1
 >> echo start
 start
 
->> #s1-2
 >> #s2
 >> #s3
 >> #single_cmd
 >> echo hi
 hi
 
->> #s1-3
 >> echo end
 end
 
@@ -140,12 +135,9 @@ it('Parallel', async () => {
     confBasic,
     'p1',
     `>> #p1
->> #p1-1
 >> node ./tests/data/delay.js 1500 slowest
->> #p1-2
 >> #delay1
 >> node ./tests/data/delay.js 1000 haha
->> #p1-3
 >> #s2
 >> #s3
 >> #single_cmd

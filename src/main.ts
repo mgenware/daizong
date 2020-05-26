@@ -4,7 +4,7 @@ import * as parseArgs from 'meow';
 import * as chalk from 'chalk';
 import * as nodepath from 'path';
 import spawnProcess from './spawn';
-import Cmd, { isSingleCmd } from './cmd';
+import Cmd from './cmd';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { name: pkgName, version: pkgVersion } = require('../package.json');
 
@@ -49,51 +49,29 @@ async function run(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   config: Record<string, Cmd>,
   cmdDisplayName: string,
-  cmd: Cmd,
+  command: Cmd | string,
   inheritedEnv: Record<string, string>,
 ): Promise<void> {
-  const cmdValue = cmd.cmd;
-  // Run the specified task.
-  if (!cmdValue) {
-    throw new Error(`No "cmd" field defined in command "${cmdDisplayName}"`);
-  }
-
-  // eslint-disable-next-line no-console
-  console.log(`>> ${cmdDisplayName}`);
-
-  const { parallel, env: definedEnv } = cmd;
-  const env = {
-    ...inheritedEnv,
-    ...definedEnv,
-  };
-  const singleCmd = isSingleCmd(cmdDisplayName, cmdValue);
-  if (singleCmd) {
-    // This is a single command, `cmd` value could either be a string or an array of strings.
+  if (typeof command === 'string') {
+    // Check if this command is calling another command.
 
     let promise: Promise<void>;
-    // Check if this command is calling another command.
-    if (typeof cmdValue === 'string' && cmdValue.startsWith('#')) {
-      const childCmdName = cmdValue.substr(1);
-      if (!childCmdName) {
-        throw new Error(`"${cmdValue}" is not a valid task name`);
+    if (command.startsWith('#')) {
+      const cmdName = command.substr(1);
+      if (!cmdName) {
+        throw new Error(`"${command}" is not a valid task name`);
       }
-      const childCmd = config[childCmdName];
+      const childCmd = config[cmdName];
       if (!childCmd) {
-        throw new Error(`Command not found "${childCmdName}"`);
+        throw new Error(`Command not found "${cmdName}"`);
       }
-      promise = run(config, cmdValue, childCmd, env);
+      promise = run(config, command, childCmd, inheritedEnv);
     } else {
-      const args =
-        typeof cmdValue === 'string' ? [cmdValue] : (cmdValue as string[]);
-      const cmdString = args.join(' ');
-
       // eslint-disable-next-line no-console
-      console.log(`>> ${chalk.yellow(cmdString)}`);
+      console.log(`>> ${chalk.yellow(command)}`);
       promise = spawnProcess(
-        args,
-        env,
-        // Use `exec` if `cmd` is a string.
-        typeof cmdValue === 'string',
+        command,
+        inheritedEnv,
         (s) => {
           // eslint-disable-next-line no-console
           console.log(s);
@@ -105,19 +83,32 @@ async function run(
       );
     }
     await promise;
+    return;
+  }
+
+  const cmdValue = command.cmd;
+  // Run the specified task.
+  if (!cmdValue) {
+    throw new Error(`No "cmd" field defined in command "${cmdDisplayName}"`);
+  }
+
+  if (cmdDisplayName) {
+    // eslint-disable-next-line no-console
+    console.log(`>> ${cmdDisplayName}`);
+  }
+
+  const { parallel, env: definedEnv } = command;
+  const env = {
+    ...inheritedEnv,
+    ...definedEnv,
+  };
+  if (typeof cmdValue === 'string') {
+    await run(config, '', cmdValue, env);
   } else {
-    const cmdList = cmd.cmd as Cmd[];
     const parallelPromises: Promise<void>[] = [];
 
-    let childNumber = 0;
-    for (const childCmd of cmdList) {
-      childNumber++;
-      const promise = run(
-        config,
-        `${cmdDisplayName}-${childNumber}`,
-        childCmd,
-        env,
-      );
+    for (const subCmd of cmdValue) {
+      const promise = run(config, '', subCmd, env);
       if (parallel) {
         parallelPromises.push(promise);
       } else {
