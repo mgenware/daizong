@@ -82,10 +82,10 @@ async function run(
     return;
   }
 
-  const cmdValue = command.cmd;
+  const cmdValue = command.run;
   // Run the specified task.
   if (!cmdValue) {
-    throw new Error(`No "cmd" field defined in command "${cmdDisplayName}"`);
+    throw new Error(`No "run" field defined in command "${cmdDisplayName}"`);
   }
 
   if (cmdDisplayName) {
