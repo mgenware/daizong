@@ -27,8 +27,7 @@
     "dev": "cross-env NODE_ENV=development yarn run clean && tsc -b tests -w",
     "prepublishOnly": "yarn run build",
     "lint": "eslint --max-warnings 0 --ext .ts src/ tests/",
-    "clean": "del-cli dist && del-cli dist_tests",
-    "r": "node ./dist/main.js"
+    "clean": "del-cli dist && del-cli dist_tests"
   },
   "engines": {
     "node": ">=10.0.0"
