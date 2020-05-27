@@ -8,6 +8,15 @@ import Cmd from './cmd';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { name: pkgName, version: pkgVersion } = require('../package.json');
 
+function handleProcessError(msg: string) {
+  console.error(chalk.red(msg));
+  process.exit(1);
+}
+
+process.on('uncaughtException', (err) => {
+  handleProcessError(err.message);
+});
+
 const explorer = cosmiconfig(pkgName);
 
 const cli = parseArgs(
@@ -124,29 +133,33 @@ if (!startingCmd) {
 }
 
 (async () => {
-  const explorerRes = await (flags.config
-    ? explorer.load(flags.config)
-    : explorer.search());
+  try {
+    const explorerRes = await (flags.config
+      ? explorer.load(flags.config)
+      : explorer.search());
 
-  if (!explorerRes || explorerRes.isEmpty) {
-    throw new Error(`No config file found at "${nodepath.resolve('.')}"`);
-  }
+    if (!explorerRes || explorerRes.isEmpty) {
+      throw new Error(`No config file found at "${nodepath.resolve('.')}"`);
+    }
 
-  const config = explorerRes?.config || {};
-  verboseLog(
-    `Loaded config file at "${explorerRes?.filepath}"
+    const config = explorerRes?.config || {};
+    verboseLog(
+      `Loaded config file at "${explorerRes?.filepath}"
 ${JSON.stringify(config)}
 `,
-  );
-
-  const cmd = config[startingCmd] as Cmd | undefined;
-  if (!cmd) {
-    const taskNames = Object.keys(config);
-    throw new Error(
-      `Task "${startingCmd}" not defined. Valid tasks are ${
-        taskNames.length ? taskNames.join(', ') : '<empty>'
-      }`,
     );
+
+    const cmd = config[startingCmd] as Cmd | undefined;
+    if (!cmd) {
+      const taskNames = Object.keys(config);
+      throw new Error(
+        `Task "${startingCmd}" not defined. Valid tasks are ${
+          taskNames.length ? taskNames.join(', ') : '<empty>'
+        }`,
+      );
+    }
+    await run(config, `#${startingCmd}`, cmd, {});
+  } catch (err) {
+    handleProcessError(err.message);
   }
-  await run(config, `#${startingCmd}`, cmd, {});
 })();
