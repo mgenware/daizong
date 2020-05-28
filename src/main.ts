@@ -61,16 +61,14 @@ function verboseLog(s: string) {
   }
 }
 
-async function run(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function runCommandString(
   config: Record<string, Cmd>,
-  cmdDisplayName: string,
-  command: Cmd | string,
+  command: string,
   inheritedEnv: Record<string, string>,
+  ignoreError: boolean,
 ): Promise<void> {
-  if (typeof command === 'string') {
+  try {
     // Check if this command is calling another command.
-
     let promise: Promise<void>;
     if (command.startsWith('#')) {
       const cmdName = command.substr(1);
@@ -81,13 +79,29 @@ async function run(
       if (!childCmd) {
         throw new Error(`Command not found "${cmdName}"`);
       }
-      promise = run(config, command, childCmd, inheritedEnv);
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      promise = runCommand(config, command, childCmd, inheritedEnv);
     } else {
       // eslint-disable-next-line no-console
       console.log(`>> ${chalk.yellow(command)}`);
       promise = spawnProcess(command, inheritedEnv);
     }
     await promise;
+  } catch (err) {
+    if (!ignoreError) {
+      throw err;
+    }
+  }
+}
+
+async function runCommand(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  config: Record<string, Cmd>,
+  cmdDisplayName: string,
+  command: Cmd | string,
+  inheritedEnv: Record<string, string>,
+): Promise<void> {
+  if (typeof command === 'string') {
     return;
   }
 
@@ -102,27 +116,33 @@ async function run(
     console.log(`>> ${cmdDisplayName}`);
   }
 
-  const { parallel, env: definedEnv } = command;
+  const { parallel, env: definedEnv, ignoreError } = command;
   const env = {
     ...inheritedEnv,
     ...definedEnv,
   };
   if (typeof cmdValue === 'string') {
-    await run(config, '', cmdValue, env);
+    await runCommandString(config, cmdValue, env, !!ignoreError);
   } else {
-    const parallelPromises: Promise<void>[] = [];
+    try {
+      const parallelPromises: Promise<void>[] = [];
 
-    for (const subCmd of cmdValue) {
-      const promise = run(config, '', subCmd, env);
-      if (parallel) {
-        parallelPromises.push(promise);
-      } else {
-        // eslint-disable-next-line no-await-in-loop
-        await promise;
+      for (const subCmd of cmdValue) {
+        const promise = runCommandString(config, subCmd, env, false);
+        if (parallel) {
+          parallelPromises.push(promise);
+        } else {
+          // eslint-disable-next-line no-await-in-loop
+          await promise;
+        }
       }
-    }
-    if (parallel) {
-      await Promise.all(parallelPromises);
+      if (parallel) {
+        await Promise.all(parallelPromises);
+      }
+    } catch (err) {
+      if (!ignoreError) {
+        throw err;
+      }
     }
   }
 }
@@ -158,7 +178,7 @@ ${JSON.stringify(config)}
         }`,
       );
     }
-    await run(config, `#${startingCmd}`, cmd, {});
+    await runCommand(config, `#${startingCmd}`, cmd, {});
   } catch (err) {
     handleProcessError(err.message);
   }

@@ -41,4 +41,25 @@ module.exports = {
       b: '2',
     },
   },
+  stopsOnErr: {
+    run: ['echo 1', 'node ./tests/data/err.js', 'echo 2'],
+  },
+  stopsOnErrParallel: {
+    run: [
+      'echo 1',
+      'node ./tests/data/err.js 600',
+      'node ./tests/data/delay.js 1000 slowest',
+    ],
+  },
+  ignoreErr: {
+    run: ['echo 1', '#errIgnored', 'echo 2'],
+  },
+  ignoreErrParallel: {
+    run: ['echo 1', '#errIgnored', 'node ./tests/data/delay.js 1000 slowest'],
+    parallel: true,
+  },
+  errIgnored: {
+    run: 'node ./tests/data/err.js 100',
+    ignoreError: true,
+  },
 };

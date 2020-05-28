@@ -12,13 +12,27 @@ function splitString(str: string): string[] {
   return str.split(/\r?\n/);
 }
 
-async function t(configName: string, taskName: string, expected: string) {
-  const output = await execAsync(
-    `node "./dist/main.js" -c "./tests/data/${configName}.js" ${taskName}`,
-  );
-  const outputString = output.stdout || '';
-  // Split output into lines to avoid newline difference among different platforms.
-  assert.deepEqual(splitString(outputString), splitString(expected));
+async function t(
+  configName: string,
+  taskName: string,
+  expected: string,
+  hasError?: boolean,
+) {
+  try {
+    const output = await execAsync(
+      `node "./dist/main.js" -c "./tests/data/${configName}.js" ${taskName}`,
+    );
+    const outputString = output.stdout || '';
+    // Split output into lines to avoid newline difference among different platforms.
+    assert.deepEqual(splitString(outputString), splitString(expected));
+  } catch (err) {
+    if (hasError) {
+      // Split output into lines to avoid newline difference among different platforms.
+      assert.deepEqual(splitString(err.stdout || ''), splitString(expected));
+    } else {
+      throw err;
+    }
+  }
 }
 
 it('-v', async () => {
@@ -158,6 +172,66 @@ it('ENV cascading', async () => {
 >> node ./tests/data/env.js a b
 1
 3
+`,
+  );
+});
+
+it('Stops on error', async () => {
+  await t(
+    confBasic,
+    'stopsOnErr',
+    `>> #stopsOnErr
+>> echo 1
+1
+>> node ./tests/data/err.js
+error
+`,
+    true,
+  );
+});
+
+it('Stops on error on parallel tasks', async () => {
+  await t(
+    confBasic,
+    'stopsOnErrParallel',
+    `>> #stopsOnErrParallel
+>> echo 1
+1
+>> node ./tests/data/err.js 600
+error
+`,
+    true,
+  );
+});
+
+it('Ignore error', async () => {
+  await t(
+    confBasic,
+    'ignoreErr',
+    `>> #ignoreErr
+>> echo 1
+1
+>> #errIgnored
+>> node ./tests/data/err.js 100
+error
+>> echo 2
+2
+`,
+  );
+});
+
+it('Ignore error on parallel tasks', async () => {
+  await t(
+    confBasic,
+    'ignoreErrParallel',
+    `>> #ignoreErrParallel
+>> echo 1
+>> #errIgnored
+>> node ./tests/data/err.js 100
+>> node ./tests/data/delay.js 1000 slowest
+1
+error
+slowest
 `,
   );
 });
