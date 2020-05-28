@@ -157,3 +157,23 @@ module.exports = {
   },
 };
 ```
+
+### Ignore a sub command error
+
+Set `ignoreError` to `true` in sub command.
+
+```js
+module.exports = {
+  build: {
+    run: [
+      '#clean',
+      // The `tsc` command will always run regardless of the result of clean command.
+      'tsc',
+    ],
+  },
+  clean: {
+    run: 'rimraf ./dist',
+    ignoreError: true,
+  },
+};
+```
