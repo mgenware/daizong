@@ -55,7 +55,11 @@ module.exports = {
     run: ['echo 1', '#errIgnored', 'echo 2'],
   },
   ignoreErrParallel: {
-    run: ['echo 1', '#errIgnored', 'node ./tests/data/delay.js 1000 slowest'],
+    run: [
+      'node ./tests/data/delay.js 500 500',
+      '#errIgnored',
+      'node ./tests/data/delay.js 1000 slowest',
+    ],
     parallel: true,
   },
   errIgnored: {

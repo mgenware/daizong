@@ -225,12 +225,12 @@ it('Ignore error on parallel tasks', async () => {
     confBasic,
     'ignoreErrParallel',
     `>> #ignoreErrParallel
->> echo 1
+>> node ./tests/data/delay.js 500 500
 >> #errIgnored
 >> node ./tests/data/err.js 100
 >> node ./tests/data/delay.js 1000 slowest
-1
 error
+500
 slowest
 `,
   );
