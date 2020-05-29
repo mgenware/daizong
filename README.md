@@ -158,6 +158,30 @@ module.exports = {
 };
 ```
 
+You can also define default enviroment variables, which will be automatically applied to all tasks:
+
+```js
+module.exports = {
+  // "_" is preserved field for configuration.
+  _: {
+    defaultEnv: {
+      NODE_ENV: 'development',
+    },
+  },
+  dev: {
+    // NODE_ENV is 'development'
+    run: 'tsc -b src -w',
+  },
+  build: {
+    // NODE_ENV is 'production'
+    run: 'tsc -b src',
+    env: {
+      NODE_ENV: 'production',
+    },
+  },
+};
+```
+
 ### Ignore a sub command error
 
 Set `ignoreError` to `true` in sub command.
@@ -174,6 +198,26 @@ module.exports = {
   clean: {
     run: 'rimraf ./dist',
     ignoreError: true,
+  },
+};
+```
+
+### Private tasks
+
+Tasks that are not intended to be called from outside.
+
+```js
+// You cannot call the "clean" task via `daizong clean`.
+module.exports = {
+  _: {
+    privateTasks: {
+      clean: {
+        run: 'rimraf ./dist',
+      },
+    },
+  },
+  build: {
+    run: ['#clean', 'tsc'],
   },
 };
 ```
