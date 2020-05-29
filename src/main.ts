@@ -3,10 +3,10 @@ import { cosmiconfig } from 'cosmiconfig';
 import * as parseArgs from 'meow';
 import * as chalk from 'chalk';
 import * as nodepath from 'path';
+import { inspect } from 'util';
 import spawnProcess from './spawn';
 import Cmd from './cmd';
 import Settings from './settings';
-import { inspect } from 'util';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { name: pkgName, version: pkgVersion } = require('../package.json');
 
