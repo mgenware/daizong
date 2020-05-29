@@ -249,3 +249,15 @@ BBB
 `,
   );
 });
+
+it('Private task', async () => {
+  await t(
+    confBasic,
+    'runPrivate',
+    `>> #runPrivate
+>> #pri1
+>> echo private
+private
+`,
+  );
+});

@@ -1,4 +1,11 @@
 module.exports = {
+  _: {
+    privateTasks: {
+      pri1: {
+        run: 'echo private',
+      },
+    },
+  },
   single_cmd: {
     run: 'echo hi',
   },
@@ -65,5 +72,8 @@ module.exports = {
   errIgnored: {
     run: 'node ./tests/data/err.js 100',
     ignoreError: true,
+  },
+  runPrivate: {
+    run: '#pri1',
   },
 };

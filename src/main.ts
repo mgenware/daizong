@@ -69,13 +69,18 @@ function verboseLog(s: string) {
 function getCmdFromConfig(
   config: Record<string, Cmd>,
   key: string,
+  allowPrivate: boolean,
 ): Cmd | undefined {
   if (key === settingsKey) {
     throw new Error(
       `You cannot use "${settingsKey}" as a command name, "${settingsKey}" is a preserved name for daizong configuration`,
     );
   }
-  return config[key];
+  const result = config[key];
+  if (!result && allowPrivate && settings.privateTasks) {
+    return settings.privateTasks[key];
+  }
+  return result;
 }
 
 async function runCommandString(
@@ -92,7 +97,7 @@ async function runCommandString(
       if (!cmdName) {
         throw new Error(`"${command}" is not a valid task name`);
       }
-      const childCmd = getCmdFromConfig(config, cmdName);
+      const childCmd = getCmdFromConfig(config, cmdName, true);
       if (!childCmd) {
         throw new Error(`Command not found "${cmdName}"`);
       }
@@ -194,7 +199,7 @@ ${JSON.stringify(config)}
         );
       }
     }
-    const cmd = getCmdFromConfig(config, startingCmd);
+    const cmd = getCmdFromConfig(config, startingCmd, false);
     if (!cmd) {
       const taskNames = Object.keys(config);
       throw new Error(
