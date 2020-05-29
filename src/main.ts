@@ -5,8 +5,13 @@ import * as chalk from 'chalk';
 import * as nodepath from 'path';
 import spawnProcess from './spawn';
 import Cmd from './cmd';
+import Settings from './settings';
+import { inspect } from 'util';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { name: pkgName, version: pkgVersion } = require('../package.json');
+
+const settingsKey = '_';
+let settings: Settings = {};
 
 function handleProcessError(msg: string) {
   console.error(chalk.red(msg));
@@ -61,6 +66,18 @@ function verboseLog(s: string) {
   }
 }
 
+function getCmdFromConfig(
+  config: Record<string, Cmd>,
+  key: string,
+): Cmd | undefined {
+  if (key === settingsKey) {
+    throw new Error(
+      `You cannot use "${settingsKey}" as a command name, "${settingsKey}" is a preserved name for daizong configuration`,
+    );
+  }
+  return config[key];
+}
+
 async function runCommandString(
   config: Record<string, Cmd>,
   command: string,
@@ -75,7 +92,7 @@ async function runCommandString(
       if (!cmdName) {
         throw new Error(`"${command}" is not a valid task name`);
       }
-      const childCmd = config[cmdName];
+      const childCmd = getCmdFromConfig(config, cmdName);
       if (!childCmd) {
         throw new Error(`Command not found "${cmdName}"`);
       }
@@ -98,13 +115,9 @@ async function runCommand(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   config: Record<string, Cmd>,
   cmdDisplayName: string,
-  command: Cmd | string,
+  command: Cmd,
   inheritedEnv: Record<string, string>,
 ): Promise<void> {
-  if (typeof command === 'string') {
-    return;
-  }
-
   const cmdValue = command.run;
   // Run the specified task.
   if (!cmdValue) {
@@ -118,6 +131,7 @@ async function runCommand(
 
   const { parallel, env: definedEnv, ignoreError } = command;
   const env = {
+    ...settings.defaultEnv,
     ...inheritedEnv,
     ...definedEnv,
   };
@@ -169,7 +183,18 @@ ${JSON.stringify(config)}
 `,
     );
 
-    const cmd = config[startingCmd] as Cmd | undefined;
+    if (config[settingsKey]) {
+      settings = config[settingsKey];
+      if (settings.defaultEnv) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `Loaded default environment variables: ${inspect(
+            settings.defaultEnv,
+          )}`,
+        );
+      }
+    }
+    const cmd = getCmdFromConfig(config, startingCmd);
     if (!cmd) {
       const taskNames = Object.keys(config);
       throw new Error(

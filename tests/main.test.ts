@@ -7,6 +7,7 @@ const { version: pkgVersion } = require('../package.json');
 
 const execAsync = promisify(exec);
 const confBasic = 'conf';
+const confDefEnv = 'defEnvConf';
 
 function splitString(str: string): string[] {
   return str.split(/\r?\n/);
@@ -232,6 +233,19 @@ it('Ignore error on parallel tasks', async () => {
 error
 500
 slowest
+`,
+  );
+});
+
+it('Default ENV', async () => {
+  await t(
+    confDefEnv,
+    'parentTask',
+    `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
+>> #parentTask
+>> #childTask
+>> node ./tests/data/env.js b
+BBB
 `,
   );
 });
