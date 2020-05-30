@@ -24,11 +24,11 @@ Add daizong to `package.json` scripts (`r` stands for "run"):
 }
 ```
 
-Create a `daizong.config.js` at the root of your project, and run `yarn r <task>` to start a task.
+Create a `daizong.config.js` at the root of your project, and run `yarn r <task>` or `npm run r <task>` to start a task.
 
 ## Examples / Comparison with `package.json` scripts
 
-### Single script
+### Single command
 
 `package.json`:
 
@@ -50,7 +50,7 @@ module.exports = {
 };
 ```
 
-### Multiple scripts
+### Multiple commands
 
 `package.json`:
 
@@ -74,12 +74,12 @@ module.exports = {
 
 ### Run multiple scripts in parallel
 
-To support all major systems, you need to use 3rd-party libs like([concurrently](https://github.com/kimmobrunfeldt/concurrently)) to achieve this in `package.json` scripts:
+To support all major systems, you need to use 3rd-party libraries like([concurrently](https://github.com/kimmobrunfeldt/concurrently)) to achieve this in `package.json` scripts:
 
 ```json
 {
   "scripts": {
-    "dev": "concurrently --kill-others \"touch a.md\" \"touch b.md\""
+    "dev": "concurrently \"touch a.md\" \"touch b.md\""
   }
 }
 ```
@@ -128,7 +128,7 @@ module.exports = {
 
 ### Environment variables
 
-To support all major systems, you need to use 3rd-party libs like([cross-env](https://github.com/kentcdodds/cross-env)) to achieve this in `package.json` scripts:
+To support all major systems, you need to use 3rd-party libraries like([cross-env](https://github.com/kentcdodds/cross-env)) to achieve this in `package.json` scripts:
 
 ```json
 {
