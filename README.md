@@ -162,7 +162,7 @@ You can also define default enviroment variables, which will be automatically ap
 
 ```js
 module.exports = {
-  // "_" is preserved field for configuration.
+  // "_" is a preserved field for configuration.
   _: {
     defaultEnv: {
       NODE_ENV: 'development',
@@ -182,9 +182,9 @@ module.exports = {
 };
 ```
 
-### Ignore a sub command error
+### Ignore a task error
 
-Set `ignoreError` to `true` in sub command.
+Set `ignoreError` to `true` in a task.
 
 ```js
 module.exports = {
@@ -208,7 +208,9 @@ Tasks that are not intended to be called from outside.
 
 ```js
 // You cannot call the "clean" task via `daizong clean`.
+// It can only be called by other tasks.
 module.exports = {
+  // "_" is a preserved field for configuration.
   _: {
     privateTasks: {
       clean: {
