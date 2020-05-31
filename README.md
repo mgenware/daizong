@@ -84,7 +84,7 @@ To support all major systems, you need to use 3rd-party libraries like([concurre
 }
 ```
 
-daizong:
+daizong supports it out of the box:
 
 ```js
 module.exports = {
@@ -95,7 +95,7 @@ module.exports = {
 };
 ```
 
-### Reuse a script
+### Reuse a command
 
 `package.json`:
 
@@ -139,7 +139,7 @@ To support all major systems, you need to use 3rd-party libraries like([cross-en
 }
 ```
 
-daizong:
+daizong supports it out of the box:
 
 ```js
 module.exports = {
