@@ -1,12 +1,10 @@
 #!/usr/bin/env node
-import { cosmiconfig } from 'cosmiconfig';
 import * as parseArgs from 'meow';
 import * as chalk from 'chalk';
-import * as nodepath from 'path';
 import { inspect } from 'util';
 import spawnProcess from './spawn';
 import Cmd from './cmd';
-import Settings from './settings';
+import { loadConfig, Settings, ConfigSource } from './config';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { name: pkgName, version: pkgVersion } = require('../package.json');
 
@@ -21,8 +19,6 @@ function handleProcessError(msg: string) {
 process.on('uncaughtException', (err) => {
   handleProcessError(err.message);
 });
-
-const explorer = cosmiconfig(pkgName);
 
 const cli = parseArgs(
   `
@@ -67,7 +63,7 @@ function verboseLog(s: string) {
 }
 
 function getCmdFromConfig(
-  config: Record<string, Cmd>,
+  configSource: ConfigSource,
   key: string,
   allowPrivate: boolean,
 ): Cmd | undefined {
@@ -76,7 +72,7 @@ function getCmdFromConfig(
       `You cannot use "${settingsKey}" as a command name, "${settingsKey}" is a preserved name for daizong configuration`,
     );
   }
-  const result = config[key];
+  const result = configSource[key];
   if (!result && allowPrivate && settings.privateTasks) {
     return settings.privateTasks[key];
   }
@@ -84,7 +80,7 @@ function getCmdFromConfig(
 }
 
 async function runCommandString(
-  config: Record<string, Cmd>,
+  config: ConfigSource,
   command: string,
   inheritedEnv: Record<string, string>,
   ignoreError: boolean,
@@ -117,8 +113,7 @@ async function runCommandString(
 }
 
 async function runCommand(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  config: Record<string, Cmd>,
+  config: ConfigSource,
   cmdDisplayName: string,
   command: Cmd,
   inheritedEnv: Record<string, string>,
@@ -173,23 +168,17 @@ if (!startingCmd) {
 
 (async () => {
   try {
-    const explorerRes = await (flags.config
-      ? explorer.load(flags.config)
-      : explorer.search());
+    const config = await loadConfig(pkgName, flags.config);
 
-    if (!explorerRes || explorerRes.isEmpty) {
-      throw new Error(`No config file found at "${nodepath.resolve('.')}"`);
-    }
-
-    const config = explorerRes?.config || {};
     verboseLog(
-      `Loaded config file at "${explorerRes?.filepath}"
-${JSON.stringify(config)}
-`,
+      `Loaded config file at "${config?.path}"
+  ${JSON.stringify(config)}
+  `,
     );
-
-    if (config[settingsKey]) {
-      settings = config[settingsKey];
+    const configSource = config.source;
+    if (configSource[settingsKey]) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      settings = (configSource[settingsKey] as any) as Settings;
       if (settings.defaultEnv) {
         // eslint-disable-next-line no-console
         console.log(
@@ -199,7 +188,7 @@ ${JSON.stringify(config)}
         );
       }
     }
-    const cmd = getCmdFromConfig(config, startingCmd, false);
+    const cmd = getCmdFromConfig(configSource, startingCmd, false);
     if (!cmd) {
       const taskNames = Object.keys(config);
       throw new Error(
@@ -208,7 +197,7 @@ ${JSON.stringify(config)}
         }`,
       );
     }
-    await runCommand(config, `#${startingCmd}`, cmd, {});
+    await runCommand(configSource, `#${startingCmd}`, cmd, {});
   } catch (err) {
     handleProcessError(err.message);
   }
