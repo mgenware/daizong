@@ -1,40 +1,9 @@
-import { promisify } from 'util';
-import { exec } from 'child_process';
-import * as assert from 'assert';
+import { t } from './common';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version: pkgVersion } = require('../package.json');
 
-const execAsync = promisify(exec);
 const confBasic = 'conf';
-const confDefEnv = 'defEnvConf';
-
-function splitString(str: string): string[] {
-  return str.split(/\r?\n/);
-}
-
-async function t(
-  configName: string,
-  taskName: string,
-  expected: string,
-  hasError?: boolean,
-) {
-  try {
-    const output = await execAsync(
-      `node "./dist/main.js" -c "./tests/data/${configName}.js" ${taskName}`,
-    );
-    const outputString = output.stdout || '';
-    // Split output into lines to avoid newline difference among different platforms.
-    assert.deepEqual(splitString(outputString), splitString(expected));
-  } catch (err) {
-    if (hasError) {
-      // Split output into lines to avoid newline difference among different platforms.
-      assert.deepEqual(splitString(err.stdout || ''), splitString(expected));
-    } else {
-      throw err;
-    }
-  }
-}
 
 it('-v', async () => {
   await t(
@@ -233,19 +202,6 @@ it('Ignore error on parallel tasks', async () => {
 error
 500
 slowest
-`,
-  );
-});
-
-it('Default ENV', async () => {
-  await t(
-    confDefEnv,
-    'parentTask',
-    `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
->> #parentTask
->> #childTask
->> node ./tests/data/env.js b
-BBB
 `,
   );
 });
