@@ -4,7 +4,14 @@
 [![npm version](https://img.shields.io/npm/v/daizong.svg?style=flat-square)](https://npmjs.com/package/daizong)
 [![Node.js Version](http://img.shields.io/node/v/daizong.svg?style=flat-square)](https://nodejs.org/en/)
 
-Command runner. Better package.json scripts.
+Command runner. Better package.json scripts. daizong supports the following feature out of the box:
+
+- Run tasks in sequentially or in parallel
+- Set enviroment variables for a specific task
+- Set default enviroment variable for all tasks
+- Define tasks in groups
+- Private tasks
+- Allow continue-on-error
 
 ## Installation
 
@@ -24,11 +31,9 @@ Add daizong to `package.json` scripts (`r` stands for "run"):
 }
 ```
 
-Create a `daizong.config.js` at the root of your project, and run `yarn r <task>` or `npm run r <task>` to start a task.
+Create a `daizong.config.js` at the root of your project. You can run `yarn r <task>` or `npm run r <task>` to start a task.
 
 ## Examples / Comparison with `package.json` scripts
-
-### Single command
 
 `package.json`:
 
@@ -50,7 +55,7 @@ module.exports = {
 };
 ```
 
-### Multiple commands
+### Multiple tasks
 
 `package.json`:
 
@@ -72,7 +77,7 @@ module.exports = {
 };
 ```
 
-### Run multiple scripts in parallel
+### Run multiple tasks in parallel
 
 To support all major systems, you need to use 3rd-party libraries like([concurrently](https://github.com/kimmobrunfeldt/concurrently)) to achieve this in `package.json` scripts:
 
@@ -95,7 +100,7 @@ module.exports = {
 };
 ```
 
-### Reuse a command
+### Reuse a task
 
 `package.json`:
 
@@ -204,7 +209,7 @@ module.exports = {
 
 ### Private tasks
 
-Tasks that are not intended to be called from outside.
+Tasks that are not intended to be called from outside, and can only be called be other tasks.
 
 ```js
 // You cannot call the "clean" task via `daizong clean`.
@@ -222,4 +227,30 @@ module.exports = {
     run: ['#clean', 'tsc'],
   },
 };
+```
+
+### Task groups
+
+```js
+module.exports = {
+  build: {
+    win: {
+      run: 'echo Windows build started',
+    },
+    linux: {
+      run: 'echo Linux build started',
+    },
+    all: {
+      run: '#build win', '#build linux',
+      parallel: true,
+    }
+  },
+};
+```
+
+To run a specific task:
+
+```sh
+yarn r build linux
+yarn r build all
 ```
