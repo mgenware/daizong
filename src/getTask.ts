@@ -27,12 +27,13 @@ function findChild(
   let currentObj = obj;
   let result: Task | undefined;
   let i = 0;
-  for (; i < path.length, !!currentObj; i++) {
+  while (i < path.length && !!currentObj) {
     const name = path[i];
     currentObj = currentObj[name] as Record<string, unknown>;
     if (i === path.length - 1) {
       result = currentObj;
     }
+    i++;
   }
 
   // fullPath: a b c d
