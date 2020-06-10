@@ -1,14 +1,14 @@
 import { cosmiconfig } from 'cosmiconfig';
 import * as nodepath from 'path';
-import Cmd from './cmd';
+import Task from './task';
 
 export interface Settings {
   defaultEnv?: Record<string, string>;
-  privateTasks?: Record<string, Cmd>;
+  privateTasks?: Record<string, Task>;
 }
 
 export interface ConfigSource {
-  [name: string]: Cmd | undefined;
+  [name: string]: Task | undefined;
 }
 
 export interface Config {

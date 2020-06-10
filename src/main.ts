@@ -3,12 +3,13 @@ import * as parseArgs from 'meow';
 import * as chalk from 'chalk';
 import { inspect } from 'util';
 import spawnProcess from './spawn';
-import Cmd from './cmd';
+import Task from './task';
 import { loadConfig, Settings, ConfigSource } from './config';
+import { settingsKey } from './consts';
+import getTask from './getTask';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { name: pkgName, version: pkgVersion } = require('../package.json');
 
-const settingsKey = '_';
 let settings: Settings = {};
 
 function handleProcessError(msg: string) {
@@ -62,29 +63,13 @@ function verboseLog(s: string) {
   }
 }
 
-function getCmdFromConfig(
-  configSource: ConfigSource,
-  key: string,
-  allowPrivate: boolean,
-): Cmd | undefined {
-  if (key === settingsKey) {
-    throw new Error(
-      `You cannot use "${settingsKey}" as a command name, "${settingsKey}" is a preserved name for daizong configuration`,
-    );
-  }
-  const result = configSource[key];
-  if (!result && allowPrivate && settings.privateTasks) {
-    return settings.privateTasks[key];
-  }
-  return result;
-}
-
 async function runCommandString(
   config: ConfigSource,
   command: string,
   inheritedEnv: Record<string, string>,
   ignoreError: boolean,
 ): Promise<void> {
+  let isTaskNotFoundErr = false;
   try {
     // Check if this command is calling another command.
     let promise: Promise<void>;
@@ -93,12 +78,17 @@ async function runCommandString(
       if (!cmdName) {
         throw new Error(`"${command}" is not a valid task name`);
       }
-      const childCmd = getCmdFromConfig(config, cmdName, true);
-      if (!childCmd) {
-        throw new Error(`Command not found "${cmdName}"`);
+      let innerTask: Task;
+      try {
+        innerTask = getTask(config, settings, cmdName.split(' '));
+      } catch (getTaskErr) {
+        isTaskNotFoundErr = true;
+        throw new Error(
+          `Error running command "${command}": ${getTaskErr.message}`,
+        );
       }
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      promise = runCommand(config, command, childCmd, inheritedEnv);
+      promise = runTask(config, command, innerTask, inheritedEnv);
     } else {
       // eslint-disable-next-line no-console
       console.log(`>> ${chalk.yellow(command)}`);
@@ -106,19 +96,19 @@ async function runCommandString(
     }
     await promise;
   } catch (err) {
-    if (!ignoreError) {
+    if (!ignoreError || isTaskNotFoundErr) {
       throw err;
     }
   }
 }
 
-async function runCommand(
+async function runTask(
   config: ConfigSource,
   cmdDisplayName: string,
-  command: Cmd,
+  task: Task,
   inheritedEnv: Record<string, string>,
 ): Promise<void> {
-  const cmdValue = command.run;
+  const cmdValue = task.run;
   // Run the specified task.
   if (!cmdValue) {
     throw new Error(`No "run" field defined in command "${cmdDisplayName}"`);
@@ -129,7 +119,7 @@ async function runCommand(
     console.log(`>> ${cmdDisplayName}`);
   }
 
-  const { parallel, env: definedEnv, ignoreError } = command;
+  const { parallel, env: definedEnv, ignoreError } = task;
   const env = {
     ...settings.defaultEnv,
     ...inheritedEnv,
@@ -161,9 +151,9 @@ async function runCommand(
   }
 }
 
-const startingCmd = cli.input?.[0];
-if (!startingCmd) {
-  throw new Error('No task given');
+const inputTasks = cli.input;
+if (!inputTasks || inputTasks.length === 0) {
+  throw new Error('No tasks specified');
 }
 
 (async () => {
@@ -188,16 +178,8 @@ if (!startingCmd) {
         );
       }
     }
-    const cmd = getCmdFromConfig(configSource, startingCmd, false);
-    if (!cmd) {
-      const taskNames = Object.keys(config);
-      throw new Error(
-        `Task "${startingCmd}" not defined. Valid tasks are ${
-          taskNames.length ? taskNames.join(', ') : '<empty>'
-        }`,
-      );
-    }
-    await runCommand(configSource, `#${startingCmd}`, cmd, {});
+    const cmd = getTask(configSource, settings, inputTasks);
+    await runTask(configSource, `#${inputTasks.join(' ')}`, cmd, {});
   } catch (err) {
     handleProcessError(err.message);
   }
