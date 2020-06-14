@@ -12,7 +12,7 @@ Command runner. Better package.json scripts. daizong supports the following feat
 - Define tasks in groups
 - Private tasks
 - Allow continue-on-error
-- Common actions (make dir, delete files / directories)
+- Common actions (create directories, delete files / directories)
 
 ## Installation
 
