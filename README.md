@@ -12,6 +12,7 @@ Command runner. Better package.json scripts. daizong supports the following feat
 - Define tasks in groups
 - Private tasks
 - Allow continue-on-error
+- Common actions (make dir, delete files / directories)
 
 ## Installation
 
@@ -201,7 +202,7 @@ module.exports = {
     ],
   },
   clean: {
-    run: 'rimraf ./dist',
+    run: 'echo cleaning...',
     ignoreError: true,
   },
 };
@@ -219,7 +220,7 @@ module.exports = {
   _: {
     privateTasks: {
       clean: {
-        run: 'rimraf ./dist',
+        run: 'echo cleaning...',
       },
     },
   },
@@ -253,4 +254,43 @@ To run a specific task:
 ```sh
 yarn r build linux
 yarn r build all
+```
+
+### Common actions
+
+You can have a set of builtin common actions running before or after a task:
+
+```js
+module.exports = {
+  task: {
+    run: 'echo hi',
+    before: {
+      // Quick actions ...
+    },
+    after: {
+      // Quick actions
+    },
+  },
+};
+```
+
+daizong currently supports following common actions:
+
+- `mkdir`: `string`: creates a directory or its parents if needed.
+- `del`: `string` | `string[]`: deleted files or directories. see [del](https://github.com/sindresorhus/del#usage) for details.
+
+For example, create a `/dist` directory before running task `dev`, and delete all `js.map` when it's done:
+
+```js
+module.exports = {
+  dev: {
+    run: 'echo dev',
+    before: {
+      mkdir: 'dist',
+    },
+    after: {
+      del: 'dist/*.js.map',
+    },
+  },
+};
 ```
