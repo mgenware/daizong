@@ -1,3 +1,5 @@
+import { Actions } from './actions';
+
 export type TaskItemType = string | string[];
 
 export default interface Task {
@@ -5,4 +7,6 @@ export default interface Task {
   parallel?: boolean;
   env?: Record<string, string>;
   ignoreError?: boolean;
+  before?: Actions;
+  after?: Actions;
 }

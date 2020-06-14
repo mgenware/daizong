@@ -7,6 +7,7 @@ import Task from './task';
 import { loadConfig, Settings, ConfigSource } from './config';
 import { settingsKey } from './consts';
 import getTask from './getTask';
+import { runActions } from './actions';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { name: pkgName, version: pkgVersion } = require('../package.json');
 
@@ -119,12 +120,15 @@ async function runTask(
     console.log(`>> ${cmdDisplayName}`);
   }
 
-  const { parallel, env: definedEnv, ignoreError } = task;
+  const { parallel, env: definedEnv, ignoreError, before, after } = task;
   const env = {
     ...settings.defaultEnv,
     ...inheritedEnv,
     ...definedEnv,
   };
+  if (before) {
+    await runActions(before);
+  }
   if (typeof cmdValue === 'string') {
     await runCommandString(config, cmdValue, env, !!ignoreError);
   } else {
@@ -148,6 +152,9 @@ async function runTask(
         throw err;
       }
     }
+  }
+  if (after) {
+    await runActions(after);
   }
 }
 
