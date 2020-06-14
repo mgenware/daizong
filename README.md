@@ -265,21 +265,21 @@ module.exports = {
   task: {
     run: 'echo hi',
     before: {
-      // Quick actions ...
+      // Common actions ...
     },
     after: {
-      // Quick actions
+      // Common actions ...
     },
   },
 };
 ```
 
-daizong currently supports following common actions:
+daizong currently supports the following common actions:
 
-- `mkdir`: `string`: creates a directory or its parents if needed.
-- `del`: `string` | `string[]`: deleted files or directories. see [del](https://github.com/sindresorhus/del#usage) for details.
+- `mkdir`: `string` creates a directory or its parents if needed.
+- `del`: `string | string[]` deletes files or directories based on the given paths or globs. See [del](https://github.com/sindresorhus/del#usage) for details.
 
-For example, create a `/dist` directory before running task `dev`, and delete all `js.map` when it's done:
+For example, to create a `/dist` directory before running task `dev`, and delete all `js.map` files when it's done:
 
 ```js
 module.exports = {
