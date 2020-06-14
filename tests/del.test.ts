@@ -48,3 +48,23 @@ hi
 
   await clean();
 });
+
+it('Actions(after), del with multiple args', async () => {
+  const path = await newTmpDir('after1');
+  await fs.writeFile(nodepath.join(path, 'a.txt'), 'haha');
+  await fs.writeFile(nodepath.join(path, 'a.json'), 'haha');
+
+  await t(
+    conf,
+    'after',
+    `>> #after
+>> echo hi
+hi
+>> del ["tests/data/tmp/after1/*.*","!tests/data/tmp/after1/a.txt"]
+`,
+  );
+  assert.equal(await isFile('tests/data/tmp/after1/a.txt'), true);
+  assert.equal(await isFile('tests/data/tmp/after1/a.json'), null);
+
+  await clean();
+});

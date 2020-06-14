@@ -9,8 +9,7 @@ module.exports = {
   after: {
     run: 'echo hi',
     after: {
-      mkdir: 'tests/data/tmp/before1-new',
-      del: 'tests/data/tmp/before1/*.txt',
+      del: ['tests/data/tmp/after1/*.*', '!tests/data/tmp/after1/a.txt'],
     },
   },
 };
