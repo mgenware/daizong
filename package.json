@@ -1,7 +1,7 @@
 {
   "name": "daizong",
   "version": "0.6.0",
-  "description": "Command runner. Better package.json scripts.",
+  "description": "package.json scripts runner",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "author": "Mgen (https://www.mgenware.com)",
