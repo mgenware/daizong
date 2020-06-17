@@ -294,3 +294,22 @@ module.exports = {
   },
 };
 ```
+
+Common actions can be reused by simply wrapping them in `run` field:
+
+```js
+module.exports = {
+  prepare: {
+    run: {
+      mkdir: 'dist',
+      del: 'cache',
+    },
+  },
+  dev: {
+    run: ['#prepare', 'echo dev'],
+  },
+  build: {
+    run: ['#prepare', 'echo build'],
+  },
+};
+```

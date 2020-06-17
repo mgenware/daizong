@@ -68,3 +68,23 @@ hi
 
   await clean();
 });
+
+it('Run actions', async () => {
+  const path = await newTmpDir('run1');
+  await fs.writeFile(nodepath.join(path, 'a.txt'), 'haha');
+  await fs.writeFile(nodepath.join(path, 'a.json'), 'haha');
+
+  await t(
+    conf,
+    'runActions',
+    `>> #runActions
+>> mkdir "tests/data/tmp/run1-new"
+>> del "tests/data/tmp/run1/*.txt"
+`,
+  );
+  assert.equal(await isFile('tests/data/tmp/run1-new'), false);
+  assert.equal(await isFile('tests/data/tmp/run1/a.txt'), null);
+  assert.equal(await isFile('tests/data/tmp/run1/a.json'), true);
+
+  await clean();
+});

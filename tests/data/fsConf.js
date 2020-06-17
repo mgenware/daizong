@@ -12,4 +12,10 @@ module.exports = {
       del: ['tests/data/tmp/after1/*.*', '!tests/data/tmp/after1/a.txt'],
     },
   },
+  runActions: {
+    run: {
+      mkdir: 'tests/data/tmp/run1-new',
+      del: 'tests/data/tmp/run1/*.txt',
+    },
+  },
 };

@@ -131,7 +131,7 @@ async function runTask(
   }
   if (typeof cmdValue === 'string') {
     await runCommandString(config, cmdValue, env, !!ignoreError);
-  } else {
+  } else if (Array.isArray(cmdValue)) {
     try {
       const parallelPromises: Promise<void>[] = [];
 
@@ -152,7 +152,11 @@ async function runTask(
         throw err;
       }
     }
+  } else {
+    // `cmdValue` is an object of actions.
+    await runActions(cmdValue);
   }
+
   if (after) {
     await runActions(after);
   }

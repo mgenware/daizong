@@ -1,6 +1,6 @@
 import { Actions } from './actions';
 
-export type TaskItemType = string | string[];
+export type TaskItemType = string | string[] | Actions;
 
 export default interface Task {
   run?: TaskItemType;
