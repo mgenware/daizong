@@ -4,9 +4,9 @@
 [![npm version](https://img.shields.io/npm/v/daizong.svg?style=flat-square)](https://npmjs.com/package/daizong)
 [![Node.js Version](http://img.shields.io/node/v/daizong.svg?style=flat-square)](https://nodejs.org/en/)
 
-Command runner. Better package.json scripts. daizong supports the following features out of the box:
+`package.json` scripts runner. daizong supports the following features out of the box:
 
-- Run tasks in sequentially or in parallel
+- Run tasks sequentially or in parallel
 - Set enviroment variables for a specific task
 - Set default enviroment variable for all tasks
 - Define tasks in groups
@@ -256,28 +256,29 @@ yarn r build linux
 yarn r build all
 ```
 
-### Common actions
+### Actions
 
-You can have a set of builtin common actions running before or after a task:
+Actions are a set of commonly used commands you can choose to run before or after a task:
 
 ```js
 module.exports = {
   task: {
     run: 'echo hi',
     before: {
-      // Common actions ...
+      // Actions ...
     },
     after: {
-      // Common actions ...
+      // Actions ...
     },
   },
 };
 ```
 
-daizong currently supports the following common actions:
+daizong currently supports the following actions:
 
 - `mkdir`: `string` creates a directory or its parents if needed.
 - `del`: `string | string[]` deletes files or directories based on the given paths or globs. See [del](https://github.com/sindresorhus/del#usage) for details.
+- `mkdirDel`: `string` = `del <dir>` + `mkdir <dir>`.
 
 For example, to create a `/dist` directory before running task `dev`, and delete all `js.map` files when it's done:
 
@@ -295,7 +296,7 @@ module.exports = {
 };
 ```
 
-Common actions can be reused by simply wrapping them in `run` field:
+Actions can be reused by simply wrapping them in `run` field:
 
 ```js
 module.exports = {
@@ -310,6 +311,53 @@ module.exports = {
   },
   build: {
     run: ['#prepare', 'echo build'],
+  },
+};
+```
+
+Actions also supports parallel execution:
+
+```js
+module.exports = {
+  prepare: {
+    run: {
+      mkdir: 'dist',
+      del: 'cache',
+      parallel: true,
+    },
+  },
+  dev: {
+    run: ['#prepare', 'echo dev'],
+  },
+  build: {
+    run: ['#prepare', 'echo build'],
+  },
+};
+```
+
+Note that when `parallel` is false (which is the default value), **actions are executed sequentially in insertion order**:
+
+```js
+module.exports = {
+  prepare: {
+    run: {
+      // `del dist` always runs first!
+      del: 'dist',
+      mkdir: 'dist',
+    },
+  },
+};
+```
+
+The above example is also equivalent to:
+
+```js
+module.exports = {
+  prepare: {
+    run: {
+      // `mkdirDel` deletes and then create the specified directory.
+      mkdirDel: 'dist',
+    },
   },
 };
 ```
