@@ -83,7 +83,7 @@ it('Run actions', async () => {
 
 it('Action order 1', async () => {
   const path = await newTmpDir('order1');
-  // Create a file inside `order`.
+  // Create a file inside `order1`.
   await fs.writeFile(nodepath.join(path, 'a.txt'), 'haha');
 
   await t(
@@ -112,4 +112,35 @@ it('Action order 2', async () => {
 
   // `order2` should be created.
   assert.equal(await isFile('tests/data/tmp/order2'), false);
+});
+
+it('mkdirDel 1', async () => {
+  const path = await newTmpDir('mkdirDel1');
+  // Create a file inside `mkdirDel1`.
+  await fs.writeFile(nodepath.join(path, 'a.txt'), 'haha');
+
+  await t(
+    conf,
+    'mkdirDel1',
+    `>> #mkdirDel1
+>> mkdirDel "tests/data/tmp/mkdirDel1"
+`,
+  );
+
+  // `mkdirDel1` should be cleaned.
+  assert.equal(await isFile('tests/data/tmp/mkdirDel1'), false);
+  assert.equal(await isFile('tests/data/tmp/mkdirDel1/a.txt'), null);
+});
+
+it('mkdirDel 2', async () => {
+  await t(
+    conf,
+    'mkdirDel2',
+    `>> #mkdirDel2
+>> mkdirDel "tests/data/tmp/mkdirDel2"
+`,
+  );
+
+  // `mkdirDel2` should be created.
+  assert.equal(await isFile('tests/data/tmp/mkdirDel2'), false);
 });

@@ -30,4 +30,14 @@ module.exports = {
       mkdir: 'tests/data/tmp/order2',
     },
   },
+  mkdirDel1: {
+    run: {
+      mkdirDel: 'tests/data/tmp/mkdirDel1',
+    },
+  },
+  mkdirDel2: {
+    run: {
+      mkdirDel: 'tests/data/tmp/mkdirDel2',
+    },
+  },
 };
