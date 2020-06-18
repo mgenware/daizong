@@ -2,7 +2,7 @@ import * as mkdir from 'make-dir';
 import { promises as fs } from 'fs';
 import * as assert from 'assert';
 import * as nodepath from 'path';
-import * as del from 'del';
+// import * as del from 'del';
 import { t } from './common';
 
 const conf = 'fsConf';
@@ -14,10 +14,6 @@ async function newTmpDir(name: string): Promise<string> {
   return path;
 }
 
-async function clean() {
-  await del(rootTmpDir);
-}
-
 export async function isFile(path: string): Promise<boolean | null> {
   try {
     const st = await fs.stat(path);
@@ -26,6 +22,8 @@ export async function isFile(path: string): Promise<boolean | null> {
     return null;
   }
 }
+
+// after(async () => del(rootTmpDir));
 
 it('Actions(before), del with glob, mkdir', async () => {
   const path = await newTmpDir('before1');
@@ -45,8 +43,6 @@ hi
   assert.equal(await isFile('tests/data/tmp/before1-new'), false);
   assert.equal(await isFile('tests/data/tmp/before1/a.txt'), null);
   assert.equal(await isFile('tests/data/tmp/before1/a.json'), true);
-
-  await clean();
 });
 
 it('Actions(after), del with multiple args', async () => {
@@ -65,8 +61,6 @@ hi
   );
   assert.equal(await isFile('tests/data/tmp/after1/a.txt'), true);
   assert.equal(await isFile('tests/data/tmp/after1/a.json'), null);
-
-  await clean();
 });
 
 it('Run actions', async () => {
@@ -85,6 +79,37 @@ it('Run actions', async () => {
   assert.equal(await isFile('tests/data/tmp/run1-new'), false);
   assert.equal(await isFile('tests/data/tmp/run1/a.txt'), null);
   assert.equal(await isFile('tests/data/tmp/run1/a.json'), true);
+});
 
-  await clean();
+it('Action order 1', async () => {
+  const path = await newTmpDir('order1');
+  // Create a file inside `order`.
+  await fs.writeFile(nodepath.join(path, 'a.txt'), 'haha');
+
+  await t(
+    conf,
+    'order1',
+    `>> #order1
+>> del "tests/data/tmp/order1"
+>> mkdir "tests/data/tmp/order1"
+`,
+  );
+
+  // `order1` should be cleaned.
+  assert.equal(await isFile('tests/data/tmp/order1'), false);
+  assert.equal(await isFile('tests/data/tmp/order1/a.txt'), null);
+});
+
+it('Action order 2', async () => {
+  await t(
+    conf,
+    'order2',
+    `>> #order2
+>> del "tests/data/tmp/order2"
+>> mkdir "tests/data/tmp/order2"
+`,
+  );
+
+  // `order2` should be created.
+  assert.equal(await isFile('tests/data/tmp/order2'), false);
 });

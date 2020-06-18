@@ -43,7 +43,8 @@
     "cosmiconfig": "^6.0.0",
     "del": "^5.1.0",
     "make-dir": "^3.1.0",
-    "meow": "^7.0.1"
+    "meow": "^7.0.1",
+    "p-map": "^4.0.0"
   },
   "devDependencies": {
     "@types/mocha": "^7.0.2",

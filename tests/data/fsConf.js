@@ -18,4 +18,16 @@ module.exports = {
       del: 'tests/data/tmp/run1/*.txt',
     },
   },
+  order1: {
+    run: {
+      del: 'tests/data/tmp/order1',
+      mkdir: 'tests/data/tmp/order1',
+    },
+  },
+  order2: {
+    run: {
+      del: 'tests/data/tmp/order2',
+      mkdir: 'tests/data/tmp/order2',
+    },
+  },
 };
