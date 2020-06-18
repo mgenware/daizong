@@ -4,7 +4,7 @@
 [![npm version](https://img.shields.io/npm/v/daizong.svg?style=flat-square)](https://npmjs.com/package/daizong)
 [![Node.js Version](http://img.shields.io/node/v/daizong.svg?style=flat-square)](https://nodejs.org/en/)
 
-Command runner. Better package.json scripts. daizong supports the following feature out of the box:
+Command runner. Better package.json scripts. daizong supports the following features out of the box:
 
 - Run tasks in sequentially or in parallel
 - Set enviroment variables for a specific task
