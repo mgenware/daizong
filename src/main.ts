@@ -2,6 +2,7 @@
 import * as parseArgs from 'meow';
 import * as chalk from 'chalk';
 import { inspect } from 'util';
+import * as pMap from 'p-map';
 import spawnProcess from './spawn';
 import Task from './task';
 import { loadConfig, Settings, ConfigSource } from './config';
@@ -120,7 +121,14 @@ async function runTask(
     console.log(`>> ${cmdDisplayName}`);
   }
 
-  const { parallel, env: definedEnv, ignoreError, before, after } = task;
+  const {
+    parallel,
+    env: definedEnv,
+    ignoreError,
+    before,
+    after,
+    continueOnChildError,
+  } = task;
   const env = {
     ...settings.defaultEnv,
     ...inheritedEnv,
@@ -133,20 +141,14 @@ async function runTask(
     await runCommandString(config, cmdValue, env, !!ignoreError);
   } else if (Array.isArray(cmdValue)) {
     try {
-      const parallelPromises: Promise<void>[] = [];
-
-      for (const subCmd of cmdValue) {
-        const promise = runCommandString(config, subCmd, env, false);
-        if (parallel) {
-          parallelPromises.push(promise);
-        } else {
-          // eslint-disable-next-line no-await-in-loop
-          await promise;
-        }
-      }
-      if (parallel) {
-        await Promise.all(parallelPromises);
-      }
+      await pMap(
+        cmdValue,
+        (subCmd) => runCommandString(config, subCmd, env, false),
+        {
+          concurrency: parallel ? undefined : 1,
+          stopOnError: !continueOnChildError,
+        },
+      );
     } catch (err) {
       if (!ignoreError) {
         throw err;

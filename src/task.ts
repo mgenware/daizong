@@ -9,4 +9,5 @@ export default interface Task {
   ignoreError?: boolean;
   before?: Actions;
   after?: Actions;
+  continueOnChildError?: boolean;
 }

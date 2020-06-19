@@ -12,7 +12,7 @@
 - Define tasks in groups
 - Private tasks
 - Allow continue-on-error
-- Common actions (create directories, delete files / directories)
+- Actions (create directories, delete files / directories)
 
 ## Installation
 
@@ -188,9 +188,12 @@ module.exports = {
 };
 ```
 
-### Ignore a task error
+### Continue on error
 
-Set `ignoreError` to `true` in a task.
+- `ignoreError` available on all tasks, defaults to `false`. If `true`, task failure is ignored and won't stop execution.
+- `continueOnChildError` only available on tasks with multiple subtasks. It controls if pending subtasks continue to run when one subtask fails. Defaults to `false`.
+
+Example:
 
 ```js
 module.exports = {
