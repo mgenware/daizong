@@ -281,6 +281,7 @@ daizong currently supports the following actions:
 
 - `mkdir`: `string` creates a directory or its parents if needed.
 - `del`: `string | string[]` deletes files or directories based on the given paths or globs. See [del](https://github.com/sindresorhus/del#usage) for details.
+  - Examples: `del: 'dist/*.js.map'`, `del: ['a.txt', 'b.txt']`.
 - `mkdirDel`: `string` = `del <dir>` + `mkdir <dir>`.
 
 For example, to create a `/dist` directory before running task `dev`, and delete all `js.map` files when it's done:
