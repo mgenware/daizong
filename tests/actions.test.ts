@@ -23,8 +23,6 @@ export async function isFile(path: string): Promise<boolean | null> {
   }
 }
 
-// after(async () => del(rootTmpDir));
-
 it('Actions(before), del with glob, mkdir', async () => {
   const path = await newTmpDir('before1');
   await fs.writeFile(nodepath.join(path, 'a.txt'), 'haha');
@@ -43,6 +41,24 @@ hi
   assert.equal(await isFile('tests/data/tmp/before1-new'), false);
   assert.equal(await isFile('tests/data/tmp/before1/a.txt'), null);
   assert.equal(await isFile('tests/data/tmp/before1/a.json'), true);
+});
+
+it('Multiple inputs', async () => {
+  const path = await newTmpDir('del-multiple');
+  await fs.writeFile(nodepath.join(path, 'a.txt'), 'haha');
+  await fs.writeFile(nodepath.join(path, 'b.txt'), 'haha');
+  await fs.writeFile(nodepath.join(path, 'c.txt'), 'haha');
+
+  await t(
+    conf,
+    'delMultiple',
+    `>> #delMultiple
+>> del ["tests/data/tmp/del-multiple/a.txt", "tests/data/tmp/del-multiple/b.txt"]
+`,
+  );
+  assert.equal(await isFile('tests/data/tmp/del-multiple/a.txt'), null);
+  assert.equal(await isFile('tests/data/tmp/del-multiple/b.txt'), null);
+  assert.equal(await isFile('tests/data/tmp/del-multiple/c.txt'), true);
 });
 
 it('Actions(after), del with multiple args', async () => {

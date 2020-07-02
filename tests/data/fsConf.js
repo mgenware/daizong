@@ -40,4 +40,12 @@ module.exports = {
       mkdirDel: 'tests/data/tmp/mkdirDel2',
     },
   },
+  delMultiple: {
+    run: {
+      del: [
+        'tests/data/tmp/del-multiple/a.txt',
+        'tests/data/tmp/del-multiple/b.txt',
+      ],
+    },
+  },
 };
