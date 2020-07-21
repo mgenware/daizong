@@ -2,8 +2,7 @@ import { spawn } from 'child_process';
 
 export default function spawnMain(
   cmd: string,
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  env: object | undefined,
+  env: Record<string, unknown> | undefined,
 ): Promise<void> {
   if (!cmd || !cmd.length) {
     throw new Error('Argument "cmd" cannot be empty');

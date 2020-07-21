@@ -53,7 +53,7 @@ it('Multiple inputs', async () => {
     conf,
     'delMultiple',
     `>> #delMultiple
->> del ["tests/data/tmp/del-multiple/a.txt", "tests/data/tmp/del-multiple/b.txt"]
+>> del ["tests/data/tmp/del-multiple/a.txt","tests/data/tmp/del-multiple/b.txt"]
 `,
   );
   assert.equal(await isFile('tests/data/tmp/del-multiple/a.txt'), null);
