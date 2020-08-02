@@ -8,7 +8,7 @@
 
 - Run tasks sequentially or in parallel
 - Set enviroment variables for a specific task
-- Set default enviroment variable for all tasks
+- Set default enviroment variables for all tasks
 - Define tasks in groups
 - Private tasks
 - Allow continue-on-error
