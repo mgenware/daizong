@@ -80,7 +80,9 @@ module.exports = {
 
 ### Run multiple tasks in parallel
 
-To support all major systems, you need to use 3rd-party libraries like([concurrently](https://github.com/kimmobrunfeldt/concurrently)) to achieve this in `package.json` scripts:
+In `package.json`, to support all major systems, you need to use 3rd-party libraries like([concurrently](https://github.com/kimmobrunfeldt/concurrently)) to achieve this.
+
+`package.json`:
 
 ```json
 {
@@ -134,7 +136,9 @@ module.exports = {
 
 ### Environment variables
 
-To support all major systems, you need to use 3rd-party libraries like([cross-env](https://github.com/kentcdodds/cross-env)) to achieve this in `package.json` scripts:
+To support all major systems, you need to use 3rd-party libraries like([cross-env](https://github.com/kentcdodds/cross-env)) to achieve this in `package.json` scripts.
+
+`package.json`:
 
 ```json
 {
@@ -164,7 +168,7 @@ module.exports = {
 };
 ```
 
-You can also define default enviroment variables, which will be automatically applied to all tasks:
+You can also define default environment variables, which will be automatically applied to all tasks:
 
 ```js
 module.exports = {
@@ -213,7 +217,7 @@ module.exports = {
 
 ### Private tasks
 
-Tasks that are not intended to be called from outside, and can only be called be other tasks.
+Tasks that are not intended to be called from outside, and can only be called by other tasks.
 
 ```js
 // You cannot call the "clean" task via `daizong clean`.
@@ -279,7 +283,7 @@ module.exports = {
 
 daizong currently supports the following actions:
 
-- `mkdir`: `string` creates a directory or its parents if needed.
+- `mkdir`: `string` creates a directory and its parents if needed.
 - `del`: `string | string[]` deletes files or directories based on the given paths or globs. See [del](https://github.com/sindresorhus/del#usage) for details.
   - Examples: `del: 'dist/*.js.map'`, `del: ['a.txt', 'b.txt']`.
 - `mkdirDel`: `string` = `del <dir>` + `mkdir <dir>`.
@@ -319,7 +323,7 @@ module.exports = {
 };
 ```
 
-Actions also supports parallel execution:
+Actions also support parallel execution:
 
 ```js
 module.exports = {
@@ -359,7 +363,7 @@ The above example is also equivalent to:
 module.exports = {
   prepare: {
     run: {
-      // `mkdirDel` deletes and then create the specified directory.
+      // `mkdirDel` deletes and then creates the specified directory.
       mkdirDel: 'dist',
     },
   },
