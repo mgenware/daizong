@@ -18,7 +18,7 @@ export interface Config {
 
 export async function loadConfig(
   pkgName: string,
-  configFile: string | null,
+  configFile: string | undefined,
 ): Promise<Config> {
   const explorer = cosmiconfig(pkgName);
   const explorerRes = await (configFile
