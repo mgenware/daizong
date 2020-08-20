@@ -7,8 +7,8 @@
 `package.json` scripts runner. daizong supports the following features out of the box:
 
 - Run tasks sequentially or in parallel
-- Set enviroment variables for a specific task
-- Set default enviroment variables for all tasks
+- Set environment variables for a specific task
+- Set default environment variables for all tasks
 - Define tasks in groups
 - Private tasks
 - Allow continue-on-error
