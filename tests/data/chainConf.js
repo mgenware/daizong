@@ -15,6 +15,14 @@ module.exports = {
           run: 'echo priA stopped',
         },
       },
+      priB: {
+        run: 'echo priB',
+      },
+    },
+  },
+  zzz: {
+    start: {
+      run: 'echo a b started',
     },
   },
   a: {

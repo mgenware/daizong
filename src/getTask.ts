@@ -59,18 +59,30 @@ export default function getTask(
       `You cannot use "${settingsKey}" as a command name, "${settingsKey}" is a preserved name for daizong configuration`,
     );
   }
-  let result = configSource[currentName];
-  if (!result && settings.privateTasks) {
-    result = settings.privateTasks[currentName];
+  let task = configSource[currentName];
+  if (!task) {
+    if (settings.privateTasks && settings.privateTasks[currentName]) {
+      throw new Error(
+        `The task "${currentName}" is in private tasks, you can only run it from other tasks.`,
+      );
+    }
+    const validTasks = Object.keys(configSource)
+      .filter((s) => s !== settingsKey)
+      .sort();
+    throw new Error(
+      `Undefined task "${currentName}". Valid tasks: ${JSON.stringify(
+        validTasks,
+      )}.`,
+    );
   }
   if (names.length > 1) {
-    result = findChild(
-      result as Record<string, unknown>,
+    task = findChild(
+      task as Record<string, unknown>,
       names.slice(1),
       names,
       configSource,
     );
   }
-  checkTask(result, names, configSource);
-  return result;
+  checkTask(task, names, configSource);
+  return task;
 }
