@@ -56,7 +56,7 @@ module.exports = {
 };
 ```
 
-### Multiple tasks
+### Run tasks sequentially
 
 `package.json`:
 
@@ -78,7 +78,7 @@ module.exports = {
 };
 ```
 
-### Run multiple tasks in parallel
+### Run tasks in parallel
 
 In `package.json`, to support all major systems, you need to use 3rd-party libraries like([concurrently](https://github.com/kimmobrunfeldt/concurrently)) to achieve this.
 
