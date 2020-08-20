@@ -34,6 +34,9 @@ module.exports = {
     stop: {
       run: 'echo a stopped',
     },
+    trigger_err: {
+      run: '#priA b xyz',
+    },
     private: {
       start: {
         run: '#priA b start',

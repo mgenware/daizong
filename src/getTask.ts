@@ -22,16 +22,15 @@ function findChild(
   obj: Record<string, unknown>,
   path: string[],
   fullPath: string[],
-  configSource: ConfigSource,
 ): Task {
   let currentObj = obj;
-  let result: Task | undefined;
+  let child: Task | undefined;
   let i = 0;
   while (i < path.length && !!currentObj) {
     const name = path[i];
     currentObj = currentObj[name] as Record<string, unknown>;
     if (i === path.length - 1) {
-      result = currentObj;
+      child = currentObj;
     }
     i++;
   }
@@ -41,8 +40,14 @@ function findChild(
   // if we failed to find c, we need to print "a b c" is undefined.
   // i is 3 (index of d)
   // fullPath(0, 3) is "a b c"
-  checkTask(result, fullPath.slice(0, i), configSource);
-  return result;
+  if (!child) {
+    throw new Error(
+      `The task "${fullPath
+        .slice(0, i)
+        .join(' ')}" does not contain a child task named "${fullPath[i]}".`,
+    );
+  }
+  return child;
 }
 
 export default function getTask(
@@ -80,12 +85,7 @@ export default function getTask(
     );
   }
   if (names.length > 1) {
-    task = findChild(
-      task as Record<string, unknown>,
-      names.slice(1),
-      names,
-      configSource,
-    );
+    task = findChild(task as Record<string, unknown>, names.slice(1), names);
   }
   checkTask(task, names, configSource);
   return task;
