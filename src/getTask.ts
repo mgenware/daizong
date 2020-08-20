@@ -49,6 +49,7 @@ export default function getTask(
   configSource: ConfigSource,
   settings: Settings,
   names: string[],
+  allowPrivate: boolean,
 ): Task {
   if (!names || names.length === 0) {
     throw new Error('No tasks specified');
@@ -60,6 +61,9 @@ export default function getTask(
     );
   }
   let task = configSource[currentName];
+  if (!task && allowPrivate && settings.privateTasks) {
+    task = settings.privateTasks[currentName];
+  }
   if (!task) {
     if (settings.privateTasks && settings.privateTasks[currentName]) {
       throw new Error(

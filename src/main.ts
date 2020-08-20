@@ -83,7 +83,7 @@ async function runCommandString(
       }
       let innerTask: Task;
       try {
-        innerTask = getTask(config, settings, cmdName.split(' '));
+        innerTask = getTask(config, settings, cmdName.split(' '), true);
       } catch (getTaskErr) {
         isTaskNotFoundErr = true;
         throw new Error(
@@ -192,7 +192,7 @@ if (!inputTasks || inputTasks.length === 0) {
         );
       }
     }
-    const cmd = getTask(configSource, settings, inputTasks);
+    const cmd = getTask(configSource, settings, inputTasks, false);
     await runTask(configSource, `#${inputTasks.join(' ')}`, cmd, {});
   } catch (err) {
     handleProcessError(err.message);
