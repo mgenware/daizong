@@ -15,7 +15,8 @@ const { name: pkgName, version: pkgVersion } = require('../package.json');
 let settings: Settings = {};
 
 function handleProcessError(msg: string) {
-  console.error(chalk.red(msg));
+  // eslint-disable-next-line no-console
+  console.log(chalk.red(msg));
   process.exit(1);
 }
 
