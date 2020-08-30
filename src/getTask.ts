@@ -44,7 +44,9 @@ export default function getTask(
   const currentName = names[0];
   let task = config.tasks[currentName];
   if (!task) {
-    const validTasks = Object.keys(config.tasks).sort();
+    const validTasks = Object.entries(config.tasks)
+      .filter(([, value]) => !value.__isPrivate)
+      .sort(([k1], [k2]) => k1.localeCompare(k2));
     throw new Error(
       `Task "${currentName}" is not defined. Valid tasks: ${JSON.stringify(
         validTasks,
