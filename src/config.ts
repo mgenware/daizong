@@ -61,5 +61,21 @@ export async function loadConfig(
     delete rawSettings.privateTasks;
   }
 
+  // Process aliases.
+  for (const [name, task] of Object.entries(tasks)) {
+    const { alias } = task;
+    if (alias) {
+      if (task.__isPrivate) {
+        throw new Error(
+          `Private cannot have an alias. Task: "${name}", alias: "${alias}"`,
+        );
+      }
+      if (tasks[alias]) {
+        throw new Error(`Duplicate name "${alias}"`);
+      }
+      tasks[alias] = task;
+    }
+  }
+
   return config;
 }

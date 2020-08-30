@@ -67,3 +67,23 @@ it('Duplicate tasks', async () => {
     true,
   );
 });
+
+it('Duplicate alias', async () => {
+  await t(
+    'duplicateAliasesConf',
+    'xyz',
+    `Duplicate name "p"
+`,
+    true,
+  );
+});
+
+it('No private aliases', async () => {
+  await t(
+    'noPrivateAliasConf',
+    'xyz',
+    `Private cannot have an alias. Task: "priTask", alias: "childTask"
+`,
+    true,
+  );
+});

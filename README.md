@@ -369,3 +369,20 @@ module.exports = {
   },
 };
 ```
+
+### Aliases
+
+> Note: To keep things simple, aliases are only allowed in top-level public tasks.
+
+You can set an alias for a public task:
+
+```js
+module.exports = {
+  build-all: {
+    run: ['#build-windows', '#build-macos', '#build-linux'],
+    alias: 'b-all',
+  },
+};
+```
+
+Now you can start the `build-all` task by `yarn r b-all`.
