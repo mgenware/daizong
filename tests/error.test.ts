@@ -62,8 +62,7 @@ it('Duplicate tasks', async () => {
   await t(
     'duplicateTaskNamesConf',
     'xyz',
-    `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
-Task "childTask" is already defined in public tasks
+    `Task "childTask" is already defined in public tasks
 `,
     true,
   );
