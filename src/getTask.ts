@@ -1,22 +1,5 @@
-import { ConfigSource, Settings } from './config';
+import { Config } from './config';
 import Task from './task';
-import { settingsKey } from './consts';
-
-function checkTask(
-  task: Task | undefined,
-  taskPath: string[],
-  configSource: ConfigSource,
-): asserts task {
-  if (task) {
-    return;
-  }
-  const validTasks = Object.keys(configSource).filter((s) => s !== settingsKey);
-  throw new Error(
-    `Task "${taskPath.join(
-      ' ',
-    )}" is not defined. Valid tasks are "${validTasks.join(', ')}".`,
-  );
-}
 
 function findChild(
   obj: Record<string, unknown>,
@@ -42,17 +25,16 @@ function findChild(
   // fullPath(0, 3) is "a b c"
   if (!child) {
     throw new Error(
-      `The task "${fullPath
+      `Task "${fullPath
         .slice(0, i)
-        .join(' ')}" does not contain a child task named "${fullPath[i]}".`,
+        .join(' ')}" does not contain a child task named "${fullPath[i]}"`,
     );
   }
   return child;
 }
 
 export default function getTask(
-  configSource: ConfigSource,
-  settings: Settings,
+  config: Config,
   names: string[],
   allowPrivate: boolean,
 ): Task {
@@ -60,33 +42,22 @@ export default function getTask(
     throw new Error('No tasks specified');
   }
   const currentName = names[0];
-  if (currentName === settingsKey) {
+  let task = config.tasks[currentName];
+  if (!task) {
+    const validTasks = Object.keys(config.tasks).sort();
     throw new Error(
-      `You cannot use "${settingsKey}" as a command name, "${settingsKey}" is a preserved name for daizong configuration`,
+      `Task "${currentName}" is not defined. Valid tasks: ${JSON.stringify(
+        validTasks,
+      )}`,
     );
   }
-  let task = configSource[currentName];
-  if (!task && allowPrivate && settings.privateTasks) {
-    task = settings.privateTasks[currentName];
-  }
-  if (!task) {
-    if (settings.privateTasks && settings.privateTasks[currentName]) {
-      throw new Error(
-        `The task "${currentName}" is in private tasks, you can only run it from other tasks.`,
-      );
-    }
-    const validTasks = Object.keys(configSource)
-      .filter((s) => s !== settingsKey)
-      .sort();
+  if (task.__isPrivate && !allowPrivate) {
     throw new Error(
-      `Undefined task "${currentName}". Valid tasks: ${JSON.stringify(
-        validTasks,
-      )}.`,
+      `Task "${currentName}" is private, you can only run it from other tasks`,
     );
   }
   if (names.length > 1) {
     task = findChild(task as Record<string, unknown>, names.slice(1), names);
   }
-  checkTask(task, names, configSource);
   return task;
 }

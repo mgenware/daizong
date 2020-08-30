@@ -33,5 +33,6 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/switch-exhaustiveness-check': 'error',
     'import/prefer-default-export': 'off',
+    'no-underscore-dangle': 'off',
   },
 };

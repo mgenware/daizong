@@ -7,7 +7,7 @@ it('Not found (root)', async () => {
     conf,
     'xyz',
     `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
-Undefined task "xyz". Valid tasks: ["a","zzz"].
+Task "xyz" is not defined. Valid tasks: ["a","zzz"]
 `,
     true,
   );
@@ -18,7 +18,7 @@ it('Not found (in private)', async () => {
     conf,
     'priB',
     `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
-The task "priB" is in private tasks, you can only run it from other tasks.
+Task "priB" is private, you can only run it from other tasks
 `,
     true,
   );
@@ -29,7 +29,7 @@ it('Not found (in private, not a valid task)', async () => {
     conf,
     'priA',
     `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
-The task "priA" is in private tasks, you can only run it from other tasks.
+Task "priA" is private, you can only run it from other tasks
 `,
     true,
   );
@@ -40,7 +40,7 @@ it('Child not found (root)', async () => {
     conf,
     'a private xyz',
     `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
-The task "a private" does not contain a child task named "xyz".
+Task "a private" does not contain a child task named "xyz"
 `,
     true,
   );
@@ -52,7 +52,18 @@ it('Child not found (in private)', async () => {
     'a trigger_err',
     `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
 >> #a trigger_err
-Error running command "#priA b xyz": The task "priA b" does not contain a child task named "xyz".
+Error running command "#priA b xyz": Task "priA b" does not contain a child task named "xyz"
+`,
+    true,
+  );
+});
+
+it('Duplicate tasks', async () => {
+  await t(
+    'duplicateTaskNamesConf',
+    'xyz',
+    `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
+Task "childTask" is already defined in public tasks
 `,
     true,
   );

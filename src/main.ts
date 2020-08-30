@@ -5,14 +5,11 @@ import { inspect } from 'util';
 import * as pMap from 'p-map';
 import spawnProcess from './spawn';
 import Task from './task';
-import { loadConfig, Settings, ConfigSource } from './config';
-import { settingsKey } from './consts';
+import { loadConfig, Config } from './config';
 import getTask from './getTask';
 import { runActions } from './actions';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { name: pkgName, version: pkgVersion } = require('../package.json');
-
-let settings: Settings = {};
 
 function handleProcessError(msg: string) {
   // eslint-disable-next-line no-console
@@ -67,7 +64,7 @@ function verboseLog(s: string) {
 }
 
 async function runCommandString(
-  config: ConfigSource,
+  config: Config,
   command: string,
   inheritedEnv: Record<string, string>,
   ignoreError: boolean,
@@ -83,7 +80,7 @@ async function runCommandString(
       }
       let innerTask: Task;
       try {
-        innerTask = getTask(config, settings, cmdName.split(' '), true);
+        innerTask = getTask(config, cmdName.split(' '), true);
       } catch (getTaskErr) {
         isTaskNotFoundErr = true;
         throw new Error(
@@ -106,7 +103,7 @@ async function runCommandString(
 }
 
 async function runTask(
-  config: ConfigSource,
+  config: Config,
   cmdDisplayName: string,
   task: Task,
   inheritedEnv: Record<string, string>,
@@ -122,6 +119,7 @@ async function runTask(
     console.log(`>> ${cmdDisplayName}`);
   }
 
+  const { settings } = config;
   const {
     parallel,
     env: definedEnv,
@@ -173,27 +171,21 @@ if (!inputTasks || inputTasks.length === 0) {
 (async () => {
   try {
     const config = await loadConfig(pkgName, flags.config);
+    const { settings } = config;
 
     verboseLog(
       `Loaded config file at "${config?.path}"
   ${JSON.stringify(config)}
   `,
     );
-    const configSource = config.source;
-    if (configSource[settingsKey]) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      settings = (configSource[settingsKey] as any) as Settings;
-      if (settings.defaultEnv) {
-        // eslint-disable-next-line no-console
-        console.log(
-          `Loaded default environment variables: ${inspect(
-            settings.defaultEnv,
-          )}`,
-        );
-      }
+    if (settings.defaultEnv) {
+      // eslint-disable-next-line no-console
+      console.log(
+        `Loaded default environment variables: ${inspect(settings.defaultEnv)}`,
+      );
     }
-    const cmd = getTask(configSource, settings, inputTasks, false);
-    await runTask(configSource, `#${inputTasks.join(' ')}`, cmd, {});
+    const cmd = getTask(config, inputTasks, false);
+    await runTask(config, `#${inputTasks.join(' ')}`, cmd, {});
   } catch (err) {
     handleProcessError(err.message);
   }

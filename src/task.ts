@@ -10,4 +10,8 @@ export default interface Task {
   before?: Actions;
   after?: Actions;
   continueOnChildError?: boolean;
+  alias?: string;
+
+  // An internal flag indicating if a task is defined as private.
+  __isPrivate?: boolean;
 }
