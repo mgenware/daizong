@@ -1,6 +1,6 @@
 import { cosmiconfig } from 'cosmiconfig';
 import * as nodepath from 'path';
-import Task from './task';
+import { Task, TaskValue } from './task';
 
 const settingsKey = '_';
 
@@ -19,7 +19,7 @@ export interface Settings {
 }
 
 export interface Config {
-  tasks: Record<string, Task>;
+  tasks: Record<string, TaskValue>;
   settings: Settings;
   path: string;
 }

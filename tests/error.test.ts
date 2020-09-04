@@ -7,7 +7,17 @@ it('Not found (root)', async () => {
     conf,
     'xyz',
     `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
-Task "xyz" is not defined. Valid tasks: ["a","zzz"]
+Task "xyz" is not defined. Valid top-level tasks are ["a","zzz"]
+`,
+    true,
+  );
+});
+
+it('Not found (with aliases)', async () => {
+  await t(
+    'notFoundWithAliasConf',
+    'xyz',
+    `Task "xyz" is not defined. Valid top-level tasks are ["a","zzz"]
 `,
     true,
   );
