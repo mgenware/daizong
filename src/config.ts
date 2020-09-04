@@ -1,6 +1,6 @@
 import { cosmiconfig } from 'cosmiconfig';
 import * as nodepath from 'path';
-import { Task, TaskValue } from './task';
+import { Task } from './task';
 
 const settingsKey = '_';
 
@@ -19,7 +19,10 @@ export interface Settings {
 }
 
 export interface Config {
-  tasks: Record<string, TaskValue>;
+  // Tasks defined in config.
+  originalTasks: Record<string, Task>;
+  // Tasks with aliases injected.
+  fullTasks: Record<string, Task>;
   settings: Settings;
   path: string;
 }
@@ -46,8 +49,6 @@ export async function loadConfig(
   const settings: Settings = {};
   settings.defaultEnv = rawSettings.defaultEnv;
 
-  const config: Config = { settings, tasks, path: explorerRes?.filepath || '' };
-
   // Merge private tasks into `config.tasks`.
   const { privateTasks } = rawSettings;
   if (privateTasks) {
@@ -62,6 +63,7 @@ export async function loadConfig(
   }
 
   // Process aliases.
+  const fullTasks = { ...tasks };
   for (const [name, task] of Object.entries(tasks)) {
     const { alias } = task;
     if (alias) {
@@ -70,12 +72,18 @@ export async function loadConfig(
           `Private cannot have an alias. Task: "${name}", alias: "${alias}"`,
         );
       }
-      if (tasks[alias]) {
+      if (fullTasks[alias]) {
         throw new Error(`Duplicate name "${alias}"`);
       }
-      tasks[alias] = task;
+      fullTasks[alias] = task;
     }
   }
 
+  const config: Config = {
+    settings,
+    originalTasks: tasks,
+    fullTasks,
+    path: explorerRes?.filepath || '',
+  };
   return config;
 }

@@ -17,7 +17,7 @@ it('Not found (with aliases)', async () => {
   await t(
     'notFoundWithAliasConf',
     'xyz',
-    `Task "xyz" is not defined. Valid top-level tasks are ["a","zzz"]
+    `Task "xyz" is not defined. Valid top-level tasks are ["a","b(alias-of-b)"]
 `,
     true,
   );

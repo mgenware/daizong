@@ -1,5 +1,5 @@
 import { Config } from './config';
-import { Task, TaskRef, TaskValue } from './task';
+import { Task } from './task';
 
 function findChild(
   obj: Record<string, unknown>,
@@ -33,10 +33,6 @@ function findChild(
   return child;
 }
 
-function isTask(taskValue: TaskValue): taskValue is Task {
-  return taskValue instanceof TaskRef === false;
-}
-
 export default function getTask(
   config: Config,
   names: string[],
@@ -46,17 +42,12 @@ export default function getTask(
     throw new Error('No tasks specified');
   }
   const currentName = names[0];
-  const taskValue = config.tasks[currentName];
-  let task = isTask(taskValue) ? taskValue : taskValue.task;
+  let task = config.fullTasks[currentName];
   if (!task) {
-    const validTasks = Object.entries(config.tasks)
-      .filter(([, value]) => isTask(value) && !value.__isPrivate)
+    const validTasks = Object.entries(config.originalTasks)
+      .filter(([, value]) => !value.__isPrivate)
       .sort(([k1], [k2]) => k1.localeCompare(k2))
-      .map(([key, value]) => {
-        // TaskRefs are already filtered out.
-        const t = value as Task;
-        return t.alias ? `${key}(${t.alias})` : key;
-      });
+      .map(([key, value]) => (value.alias ? `${key}(${value.alias})` : key));
     throw new Error(
       `Task "${currentName}" is not defined. Valid top-level tasks are ${JSON.stringify(
         validTasks,
