@@ -29,6 +29,7 @@ const cli = parseArgs(
   Options
     --config, -c   Explicitly specify the config file
     --verbose      Print verbose information during execution
+    --private      Allow private tasks to be called from CLI
     --version, -v  Print version information
     
 `,
@@ -44,6 +45,9 @@ const cli = parseArgs(
       version: {
         type: 'boolean',
         alias: 'v',
+      },
+      private: {
+        type: 'boolean',
       },
     },
   },
@@ -184,7 +188,7 @@ if (!inputTasks || inputTasks.length === 0) {
         `Loaded default environment variables: ${inspect(settings.defaultEnv)}`,
       );
     }
-    const cmd = getTask(config, inputTasks, false);
+    const cmd = getTask(config, inputTasks, flags.private || false);
     await runTask(config, `#${inputTasks.join(' ')}`, cmd, {});
   } catch (err) {
     handleProcessError(err.message);

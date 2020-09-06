@@ -157,7 +157,7 @@ it('Stops on error', async () => {
 error
 Process exited with code 1
 `,
-    true,
+    { hasError: true },
   );
 });
 
@@ -172,7 +172,7 @@ it('Stops on error on parallel tasks', async () => {
 error
 Process exited with code 1
 `,
-    true,
+    { hasError: true },
   );
 });
 

@@ -9,7 +9,7 @@ it('Not found (root)', async () => {
     `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
 Task "xyz" is not defined. Valid top-level tasks are ["a","zzz"]
 `,
-    true,
+    { hasError: true },
   );
 });
 
@@ -19,7 +19,7 @@ it('Not found (with aliases)', async () => {
     'xyz',
     `Task "xyz" is not defined. Valid top-level tasks are ["a","b(alias-of-b)"]
 `,
-    true,
+    { hasError: true },
   );
 });
 
@@ -30,7 +30,20 @@ it('Not found (in private)', async () => {
     `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
 Task "priB" is private, you can only run it from other tasks
 `,
-    true,
+    { hasError: true },
+  );
+});
+
+it('--private', async () => {
+  await t(
+    conf,
+    'priB',
+    `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
+>> #priB
+>> echo priB
+priB
+`,
+    { args: '--private' },
   );
 });
 
@@ -41,7 +54,7 @@ it('Not found (in private, not a valid task)', async () => {
     `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
 Task "priA" is private, you can only run it from other tasks
 `,
-    true,
+    { hasError: true },
   );
 });
 
@@ -52,7 +65,7 @@ it('Child not found (root)', async () => {
     `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
 Task "a private" does not contain a child task named "xyz"
 `,
-    true,
+    { hasError: true },
   );
 });
 
@@ -64,7 +77,7 @@ it('Child not found (in private)', async () => {
 >> #a trigger_err
 Error running command "#priA b xyz": Task "priA b" does not contain a child task named "xyz"
 `,
-    true,
+    { hasError: true },
   );
 });
 
@@ -74,7 +87,7 @@ it('Duplicate tasks', async () => {
     'xyz',
     `Task "childTask" is already defined in public tasks
 `,
-    true,
+    { hasError: true },
   );
 });
 
@@ -84,7 +97,7 @@ it('Duplicate alias', async () => {
     'xyz',
     `Duplicate name "p"
 `,
-    true,
+    { hasError: true },
   );
 });
 
@@ -94,6 +107,6 @@ it('No private aliases', async () => {
     'xyz',
     `Private cannot have an alias. Task: "priTask", alias: "childTask"
 `,
-    true,
+    { hasError: true },
   );
 });
