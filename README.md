@@ -386,3 +386,16 @@ module.exports = {
 ```
 
 Now you can start the `build-all` task by `yarn r b-all`.
+
+## CLI Usage
+
+```sh
+  Usage
+    $ daizong <task>
+
+  Options
+    --config, -c   Explicitly specify the config file
+    --verbose      Print verbose information during execution
+    --private      Allow private tasks to be called from CLI
+    --version, -v  Print version information
+```
