@@ -110,7 +110,8 @@ async function runTask(
   config: Config,
   cmdDisplayName: string,
   task: Task,
-  inheritedEnv: Record<string, string>,
+  // Env from parent tasks when called by another tasks.
+  parentEnv: Record<string, string>,
 ): Promise<void> {
   const cmdValue = task.run;
   // Run the specified task.
@@ -126,16 +127,30 @@ async function runTask(
   const { settings } = config;
   const {
     parallel,
-    env: definedEnv,
+    env: taskEnv,
     ignoreError,
     before,
     after,
     continueOnChildError,
+    envGroups,
   } = task;
+  let envGroupNames: string[] = [];
+  if (envGroups) {
+    envGroupNames = typeof envGroups === 'string' ? [envGroups] : envGroups;
+  }
+  const groupEnv: Record<string, string> = {};
+  for (const groupName of envGroupNames) {
+    const vars = settings.envGroups[groupName];
+    if (vars === undefined) {
+      throw new Error(`Env group "${groupName}" is not defined`);
+    }
+    Object.assign(groupEnv, vars);
+  }
   const env = {
     ...settings.defaultEnv,
-    ...inheritedEnv,
-    ...definedEnv,
+    ...parentEnv,
+    ...groupEnv,
+    ...taskEnv,
   };
   if (before) {
     await runActions(before);

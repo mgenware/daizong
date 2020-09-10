@@ -8,6 +8,7 @@ interface SettingsDefinition {
   defaultEnv?: Record<string, string>;
   // After parsing, `privateTasks` are moved to `Config.tasks` with `__isPrivate` set to true.
   privateTasks?: Record<string, Task>;
+  envGroups?: Record<string, Record<string, string>>;
 }
 
 interface ConfigDefinition {
@@ -16,6 +17,7 @@ interface ConfigDefinition {
 
 export interface Settings {
   defaultEnv?: Record<string, string>;
+  envGroups: Record<string, Record<string, string>>;
 }
 
 export interface Config {
@@ -46,8 +48,11 @@ export async function loadConfig(
   delete rawConfig[settingsKey];
   const tasks = rawConfig as Record<string, Task>;
 
-  const settings: Settings = {};
+  const settings: Settings = { envGroups: {} };
   settings.defaultEnv = rawSettings.defaultEnv;
+  if (rawSettings.envGroups) {
+    settings.envGroups = rawSettings.envGroups;
+  }
 
   // Merge private tasks into `config.tasks`.
   const { privateTasks } = rawSettings;

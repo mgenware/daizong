@@ -11,6 +11,7 @@ export interface Task {
   after?: Actions;
   continueOnChildError?: boolean;
   alias?: string;
+  envGroups?: string | string[];
 
   // An internal flag indicating if a task is defined as private.
   __isPrivate?: boolean;
