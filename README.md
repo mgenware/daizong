@@ -7,8 +7,10 @@
 `package.json` scripts runner. daizong supports the following features out of the box:
 
 - Run tasks sequentially or in parallel
-- Set environment variables for a specific task
-- Set default environment variables for all tasks
+- Environment variables
+  - Set environment variables for a specific task
+  - Set default environment variables for all tasks
+  - Define groups of environment variables to be inherited by tasks
 - Define tasks in groups
 - Private tasks
 - Allow continue-on-error
@@ -191,6 +193,55 @@ module.exports = {
   },
 };
 ```
+
+You can also define groups of environment variables to be inherited by tasks:
+
+```js
+module.exports = {
+  // "_" is a preserved field for configuration.
+  _: {
+    defaultEnv: {
+      NODE_ENV: 'development',
+    },
+    envGroups: {
+      production: {
+        NODE_ENV: 'production',
+        compression_level: 'max
+      },
+    },
+  },
+  dev: {
+    // NODE_ENV is 'development'
+    run: 'tsc -b src -w',
+  },
+  build-windows: {
+    run: 'build',
+    env: {
+      platform: 'windows'
+    },
+    // This task has all environment variables defined in "production" group.
+    envGroups: ['production'],
+  },
+  build-macos: {
+    run: 'build',
+    env: {
+      platform: 'macos'
+    },
+    // This task has all environment variables defined in "production" group.
+    envGroups: ['production'],
+  },
+};
+```
+
+#### Environment variable definitions precedence
+
+From **highest** to **lowest**.
+
+|                                                                                |
+| ------------------------------------------------------------------------------ |
+| `Task.env`                                                                     |
+| `Task.envGroups` (last group overwrites preceding groups like `Object.assign`) |
+| `_.defaultEnv`                                                                 |
 
 ### Continue on error
 
