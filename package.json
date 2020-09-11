@@ -1,6 +1,6 @@
 {
   "name": "daizong",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "package.json scripts runner",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
