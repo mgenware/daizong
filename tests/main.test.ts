@@ -224,7 +224,10 @@ it('Alias', async () => {
   await t(
     'aliasConf',
     'p',
-    `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
+    `Loaded default environment variables: {
+  a: 'AAA',
+  b: 'BBB'
+}
 >> #p
 >> #childTask
 >> node ./tests/data/env.js b

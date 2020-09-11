@@ -4,7 +4,10 @@ it('Default ENV', async () => {
   await t(
     'defEnvConf',
     'parentTask',
-    `Loaded default environment variables: { a: 'AAA', b: 'BBB' }
+    `Loaded default environment variables: {
+  a: 'AAA',
+  b: 'BBB'
+}
 >> #parentTask
 >> #childTask
 >> node ./tests/data/env.js b

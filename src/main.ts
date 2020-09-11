@@ -200,7 +200,10 @@ if (!inputTasks || inputTasks.length === 0) {
     if (settings.defaultEnv) {
       // eslint-disable-next-line no-console
       console.log(
-        `Loaded default environment variables: ${inspect(settings.defaultEnv)}`,
+        `Loaded default environment variables: ${inspect(settings.defaultEnv, {
+          compact: false,
+          sorted: true,
+        })}`,
       );
     }
     const cmd = getTask(config, inputTasks, flags.private || false);
