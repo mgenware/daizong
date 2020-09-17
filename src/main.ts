@@ -28,6 +28,7 @@ const cli = parseArgs(
 
   Options
     --config, -c   Explicitly specify the config file
+    --args         Arguments passed to the command of the target task
     --verbose      Print verbose information during execution
     --private      Allow private tasks to be called from CLI
     --version, -v  Print version information
@@ -38,6 +39,9 @@ const cli = parseArgs(
       config: {
         type: 'string',
         alias: 'c',
+      },
+      args: {
+        type: 'string',
       },
       verbose: {
         type: 'boolean',
@@ -70,6 +74,7 @@ function verboseLog(s: string) {
 async function runCommandString(
   config: Config,
   command: string,
+  args: string,
   inheritedEnv: Record<string, string>,
   ignoreError: boolean,
 ): Promise<void> {
@@ -92,11 +97,11 @@ async function runCommandString(
         );
       }
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      promise = runTask(config, command, innerTask, inheritedEnv);
+      promise = runTask(config, command, innerTask, args, inheritedEnv);
     } else {
       // eslint-disable-next-line no-console
       console.log(`>> ${chalk.yellow(command)}`);
-      promise = spawnProcess(command, inheritedEnv);
+      promise = spawnProcess(command, args, inheritedEnv);
     }
     await promise;
   } catch (err) {
@@ -110,6 +115,7 @@ async function runTask(
   config: Config,
   cmdDisplayName: string,
   task: Task,
+  args: string,
   // Env from parent tasks when called by another tasks.
   parentEnv: Record<string, string>,
 ): Promise<void> {
@@ -156,12 +162,12 @@ async function runTask(
     await runActions(before);
   }
   if (typeof cmdValue === 'string') {
-    await runCommandString(config, cmdValue, env, !!ignoreError);
+    await runCommandString(config, cmdValue, args, env, !!ignoreError);
   } else if (Array.isArray(cmdValue)) {
     try {
       await pMap(
         cmdValue,
-        (subCmd) => runCommandString(config, subCmd, env, false),
+        (subCmd) => runCommandString(config, subCmd, args, env, false),
         {
           concurrency: parallel ? undefined : 1,
           stopOnError: !continueOnChildError,
@@ -206,8 +212,14 @@ if (!inputTasks || inputTasks.length === 0) {
         })}`,
       );
     }
-    const cmd = getTask(config, inputTasks, flags.private || false);
-    await runTask(config, `#${inputTasks.join(' ')}`, cmd, {});
+    const taskObj = getTask(config, inputTasks, flags.private || false);
+    await runTask(
+      config,
+      `#${inputTasks.join(' ')}`,
+      taskObj,
+      flags.args || '',
+      {},
+    );
   } catch (err) {
     handleProcessError(err.message);
   }

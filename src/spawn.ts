@@ -2,10 +2,15 @@ import { spawn } from 'child_process';
 
 export default function spawnMain(
   cmd: string,
+  args: string,
   env: Record<string, unknown> | undefined,
 ): Promise<void> {
   if (!cmd || !cmd.length) {
     throw new Error('Argument "cmd" cannot be empty');
+  }
+  if (args) {
+    // eslint-disable-next-line no-param-reassign
+    cmd = `${cmd} ${args}`;
   }
 
   const newEnv = {

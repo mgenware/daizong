@@ -438,6 +438,28 @@ module.exports = {
 
 Now you can start the `build-all` task by `yarn r b-all`.
 
+### Pass arguments to task command
+
+Use `--args`, example:
+
+```js
+module.exports = {
+  hello: {
+    run: 'echo hello',
+  },
+};
+```
+
+```sh
+yarn r hello --args "i am zzz"
+```
+
+Which runs:
+
+```sh
+echo hello i am zzz
+```
+
 ## CLI Usage
 
 ```sh
@@ -446,6 +468,7 @@ Now you can start the `build-all` task by `yarn r b-all`.
 
   Options
     --config, -c   Explicitly specify the config file
+    --args         Arguments passed to the command of the target task
     --verbose      Print verbose information during execution
     --private      Allow private tasks to be called from CLI
     --version, -v  Print version information
