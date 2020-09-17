@@ -38,9 +38,9 @@ it('Actions(before), del with glob, mkdir', async () => {
 hi
 `,
   );
-  assert.equal(await isFile('tests/data/tmp/before1-new'), false);
-  assert.equal(await isFile('tests/data/tmp/before1/a.txt'), null);
-  assert.equal(await isFile('tests/data/tmp/before1/a.json'), true);
+  assert.strictEqual(await isFile('tests/data/tmp/before1-new'), false);
+  assert.strictEqual(await isFile('tests/data/tmp/before1/a.txt'), null);
+  assert.strictEqual(await isFile('tests/data/tmp/before1/a.json'), true);
 });
 
 it('Multiple inputs', async () => {
@@ -56,9 +56,9 @@ it('Multiple inputs', async () => {
 >> del ["tests/data/tmp/del-multiple/a.txt","tests/data/tmp/del-multiple/b.txt"]
 `,
   );
-  assert.equal(await isFile('tests/data/tmp/del-multiple/a.txt'), null);
-  assert.equal(await isFile('tests/data/tmp/del-multiple/b.txt'), null);
-  assert.equal(await isFile('tests/data/tmp/del-multiple/c.txt'), true);
+  assert.strictEqual(await isFile('tests/data/tmp/del-multiple/a.txt'), null);
+  assert.strictEqual(await isFile('tests/data/tmp/del-multiple/b.txt'), null);
+  assert.strictEqual(await isFile('tests/data/tmp/del-multiple/c.txt'), true);
 });
 
 it('Actions(after), del with multiple args', async () => {
@@ -75,8 +75,8 @@ hi
 >> del ["tests/data/tmp/after1/*.*","!tests/data/tmp/after1/a.txt"]
 `,
   );
-  assert.equal(await isFile('tests/data/tmp/after1/a.txt'), true);
-  assert.equal(await isFile('tests/data/tmp/after1/a.json'), null);
+  assert.strictEqual(await isFile('tests/data/tmp/after1/a.txt'), true);
+  assert.strictEqual(await isFile('tests/data/tmp/after1/a.json'), null);
 });
 
 it('Run actions', async () => {
@@ -92,9 +92,9 @@ it('Run actions', async () => {
 >> del "tests/data/tmp/run1/*.txt"
 `,
   );
-  assert.equal(await isFile('tests/data/tmp/run1-new'), false);
-  assert.equal(await isFile('tests/data/tmp/run1/a.txt'), null);
-  assert.equal(await isFile('tests/data/tmp/run1/a.json'), true);
+  assert.strictEqual(await isFile('tests/data/tmp/run1-new'), false);
+  assert.strictEqual(await isFile('tests/data/tmp/run1/a.txt'), null);
+  assert.strictEqual(await isFile('tests/data/tmp/run1/a.json'), true);
 });
 
 it('Action order 1', async () => {
@@ -112,8 +112,8 @@ it('Action order 1', async () => {
   );
 
   // `order1` should be cleaned.
-  assert.equal(await isFile('tests/data/tmp/order1'), false);
-  assert.equal(await isFile('tests/data/tmp/order1/a.txt'), null);
+  assert.strictEqual(await isFile('tests/data/tmp/order1'), false);
+  assert.strictEqual(await isFile('tests/data/tmp/order1/a.txt'), null);
 });
 
 it('Action order 2', async () => {
@@ -127,7 +127,7 @@ it('Action order 2', async () => {
   );
 
   // `order2` should be created.
-  assert.equal(await isFile('tests/data/tmp/order2'), false);
+  assert.strictEqual(await isFile('tests/data/tmp/order2'), false);
 });
 
 it('mkdirDel 1', async () => {
@@ -144,8 +144,8 @@ it('mkdirDel 1', async () => {
   );
 
   // `mkdirDel1` should be cleaned.
-  assert.equal(await isFile('tests/data/tmp/mkdirDel1'), false);
-  assert.equal(await isFile('tests/data/tmp/mkdirDel1/a.txt'), null);
+  assert.strictEqual(await isFile('tests/data/tmp/mkdirDel1'), false);
+  assert.strictEqual(await isFile('tests/data/tmp/mkdirDel1/a.txt'), null);
 });
 
 it('mkdirDel 2', async () => {
@@ -158,5 +158,5 @@ it('mkdirDel 2', async () => {
   );
 
   // `mkdirDel2` should be created.
-  assert.equal(await isFile('tests/data/tmp/mkdirDel2'), false);
+  assert.strictEqual(await isFile('tests/data/tmp/mkdirDel2'), false);
 });
