@@ -18,7 +18,11 @@ export default async function spawnMain(
     ...env,
   };
 
-  const subprocess = execa.command(cmd, { env: newEnv, shell: true });
+  const subprocess = execa.command(cmd, {
+    env: newEnv,
+    shell: true,
+    stdio: 'inherit',
+  });
   subprocess.stdout?.pipe(process.stdout);
   await subprocess;
 }

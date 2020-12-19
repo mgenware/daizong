@@ -54,7 +54,7 @@ module.exports = {
   stopsOnErrParallel: {
     run: [
       'echo 1',
-      'node ./tests/data/err.js 600',
+      'node ./tests/data/err.js 300',
       'node ./tests/data/delay.js 1000 slowest',
     ],
   },
