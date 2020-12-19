@@ -1,6 +1,6 @@
 {
   "name": "daizong",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "package.json scripts runner",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
@@ -55,10 +55,10 @@
     "del-cli": "^3.0.1",
     "eslint": "^7.13.0",
     "eslint-config-airbnb-typescript-lite": "^12.0.0",
+    "eslint-config-mgenware": "^0.0.2",
     "eslint-plugin-import": "^2.22.1",
     "mocha": "^8.2.1",
     "source-map-support": "^0.5.19",
-    "eslint-config-mgenware": "^0.0.2",
     "typescript": "^4.0.5"
   }
 }
