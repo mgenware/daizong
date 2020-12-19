@@ -41,6 +41,8 @@
     "chalk": "^4.1.0",
     "cosmiconfig": "^7.0.0",
     "del": "^6.0.0",
+    "eslint-config-mgenware": "^0.0.1",
+    "execa": "^5.0.0",
     "make-dir": "^3.1.0",
     "meow": "^8.0.0",
     "p-map": "^4.0.0"

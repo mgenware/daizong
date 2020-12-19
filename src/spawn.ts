@@ -1,9 +1,9 @@
-import { spawn } from 'child_process';
+import execa from 'execa';
 
-export default function spawnMain(
+export default async function spawnMain(
   cmd: string,
   args: string,
-  env: Record<string, unknown> | undefined,
+  env: Record<string, string> | undefined,
 ): Promise<void> {
   if (!cmd || !cmd.length) {
     throw new Error('Argument "cmd" cannot be empty');
@@ -18,20 +18,7 @@ export default function spawnMain(
     ...env,
   };
 
-  return new Promise((resolve, reject) => {
-    const child = spawn(cmd, {
-      shell: true,
-      env: newEnv,
-      stdio: 'inherit',
-    });
-
-    child.on('close', (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        const error = new Error(`Process exited with code ${code}`);
-        reject(error);
-      }
-    });
-  });
+  const subprocess = execa.command(cmd, { env: newEnv, shell: true });
+  subprocess.stdout?.pipe(process.stdout);
+  await subprocess;
 }

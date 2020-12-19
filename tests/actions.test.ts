@@ -1,8 +1,7 @@
-import * as mkdir from 'make-dir';
+import mkdir from 'make-dir';
 import { promises as fs } from 'fs';
 import * as assert from 'assert';
 import * as nodepath from 'path';
-// import * as del from 'del';
 import { t } from './common';
 
 const conf = 'fsConf';

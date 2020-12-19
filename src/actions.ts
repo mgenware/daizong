@@ -1,7 +1,7 @@
-import * as mkdir from 'make-dir';
-import * as del from 'del';
-import * as chalk from 'chalk';
-import * as pMap from 'p-map';
+import mkdir from 'make-dir';
+import del from 'del';
+import chalk from 'chalk';
+import pMap from 'p-map';
 
 export interface Actions {
   mkdir?: string;

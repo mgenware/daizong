@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import * as parseArgs from 'meow';
-import * as chalk from 'chalk';
+import parseArgs from 'meow';
+import chalk from 'chalk';
 import { inspect } from 'util';
-import * as pMap from 'p-map';
+import pMap from 'p-map';
 import spawnProcess from './spawn';
 import { Task } from './task';
 import { loadConfig, Config } from './config';
