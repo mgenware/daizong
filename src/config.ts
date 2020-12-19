@@ -5,10 +5,10 @@ import { Task } from './task';
 const settingsKey = '_';
 
 interface SettingsDefinition {
-  defaultEnv?: Record<string, string>;
+  defaultEnv?: Record<string, string | undefined>;
   // After parsing, `privateTasks` are moved to `Config.tasks` with `__isPrivate` set to true.
-  privateTasks?: Record<string, Task>;
-  envGroups?: Record<string, Record<string, string>>;
+  privateTasks?: Record<string, Task | undefined>;
+  envGroups?: Record<string, Record<string, string | undefined>>;
 }
 
 interface ConfigDefinition {
@@ -16,15 +16,15 @@ interface ConfigDefinition {
 }
 
 export interface Settings {
-  defaultEnv?: Record<string, string>;
-  envGroups: Record<string, Record<string, string>>;
+  defaultEnv?: Record<string, string | undefined>;
+  envGroups: Record<string, Record<string, string | undefined>>;
 }
 
 export interface Config {
   // Tasks defined in config.
-  originalTasks: Record<string, Task>;
+  originalTasks: Record<string, Task | undefined>;
   // Tasks with aliases injected.
-  fullTasks: Record<string, Task>;
+  fullTasks: Record<string, Task | undefined>;
   settings: Settings;
   path: string;
 }
@@ -41,12 +41,12 @@ export async function loadConfig(
   if (!explorerRes || explorerRes.isEmpty) {
     throw new Error(`No config file found at "${nodepath.resolve('.')}"`);
   }
-  const rawConfig = (explorerRes?.config || {}) as ConfigDefinition;
+  const rawConfig = (explorerRes?.config ?? {}) as ConfigDefinition;
   const rawSettings = ((rawConfig[settingsKey] ||
     {}) as unknown) as SettingsDefinition;
   // Remove the preserved `_` field from tasks.
   delete rawConfig[settingsKey];
-  const tasks = rawConfig as Record<string, Task>;
+  const tasks = rawConfig as Record<string, Task | undefined>;
 
   const settings: Settings = { envGroups: {} };
   settings.defaultEnv = rawSettings.defaultEnv;
@@ -58,6 +58,9 @@ export async function loadConfig(
   const { privateTasks } = rawSettings;
   if (privateTasks) {
     for (const [key, value] of Object.entries(privateTasks)) {
+      if (!value) {
+        continue;
+      }
       if (tasks[key]) {
         throw new Error(`Task "${key}" is already defined in public tasks`);
       }
@@ -70,6 +73,9 @@ export async function loadConfig(
   // Process aliases.
   const fullTasks = { ...tasks };
   for (const [name, task] of Object.entries(tasks)) {
+    if (!task) {
+      continue;
+    }
     const { alias } = task;
     if (alias) {
       if (task.__isPrivate) {

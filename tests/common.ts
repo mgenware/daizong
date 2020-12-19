@@ -27,13 +27,13 @@ export async function t(
         opt.args ? ` ${opt.args}` : ''
       } ${taskName}`,
     );
-    const outputString = output.stdout || '';
+    const outputString = output.stdout ?? '';
     // Split output into lines to avoid newline difference among different platforms.
     assert.deepEqual(splitString(outputString), splitString(expected));
   } catch (err) {
     if (opt?.hasError) {
       // Split output into lines to avoid newline difference among different platforms.
-      assert.deepEqual(splitString(err.stdout || ''), splitString(expected));
+      assert.deepEqual(splitString(err.stdout ?? ''), splitString(expected));
     } else {
       throw err;
     }

@@ -75,7 +75,7 @@ async function runCommandString(
   config: Config,
   command: string,
   args: string,
-  inheritedEnv: Record<string, string>,
+  inheritedEnv: Record<string, string | undefined>,
   ignoreError: boolean,
 ): Promise<void> {
   let isTaskNotFoundErr = false;
@@ -117,11 +117,11 @@ async function runTask(
   task: Task,
   args: string,
   // Env from parent tasks when called by another tasks.
-  parentEnv: Record<string, string>,
+  parentEnv: Record<string, string | undefined>,
 ): Promise<void> {
   const cmdValue = task.run;
   // Run the specified task.
-  if (!cmdValue) {
+  if (cmdValue === undefined) {
     throw new Error(`No "run" field defined in command "${cmdDisplayName}"`);
   }
 
@@ -141,7 +141,7 @@ async function runTask(
     envGroups,
   } = task;
   let envGroupNames: string[] = [];
-  if (envGroups) {
+  if (envGroups !== undefined) {
     envGroupNames = typeof envGroups === 'string' ? [envGroups] : envGroups;
   }
   const groupEnv: Record<string, string> = {};
@@ -189,7 +189,7 @@ async function runTask(
 }
 
 const inputTasks = cli.input;
-if (!inputTasks || inputTasks.length === 0) {
+if (inputTasks.length === 0) {
   throw new Error('No tasks specified');
 }
 

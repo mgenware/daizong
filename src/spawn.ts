@@ -3,7 +3,7 @@ import execa from 'execa';
 export default async function spawnMain(
   cmd: string,
   args: string,
-  env: Record<string, string> | undefined,
+  env: Record<string, string | undefined> | undefined,
 ): Promise<void> {
   if (!cmd || !cmd.length) {
     throw new Error('Argument "cmd" cannot be empty');
