@@ -21,7 +21,7 @@
   "license": "MIT",
   "scripts": {
     "test": "yarn run clean && yarn run compile && yarn run lint && yarn run t",
-    "t": "mocha --parallel --require source-map-support/register --timeout 5000 dist_tests/**/*.test.js",
+    "t": "mocha --parallel --require source-map-support/register --timeout 10000 dist_tests/**/*.test.js",
     "build": "cross-env NODE_ENV=production yarn test",
     "compile": "tsc -b tests",
     "dev": "cross-env NODE_ENV=development yarn run clean && tsc -b tests -w",
