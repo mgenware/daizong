@@ -10,7 +10,8 @@ function findChild(
   let child: Task | undefined;
   let i = 0;
   while (i < path.length && !!currentObj) {
-    const name = path[i];
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const name = path[i]!;
     currentObj = currentObj[name] as Record<string, unknown> | undefined;
     if (i === path.length - 1) {
       child = currentObj;
@@ -38,10 +39,10 @@ export default function getTask(
   names: string[],
   allowPrivate: boolean,
 ): Task {
-  if (names.length === 0) {
+  const currentName = names[0];
+  if (!currentName) {
     throw new Error('No tasks specified');
   }
-  const currentName = names[0];
   let task = config.fullTasks[currentName];
   if (!task) {
     const validTasks = Object.entries(config.originalTasks)
