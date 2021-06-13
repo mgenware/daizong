@@ -6,12 +6,12 @@ import { t } from './common.js';
 const confBasic = 'conf';
 const dirname = nodepath.dirname(fileURLToPath(import.meta.url));
 const json = JSON.parse(
-  await readFile(nodepath.join(dirname, 'package.json'), 'utf8'),
+  await readFile(nodepath.join(dirname, '../package.json'), 'utf8'),
 );
 
 it('-v', async () => {
   await t(
-    confBasic,
+    null,
     '-v',
     `${json.version}
 `,

@@ -15,18 +15,22 @@ export interface TOptions {
 }
 
 export async function t(
-  configName: string,
+  configName: string | null,
   taskName: string,
   expected: string,
   opt?: TOptions,
 ): Promise<void> {
   try {
     opt = opt || {};
-    const output = await execAsync(
-      `node "./dist/main.js" -c "./tests/data/${configName}.js"${
-        opt.args ? ` ${opt.args}` : ''
-      } ${taskName}`,
-    );
+    let cmd = 'node "./dist/main.js"';
+    if (configName) {
+      cmd += ` -c "./tests/data/${configName}.js"`;
+    }
+    if (opt.args) {
+      cmd += ` ${opt.args}`;
+    }
+    cmd += ` ${taskName}`;
+    const output = await execAsync(cmd);
     const outputString = output.stdout ?? '';
     // Split output into lines to avoid newline difference among different platforms.
     assert.deepEqual(splitString(outputString), splitString(expected));
