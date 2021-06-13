@@ -33,11 +33,14 @@ export async function t(
     const output = await execAsync(cmd);
     const outputString = output.stdout ?? '';
     // Split output into lines to avoid newline difference among different platforms.
-    assert.deepEqual(splitString(outputString), splitString(expected));
+    assert.deepStrictEqual(splitString(outputString), splitString(expected));
   } catch (err) {
     if (opt?.hasError) {
       // Split output into lines to avoid newline difference among different platforms.
-      assert.deepEqual(splitString(err.stdout ?? ''), splitString(expected));
+      assert.deepStrictEqual(
+        splitString(err.stdout ?? ''),
+        splitString(expected),
+      );
     } else {
       throw err;
     }
