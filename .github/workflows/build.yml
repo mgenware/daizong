@@ -12,8 +12,8 @@ jobs:
           - macos-latest
           - windows-latest
         node_version:
-          - 12
           - 14
+          - 16
         architecture:
           - x64
     name: Node ${{ matrix.node_version }} - ${{ matrix.architecture }} on ${{ matrix.os }}
@@ -25,4 +25,4 @@ jobs:
           node-version: ${{ matrix.node_version }}
           architecture: ${{ matrix.architecture }}
       - run: npm i
-      - run: npm test
+      - run: npm run test
