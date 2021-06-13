@@ -30,17 +30,18 @@ export interface Config {
 }
 
 async function fileExists(file: string) {
-  return fs.promises.access(file, fs.constants.F_OK)
-           .then(() => true)
-           .catch(() => false)
+  return fs.promises
+    .access(file, fs.constants.F_OK)
+    .then(() => true)
+    .catch(() => false);
 }
 
 export async function loadConfig(
   configFileInput: string | undefined,
 ): Promise<Config> {
   const configFile = nodepath.resolve(configFileInput ?? 'daizong.config.js');
-  if (!await fileExists(configFile)) {
-    throw new Error(`Config file "${configFile}" does not exist`)
+  if (!(await fileExists(configFile))) {
+    throw new Error(`Config file "${configFile}" does not exist`);
   }
   const rawConfig = (await import(configFile))?.default as ConfigDefinition;
   const rawSettings = (rawConfig[settingsKey] ||
