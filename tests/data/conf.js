@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   _: {
     privateTasks: {
       pri1: {

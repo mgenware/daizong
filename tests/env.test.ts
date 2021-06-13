@@ -1,4 +1,4 @@
-import { t } from './common';
+import { t } from './common.js';
 
 it('Default ENV', async () => {
   await t(

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   _: {
     defaultEnv: {
       defA: 'default:a',

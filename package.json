@@ -2,13 +2,13 @@
   "name": "daizong",
   "version": "0.13.0",
   "description": "package.json scripts runner",
-  "main": "dist/main.js",
-  "types": "dist/main.d.ts",
-  "author": "Mgen (https://github.com)",
+  "type": "module",
+  "exports": "./dist/main.js",
+  "types": "./dist/main.d.ts",
+  "author": "Mgenware (https://github.com)",
   "homepage": "https://github.com/mgenware/daizong",
   "bugs": "https://github.com/mgenware/daizong/issues",
   "keywords": [
-    "process",
     "task runner"
   ],
   "bin": {
@@ -39,7 +39,6 @@
   ],
   "dependencies": {
     "chalk": "^4.1.0",
-    "cosmiconfig": "^7.0.0",
     "del": "^6.0.0",
     "execa": "^5.0.0",
     "make-dir": "^3.1.0",

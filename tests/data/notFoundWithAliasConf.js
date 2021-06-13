@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   a: {
     run: 'node ./tests/data/env.js b',
   },

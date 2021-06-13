@@ -1,5 +1,5 @@
-import { Config } from './config';
-import { Task } from './task';
+import { Config } from './config.js';
+import { Task } from './task.js';
 
 function findChild(
   obj: Record<string, unknown>,

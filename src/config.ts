@@ -1,6 +1,6 @@
-import { cosmiconfig } from 'cosmiconfig';
 import * as nodepath from 'path';
-import { Task } from './task';
+import * as fs from 'fs';
+import { Task } from './task.js';
 
 const settingsKey = '_';
 
@@ -29,21 +29,22 @@ export interface Config {
   path: string;
 }
 
-export async function loadConfig(
-  pkgName: string,
-  configFile: string | undefined,
-): Promise<Config> {
-  const explorer = cosmiconfig(pkgName);
-  const explorerRes = await (configFile
-    ? explorer.load(configFile)
-    : explorer.search());
+async function fileExists(file: string) {
+  return fs.promises.access(file, fs.constants.F_OK)
+           .then(() => true)
+           .catch(() => false)
+}
 
-  if (!explorerRes || explorerRes.isEmpty) {
-    throw new Error(`No config file found at "${nodepath.resolve('.')}"`);
+export async function loadConfig(
+  configFileInput: string | undefined,
+): Promise<Config> {
+  const configFile = nodepath.resolve(configFileInput ?? 'daizong.config.js');
+  if (!await fileExists(configFile)) {
+    throw new Error(`Config file "${configFile}" does not exist`)
   }
-  const rawConfig = (explorerRes?.config ?? {}) as ConfigDefinition;
-  const rawSettings = ((rawConfig[settingsKey] ||
-    {}) as unknown) as SettingsDefinition;
+  const rawConfig = (await import(configFile))?.default as ConfigDefinition;
+  const rawSettings = (rawConfig[settingsKey] ||
+    {}) as unknown as SettingsDefinition;
   // Remove the preserved `_` field from tasks.
   delete rawConfig[settingsKey];
   const tasks = rawConfig as Record<string, Task | undefined>;
@@ -94,7 +95,7 @@ export async function loadConfig(
     settings,
     originalTasks: tasks,
     fullTasks,
-    path: explorerRes?.filepath || '',
+    path: configFile,
   };
   return config;
 }

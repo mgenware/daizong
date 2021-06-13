@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   print: {
     run: 'node ./tests/data/args.js',
   },

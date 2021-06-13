@@ -51,7 +51,7 @@ Create a `daizong.config.js` at the root of your project. You can run `npm run r
 daizong:
 
 ```js
-module.exports = {
+export default {
   dev: {
     run: 'tsc -b src -w',
   },
@@ -73,7 +73,7 @@ module.exports = {
 daizong:
 
 ```js
-module.exports = {
+export default {
   dev: {
     run: ['touch a.md', 'touch b.md'],
   },
@@ -97,7 +97,7 @@ In `package.json`, to support all major systems, you need to use 3rd-party libra
 daizong supports it out of the box:
 
 ```js
-module.exports = {
+export default {
   dev: {
     run: ['touch a.md', 'touch b.md'],
     parallel: true,
@@ -122,7 +122,7 @@ module.exports = {
 daizong:
 
 ```js
-module.exports = {
+export default {
   dev: {
     run: ['#touch1', '#touch2'],
     parallel: true,
@@ -154,7 +154,7 @@ To support all major systems, you need to use 3rd-party libraries like([cross-en
 daizong supports it out of the box:
 
 ```js
-module.exports = {
+export default {
   build: {
     run: 'tsc -b src',
     env: {
@@ -173,7 +173,7 @@ module.exports = {
 You can also define default environment variables, which will be automatically applied to all tasks:
 
 ```js
-module.exports = {
+export default {
   // "_" is a preserved field for configuration.
   _: {
     defaultEnv: {
@@ -197,7 +197,7 @@ module.exports = {
 You can also define groups of environment variables to be inherited by tasks:
 
 ```js
-module.exports = {
+export default {
   // "_" is a preserved field for configuration.
   _: {
     defaultEnv: {
@@ -251,7 +251,7 @@ From **highest** to **lowest**.
 Example:
 
 ```js
-module.exports = {
+export default {
   build: {
     run: [
       '#clean',
@@ -273,7 +273,7 @@ Tasks that are not intended to be called from outside, and can only be called by
 ```js
 // You cannot call the "clean" task via `daizong clean`.
 // It can only be called by other tasks.
-module.exports = {
+export default {
   // "_" is a preserved field for configuration.
   _: {
     privateTasks: {
@@ -291,7 +291,7 @@ module.exports = {
 ### Task groups
 
 ```js
-module.exports = {
+export default {
   build: {
     win: {
       run: 'echo Windows build started',
@@ -319,7 +319,7 @@ npm run r build all
 Actions are a set of commonly used commands you can choose to run before or after a task:
 
 ```js
-module.exports = {
+export default {
   task: {
     run: 'echo hi',
     before: {
@@ -342,7 +342,7 @@ daizong currently supports the following actions:
 For example, to create a `/dist` directory before running task `dev`, and delete all `js.map` files when it's done:
 
 ```js
-module.exports = {
+export default {
   dev: {
     run: 'echo dev',
     before: {
@@ -358,7 +358,7 @@ module.exports = {
 Actions can be reused by simply wrapping them in `run` field:
 
 ```js
-module.exports = {
+export default {
   prepare: {
     run: {
       mkdir: 'dist',
@@ -377,7 +377,7 @@ module.exports = {
 Actions also support parallel execution:
 
 ```js
-module.exports = {
+export default {
   prepare: {
     run: {
       mkdir: 'dist',
@@ -397,7 +397,7 @@ module.exports = {
 Note that when `parallel` is false (which is the default value), **actions are executed sequentially in insertion order**:
 
 ```js
-module.exports = {
+export default {
   prepare: {
     run: {
       // `del dist` always runs first!
@@ -411,7 +411,7 @@ module.exports = {
 The above example is also equivalent to:
 
 ```js
-module.exports = {
+export default {
   prepare: {
     run: {
       // `mkdirDel` deletes and then creates the specified directory.
@@ -428,7 +428,7 @@ module.exports = {
 You can set an alias for a public task:
 
 ```js
-module.exports = {
+export default {
   build-all: {
     run: ['#build-windows', '#build-macos', '#build-linux'],
     alias: 'b-all',
@@ -443,7 +443,7 @@ Now you can start the `build-all` task by `npm run r b-all`.
 Use `--args`, example:
 
 ```js
-module.exports = {
+export default {
   hello: {
     run: 'echo hello',
   },

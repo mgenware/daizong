@@ -3,13 +3,19 @@ import parseArgs from 'meow';
 import chalk from 'chalk';
 import { inspect } from 'util';
 import pMap from 'p-map';
-import spawnProcess from './spawn';
-import { Task } from './task';
-import { loadConfig, Config } from './config';
-import getTask from './getTask';
-import { runActions } from './actions';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { name: pkgName, version: pkgVersion } = require('../package.json');
+import { readFile } from 'fs/promises';
+import nodepath from 'path';
+import { fileURLToPath } from 'url';
+import spawnProcess from './spawn.js';
+import { Task } from './task.js';
+import { loadConfig, Config } from './config.js';
+import getTask from './getTask.js';
+import { runActions } from './actions.js';
+
+const dirname = nodepath.dirname(fileURLToPath(import.meta.url));
+const json = JSON.parse(
+  await readFile(nodepath.join(dirname, '../package.json'), 'utf8'),
+);
 
 function handleProcessError(msg: string) {
   // eslint-disable-next-line no-console
@@ -24,7 +30,7 @@ process.on('uncaughtException', (err) => {
 const cli = parseArgs(
   `
   Usage
-    $ ${pkgName} <task>
+    $ ${json.name} <task>
 
   Options
     --config, -c   Explicitly specify the config file
@@ -35,6 +41,7 @@ const cli = parseArgs(
     
 `,
   {
+    importMeta: import.meta,
     flags: {
       config: {
         type: 'string',
@@ -60,7 +67,7 @@ const cli = parseArgs(
 const { flags } = cli;
 if (flags.version) {
   // eslint-disable-next-line no-console
-  console.log(pkgVersion);
+  console.log(json.version);
   process.exit();
 }
 
@@ -195,7 +202,7 @@ if (inputTasks.length === 0) {
 
 (async () => {
   try {
-    const config = await loadConfig(pkgName, flags.config);
+    const config = await loadConfig(flags.config);
     const { settings } = config;
 
     verboseLog(

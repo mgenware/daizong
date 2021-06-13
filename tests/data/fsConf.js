@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   before: {
     run: 'echo hi',
     before: {
