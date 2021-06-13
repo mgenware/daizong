@@ -20,11 +20,11 @@
   },
   "license": "MIT",
   "scripts": {
-    "test": "yarn run clean && yarn run compile && yarn run lint && yarn run t",
+    "test": "npm run clean && npm run compile && npm run lint && npm run t",
     "t": "mocha --parallel --require source-map-support/register --timeout 10000 dist_tests/**/*.test.js",
-    "build": "cross-env NODE_ENV=production yarn test",
+    "build": "cross-env NODE_ENV=production npm run test",
     "compile": "tsc -b tests",
-    "dev": "cross-env NODE_ENV=development yarn run clean && tsc -b tests -w",
+    "dev": "cross-env NODE_ENV=development npm run clean && tsc -b tests -w",
     "lint": "eslint --max-warnings 0 --ext .ts src/ tests/",
     "clean": "del-cli dist dist_tests"
   },

@@ -19,7 +19,7 @@
 ## Installation
 
 ```sh
-yarn add daizong -D
+npm i daizong -D
 ```
 
 ## Usage
@@ -34,7 +34,7 @@ Add daizong to `package.json` scripts (`r` stands for "run"):
 }
 ```
 
-Create a `daizong.config.js` at the root of your project. You can run `yarn r <task>` or `npm run r <task>` to start a task.
+Create a `daizong.config.js` at the root of your project. You can run `npm run r <task>` or `yarn r <task>` to start a task.
 
 ## Examples / Comparison with `package.json` scripts
 
@@ -112,7 +112,7 @@ module.exports = {
 ```json
 {
   "scripts": {
-    "dev": "concurrently \"yarn run touch1\" \"yarn run touch2\"",
+    "dev": "concurrently \"npm run touch1\" \"npm run touch2\"",
     "touch1": "touch a.md",
     "touch2": "touch b.md"
   }
@@ -310,8 +310,8 @@ module.exports = {
 To run a specific task:
 
 ```sh
-yarn r build linux
-yarn r build all
+npm run r build linux
+npm run r build all
 ```
 
 ### Actions
@@ -436,7 +436,7 @@ module.exports = {
 };
 ```
 
-Now you can start the `build-all` task by `yarn r b-all`.
+Now you can start the `build-all` task by `npm run r b-all`.
 
 ### Pass arguments to task command
 
@@ -451,7 +451,7 @@ module.exports = {
 ```
 
 ```sh
-yarn r hello --args "i am zzz"
+npm run r hello --args "i am zzz"
 ```
 
 Which runs:
