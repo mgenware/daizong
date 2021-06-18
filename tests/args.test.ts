@@ -56,3 +56,14 @@ it('With args (3)', async () => {
 `,
   );
 });
+
+it('With args (4)', async () => {
+  await t(
+    conf,
+    '--args "c -d --e" group group2',
+    `>> #group group2
+>> node ./tests/data/args.js a b
+[ 'a', 'b', 'c', '-d', '--e' ]
+`,
+  );
+});
