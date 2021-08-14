@@ -5,6 +5,7 @@ import { t } from './common.js';
 
 const confBasic = 'conf';
 const dirname = nodepath.dirname(fileURLToPath(import.meta.url));
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const json = JSON.parse(
   await readFile(nodepath.join(dirname, '../package.json'), 'utf8'),
 );

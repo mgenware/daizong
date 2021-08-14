@@ -13,6 +13,7 @@ import getTask from './getTask.js';
 import { runActions } from './actions.js';
 
 const dirname = nodepath.dirname(fileURLToPath(import.meta.url));
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const json = JSON.parse(
   await readFile(nodepath.join(dirname, '../package.json'), 'utf8'),
 );
@@ -200,6 +201,7 @@ if (inputTasks.length === 0) {
   throw new Error('No tasks specified');
 }
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
   try {
     const config = await loadConfig(flags.config);
