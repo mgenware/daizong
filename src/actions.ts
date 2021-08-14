@@ -25,7 +25,7 @@ export async function runActions(actions: Actions): Promise<void> {
       } else if (prop === 'del' && delInput !== undefined) {
         // eslint-disable-next-line no-console
         console.log(`>> ${chalk.gray(`del ${JSON.stringify(delInput)}`)}`);
-        await del(delInput);
+        await del(delInput, { force: true });
       } else if (prop === 'mkdirDel' && mkdirDel) {
         // eslint-disable-next-line no-console
         console.log(`>> ${chalk.gray(`mkdirDel "${mkdirDel}"`)}`);

@@ -9,9 +9,29 @@ function splitString(str: string): string[] {
   return str.split(/\r?\n/);
 }
 
+function checkStrings(
+  a: string[],
+  b: string[],
+  checkPrefixes: boolean | undefined,
+) {
+  if (checkPrefixes) {
+    if (a.length !== b.length) {
+      assert.fail("Length doesn't match");
+    }
+    for (let i = 0; i < a.length; i++) {
+      const c1 = a[i] ?? '';
+      const c2 = b[i] ?? '';
+      assert.ok(c1.startsWith(c2), `${c1} doesn't start with ${c2}`);
+    }
+  } else {
+    assert.deepStrictEqual(a, b);
+  }
+}
+
 export interface TOptions {
   hasError?: boolean;
   args?: string;
+  checkPrefixes?: boolean;
 }
 
 export async function t(
@@ -33,13 +53,18 @@ export async function t(
     const output = await execAsync(cmd);
     const outputString = output.stdout ?? '';
     // Split output into lines to avoid newline difference among different platforms.
-    assert.deepStrictEqual(splitString(outputString), splitString(expected));
+    checkStrings(
+      splitString(outputString),
+      splitString(expected),
+      opt.checkPrefixes,
+    );
   } catch (err) {
     if (opt?.hasError) {
       // Split output into lines to avoid newline difference among different platforms.
-      assert.deepStrictEqual(
+      checkStrings(
         splitString(err.stdout ?? ''),
         splitString(expected),
+        opt.checkPrefixes,
       );
     } else {
       throw err;
