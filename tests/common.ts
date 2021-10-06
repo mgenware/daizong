@@ -58,7 +58,8 @@ export async function t(
       splitString(expected),
       opt.checkPrefixes,
     );
-  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     if (opt?.hasError) {
       // Split output into lines to avoid newline difference among different platforms.
       checkStrings(

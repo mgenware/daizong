@@ -3,6 +3,7 @@ import parseArgs from 'meow';
 import chalk from 'chalk';
 import { inspect } from 'util';
 import pMap from 'p-map';
+import errMsg from 'catch-err-msg';
 import { readFile } from 'fs/promises';
 import nodepath from 'path';
 import { fileURLToPath } from 'url';
@@ -101,7 +102,7 @@ async function runCommandString(
       } catch (getTaskErr) {
         isTaskNotFoundErr = true;
         throw new Error(
-          `Error running command "${command}": ${getTaskErr.message}`,
+          `Error running command "${command}": ${errMsg(getTaskErr)}`,
         );
       }
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -230,6 +231,6 @@ if (inputTasks.length === 0) {
       {},
     );
   } catch (err) {
-    handleProcessError(err.message);
+    handleProcessError(errMsg(err));
   }
 })();
