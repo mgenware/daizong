@@ -465,7 +465,7 @@ echo hello i am zzz
     $ daizong <task>
 
   Options
-    --config, -c   Explicitly specify the config file
+    --config       Explicitly specify the config file, --config=./config.js
     --verbose      Print verbose information during execution
     --private      Allow private tasks to be called from CLI
     --version, -v  Print version information
