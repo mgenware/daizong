@@ -235,13 +235,11 @@ export default {
 
 #### Environment variable definitions precedence
 
-From **highest** to **lowest**.
+Smaller number means higher precedence.
 
-|                                                                                |
-| ------------------------------------------------------------------------------ |
-| `Task.env`                                                                     |
-| `Task.envGroups` (last group overwrites preceding groups like `Object.assign`) |
-| `_.defaultEnv`                                                                 |
+1. `Task.env`
+2. `Task.envGroups` (last group overwrites preceding groups like `Object.assign`)
+3. `_.defaultEnv`
 
 ### Continue on error
 
