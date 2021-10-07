@@ -440,8 +440,6 @@ Now you can start the `build-all` task by `npm run r b-all`.
 
 ### Pass arguments to task command
 
-Use `--args`, example:
-
 ```js
 export default {
   hello: {
@@ -451,7 +449,7 @@ export default {
 ```
 
 ```sh
-npm run r hello --args "i am zzz"
+npm run r hello i am zzz
 ```
 
 Which runs:
@@ -468,7 +466,6 @@ echo hello i am zzz
 
   Options
     --config, -c   Explicitly specify the config file
-    --args         Arguments passed to the command of the target task
     --verbose      Print verbose information during execution
     --private      Allow private tasks to be called from CLI
     --version, -v  Print version information

@@ -23,10 +23,8 @@ export interface Settings {
 }
 
 export interface Config {
-  // Tasks defined in config.
-  originalTasks: Record<string, Task | undefined>;
-  // Tasks with aliases injected.
-  fullTasks: Record<string, Task | undefined>;
+  // Tasks with aliases and private tasks injected.
+  tasks: Record<string, Task | undefined>;
   settings: Settings;
   path: string;
 }
@@ -48,9 +46,10 @@ function normalizeImport(path: string): string {
 }
 
 export async function loadConfig(
-  configFileInput: string | undefined,
+  configFile: string | undefined,
 ): Promise<Config> {
-  const configFile = configFileInput ?? 'daizong.config.js';
+  // eslint-disable-next-line no-param-reassign
+  configFile = configFile ?? 'daizong.config.js';
   if (!(await fileExists(configFile))) {
     throw new Error(`Config file "${configFile}" does not exist`);
   }
@@ -60,7 +59,7 @@ export async function loadConfig(
     {}) as unknown as SettingsDefinition;
   // Remove the preserved `_` field from tasks.
   delete rawConfig[settingsKey];
-  const tasks = rawConfig as Record<string, Task | undefined>;
+  const rawTasks = rawConfig as Readonly<Record<string, Task | undefined>>;
 
   const settings: Settings = { envGroups: {} };
   settings.defaultEnv = rawSettings.defaultEnv;
@@ -68,6 +67,7 @@ export async function loadConfig(
     settings.envGroups = rawSettings.envGroups;
   }
 
+  const tasks: Record<string, Task | undefined> = { ...rawTasks };
   // Merge private tasks into `config.tasks`.
   const { privateTasks } = rawSettings;
   if (privateTasks) {
@@ -75,7 +75,7 @@ export async function loadConfig(
       if (!value) {
         continue;
       }
-      if (tasks[key]) {
+      if (rawTasks[key]) {
         throw new Error(`Task "${key}" is already defined in public tasks`);
       }
       value.__isPrivate = true;
@@ -85,7 +85,6 @@ export async function loadConfig(
   }
 
   // Process aliases.
-  const fullTasks = { ...tasks };
   for (const [name, task] of Object.entries(tasks)) {
     if (!task) {
       continue;
@@ -97,17 +96,16 @@ export async function loadConfig(
           `Private cannot have an alias. Task: "${name}", alias: "${alias}"`,
         );
       }
-      if (fullTasks[alias]) {
+      if (tasks[alias]) {
         throw new Error(`Duplicate name "${alias}"`);
       }
-      fullTasks[alias] = task;
+      tasks[alias] = task;
     }
   }
 
   const config: Config = {
     settings,
-    originalTasks: tasks,
-    fullTasks,
+    tasks,
     path: configFile,
   };
   return config;

@@ -44,7 +44,7 @@ export async function t(
     opt = opt || {};
     let cmd = 'node "./dist/main.js"';
     if (configName) {
-      cmd += ` -c "./tests/data/${configName}.js"`;
+      cmd += ` --config="./tests/data/${configName}.js"`;
     }
     if (opt.args) {
       cmd += ` ${opt.args}`;

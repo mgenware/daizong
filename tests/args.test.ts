@@ -27,7 +27,7 @@ it('No args (2)', async () => {
 it('With args (1)', async () => {
   await t(
     conf,
-    'print --args "c -d --e"',
+    'print c -d --e',
     `>> #print
 >> node ./tests/data/args.js
 [ 'c', '-d', '--e' ]
@@ -38,7 +38,7 @@ it('With args (1)', async () => {
 it('With args (2)', async () => {
   await t(
     conf,
-    'printWithArgs --args "c -d --e"',
+    'printWithArgs c -d --e',
     `>> #printWithArgs
 >> node ./tests/data/args.js a b
 [ 'a', 'b', 'c', '-d', '--e' ]
@@ -49,7 +49,7 @@ it('With args (2)', async () => {
 it('With args (3)', async () => {
   await t(
     conf,
-    'group group2 --args "c -d --e"',
+    'group group2 c -d --e',
     `>> #group group2
 >> node ./tests/data/args.js a b
 [ 'a', 'b', 'c', '-d', '--e' ]
@@ -60,7 +60,7 @@ it('With args (3)', async () => {
 it('With args (4)', async () => {
   await t(
     conf,
-    '--args "c -d --e" group group2',
+    'group group2 c -d --e',
     `>> #group group2
 >> node ./tests/data/args.js a b
 [ 'a', 'b', 'c', '-d', '--e' ]

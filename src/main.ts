@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import parseArgs from 'meow';
 import chalk from 'chalk';
 import { inspect } from 'util';
 import pMap from 'p-map';
@@ -12,12 +11,7 @@ import { Task } from './task.js';
 import { loadConfig, Config } from './config.js';
 import getTask from './getTask.js';
 import { runActions } from './actions.js';
-
-const dirname = nodepath.dirname(fileURLToPath(import.meta.url));
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const json = JSON.parse(
-  await readFile(nodepath.join(dirname, '../package.json'), 'utf8'),
-);
+import { parseArgs, Command } from './argsParser.js';
 
 function handleProcessError(msg: string) {
   // eslint-disable-next-line no-console
@@ -29,52 +23,37 @@ process.on('uncaughtException', (err) => {
   handleProcessError(err.message);
 });
 
-const cli = parseArgs(
-  `
+const dirname = nodepath.dirname(fileURLToPath(import.meta.url));
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const pkg = JSON.parse(
+  await readFile(nodepath.join(dirname, '../package.json'), 'utf8'),
+);
+
+const cmd = parseArgs(process.argv.slice(2));
+if (cmd.command === Command.help) {
+  // eslint-disable-next-line no-console
+  console.log(`
   Usage
-    $ ${json.name} <task>
+    $ ${pkg.name} <task>
 
   Options
-    --config, -c   Explicitly specify the config file
-    --args         Arguments passed to the command of the target task
+    --config       Explicitly specify the config file, --config=./config.js
     --verbose      Print verbose information during execution
     --private      Allow private tasks to be called from CLI
     --version, -v  Print version information
     
-`,
-  {
-    importMeta: import.meta,
-    flags: {
-      config: {
-        type: 'string',
-        alias: 'c',
-      },
-      args: {
-        type: 'string',
-      },
-      verbose: {
-        type: 'boolean',
-      },
-      version: {
-        type: 'boolean',
-        alias: 'v',
-      },
-      private: {
-        type: 'boolean',
-      },
-    },
-  },
-);
+`);
+  process.exit(0);
+}
 
-const { flags } = cli;
-if (flags.version) {
+if (cmd.command === Command.version) {
   // eslint-disable-next-line no-console
-  console.log(json.version);
-  process.exit();
+  console.log(pkg.version);
+  process.exit(0);
 }
 
 function verboseLog(s: string) {
-  if (flags.verbose) {
+  if (cmd.verbose) {
     // eslint-disable-next-line no-console
     console.log(`🚙 ${s}`);
   }
@@ -97,12 +76,24 @@ async function runCommandString(
         throw new Error(`"${command}" is not a valid task name`);
       }
       let innerTask: Task;
+      let matchedArgs: string[] = [];
+      let unmatchedArgs: string[] = [];
       try {
-        innerTask = getTask(config, cmdName.split(' '), true);
+        [innerTask, matchedArgs, unmatchedArgs] = getTask(
+          config,
+          cmdName.split(' '),
+          true,
+        );
+        if (unmatchedArgs.length) {
+          // eslint-disable-next-line no-param-reassign
+          args += ` ${unmatchedArgs.join(' ')}`;
+        }
       } catch (getTaskErr) {
         isTaskNotFoundErr = true;
         throw new Error(
-          `Error running command "${command}": ${errMsg(getTaskErr)}`,
+          `Error running command "${command}": ${errMsg(
+            getTaskErr,
+          )} [task "${matchedArgs.join(' ')}"]`,
         );
       }
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -128,10 +119,10 @@ async function runTask(
   // Env from parent tasks when called by another tasks.
   parentEnv: Record<string, string | undefined>,
 ): Promise<void> {
-  const cmdValue = task.run;
+  const runValue = task.run;
   // Run the specified task.
-  if (cmdValue === undefined) {
-    throw new Error(`No "run" field defined in command "${cmdDisplayName}"`);
+  if (runValue === undefined) {
+    throw new Error(`No \`run\` field found in task "${cmdDisplayName}"`);
   }
 
   if (cmdDisplayName) {
@@ -170,12 +161,12 @@ async function runTask(
   if (before) {
     await runActions(before);
   }
-  if (typeof cmdValue === 'string') {
-    await runCommandString(config, cmdValue, args, env, !!ignoreError);
-  } else if (Array.isArray(cmdValue)) {
+  if (typeof runValue === 'string') {
+    await runCommandString(config, runValue, args, env, !!ignoreError);
+  } else if (Array.isArray(runValue)) {
     try {
       await pMap(
-        cmdValue,
+        runValue,
         (subCmd) => runCommandString(config, subCmd, args, env, false),
         {
           concurrency: parallel ? undefined : 1,
@@ -188,8 +179,8 @@ async function runTask(
       }
     }
   } else {
-    // `cmdValue` is an object of actions.
-    await runActions(cmdValue);
+    // `runValue` is an object of actions.
+    await runActions(runValue);
   }
 
   if (after) {
@@ -197,15 +188,15 @@ async function runTask(
   }
 }
 
-const inputTasks = cli.input;
-if (inputTasks.length === 0) {
+const inputArgs = cmd.args;
+if (!inputArgs?.length) {
   throw new Error('No tasks specified');
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
   try {
-    const config = await loadConfig(flags.config);
+    const config = await loadConfig(cmd.configFile);
     const { settings } = config;
 
     verboseLog(
@@ -222,12 +213,16 @@ if (inputTasks.length === 0) {
         })}`,
       );
     }
-    const taskObj = getTask(config, inputTasks, flags.private || false);
+    const [taskObj, matchedArgs, unmatchedArgs] = getTask(
+      config,
+      inputArgs,
+      cmd.private || false,
+    );
     await runTask(
       config,
-      `#${inputTasks.join(' ')}`,
+      `#${matchedArgs.join(' ')}`,
       taskObj,
-      flags.args || '',
+      unmatchedArgs.join(' '),
       {},
     );
   } catch (err) {

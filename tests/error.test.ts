@@ -10,7 +10,7 @@ it('Not found (root)', async () => {
   a: 'AAA',
   b: 'BBB'
 }
-Task "xyz" is not defined. Valid top-level tasks are ["a","zzz"]
+The task you specified does not exist
 `,
     { hasError: true },
   );
@@ -20,7 +20,7 @@ it('Not found (with aliases)', async () => {
   await t(
     'notFoundWithAliasConf',
     'xyz',
-    `Task "xyz" is not defined. Valid top-level tasks are ["a","b(alias-of-b)"]
+    `The task you specified does not exist
 `,
     { hasError: true },
   );
@@ -34,7 +34,7 @@ it('Not found (in private)', async () => {
   a: 'AAA',
   b: 'BBB'
 }
-Task "priB" is private, you can only run it from other tasks
+Task "priB" is private, it can only be triggered by other tasks
 `,
     { hasError: true },
   );
@@ -64,7 +64,7 @@ it('Not found (in private, not a valid task)', async () => {
   a: 'AAA',
   b: 'BBB'
 }
-Task "priA" is private, you can only run it from other tasks
+Task "priA" is private, it can only be triggered by other tasks
 `,
     { hasError: true },
   );
@@ -78,7 +78,7 @@ it('Child not found (root)', async () => {
   a: 'AAA',
   b: 'BBB'
 }
-Task "a private" does not contain a child task named "xyz"
+No \`run\` field found in task "#a private"
 `,
     { hasError: true },
   );
@@ -93,7 +93,7 @@ it('Child not found (in private)', async () => {
   b: 'BBB'
 }
 >> #a trigger_err
-Error running command "#priA b xyz": Task "priA b" does not contain a child task named "xyz"
+No \`run\` field found in task "#priA b xyz"
 `,
     { hasError: true },
   );
