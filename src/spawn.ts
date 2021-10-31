@@ -1,4 +1,4 @@
-import execa from 'execa';
+import { spawn } from 'child_process';
 
 export default async function spawnMain(
   cmd: string,
@@ -18,11 +18,21 @@ export default async function spawnMain(
     ...env,
   };
 
-  const subprocess = execa.command(cmd, {
-    env: newEnv,
-    shell: true,
-    stdio: 'inherit',
+  return new Promise((resolve, reject) => {
+    const process = spawn(cmd, {
+      env: newEnv,
+      shell: true,
+      stdio: 'inherit',
+    });
+    process.on('close', (code) => {
+      if (code) {
+        reject(new Error(`Command failed with code ${code} (${cmd})`));
+      } else {
+        resolve();
+      }
+    });
+    process.on('error', (err) => {
+      reject(err);
+    });
   });
-  subprocess.stdout?.pipe(process.stdout);
-  await subprocess;
 }
