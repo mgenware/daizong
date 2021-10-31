@@ -4,5 +4,6 @@
     "outDir": "../dist_tests",
     "rootDir": "."
   },
-  "references": [{ "path": "../src" }]
+  "references": [{ "path": "../src" }],
+  "exclude": ["data"]
 }
