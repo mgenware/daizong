@@ -37,7 +37,6 @@
     "/dist/**/*.map"
   ],
   "dependencies": {
-    "catch-err-msg": "^1.0.0",
     "chalk": "^4.1.2",
     "del": "^6.0.0",
     "make-dir": "^3.1.0",

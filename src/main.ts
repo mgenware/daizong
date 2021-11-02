@@ -2,10 +2,10 @@
 import chalk from 'chalk';
 import { inspect } from 'util';
 import pMap from 'p-map';
-import errMsg from 'catch-err-msg';
 import { readFile } from 'fs/promises';
 import nodepath from 'path';
 import { fileURLToPath } from 'url';
+import errMsg from './errMsg.js';
 import spawnProcess from './spawn.js';
 import { Task } from './task.js';
 import { loadConfig, Config } from './config.js';
