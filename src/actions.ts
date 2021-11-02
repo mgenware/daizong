@@ -1,5 +1,5 @@
 import del from 'del';
-import colors from 'picocolors';
+import chalk from 'chalk';
 import pMap from 'p-map';
 import { mkdir as nodeMkdir } from 'fs/promises';
 
@@ -24,15 +24,15 @@ export async function runActions(actions: Actions): Promise<void> {
     async (prop: string) => {
       if (prop === 'mkdir' && mkdirInput) {
         // eslint-disable-next-line no-console
-        console.log(`>> ${colors.gray(`mkdir "${mkdirInput}"`)}`);
+        console.log(`>> ${chalk.gray(`mkdir "${mkdirInput}"`)}`);
         await mkdir(mkdirInput);
       } else if (prop === 'del' && delInput !== undefined) {
         // eslint-disable-next-line no-console
-        console.log(`>> ${colors.gray(`del ${JSON.stringify(delInput)}`)}`);
+        console.log(`>> ${chalk.gray(`del ${JSON.stringify(delInput)}`)}`);
         await del(delInput, { force: true });
       } else if (prop === 'mkdirDel' && mkdirDel) {
         // eslint-disable-next-line no-console
-        console.log(`>> ${colors.gray(`mkdirDel "${mkdirDel}"`)}`);
+        console.log(`>> ${chalk.gray(`mkdirDel "${mkdirDel}"`)}`);
         await del(mkdirDel);
         await mkdir(mkdirDel);
       }

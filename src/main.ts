@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-import colors from 'picocolors';
+import chalk from 'chalk';
 import { inspect } from 'util';
 import pMap from 'p-map';
 import { readFile } from 'fs/promises';
-import nodePath from 'path';
+import nodepath from 'path';
 import { fileURLToPath } from 'url';
 import errMsg from './errMsg.js';
 import spawnProcess from './spawn.js';
@@ -15,7 +15,7 @@ import { parseArgs, Command } from './argsParser.js';
 
 function handleProcessError(msg: string) {
   // eslint-disable-next-line no-console
-  console.log(colors.red(msg));
+  console.log(chalk.red(msg));
   process.exit(1);
 }
 
@@ -23,10 +23,10 @@ process.on('uncaughtException', (err) => {
   handleProcessError(err.message);
 });
 
-const dirname = nodePath.dirname(fileURLToPath(import.meta.url));
+const dirname = nodepath.dirname(fileURLToPath(import.meta.url));
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const pkg = JSON.parse(
-  await readFile(nodePath.join(dirname, '../package.json'), 'utf8'),
+  await readFile(nodepath.join(dirname, '../package.json'), 'utf8'),
 );
 
 const cmd = parseArgs(process.argv.slice(2));
@@ -100,7 +100,7 @@ async function runCommandString(
       promise = runTask(config, command, innerTask, args, inheritedEnv);
     } else {
       // eslint-disable-next-line no-console
-      console.log(`>> ${colors.yellow(command)}`);
+      console.log(`>> ${chalk.yellow(command)}`);
       promise = spawnProcess(command, args, inheritedEnv);
     }
     await promise;
