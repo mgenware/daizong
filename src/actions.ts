@@ -1,13 +1,17 @@
-import mkdir from 'make-dir';
 import del from 'del';
 import colors from 'picocolors';
 import pMap from 'p-map';
+import { mkdir as nodeMkdir } from 'fs/promises';
 
 export interface Actions {
   mkdir?: string;
   del?: string | string[];
   mkdirDel?: string;
   parallel?: boolean;
+}
+
+function mkdir(path: string) {
+  return nodeMkdir(path, { recursive: true });
 }
 
 export async function runActions(actions: Actions): Promise<void> {

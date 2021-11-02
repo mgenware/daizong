@@ -1,4 +1,3 @@
-import mkdir from 'make-dir';
 import { promises as fs } from 'fs';
 import * as assert from 'assert';
 import * as nodepath from 'path';
@@ -6,6 +5,10 @@ import { t } from './common.js';
 
 const conf = 'fsConf';
 const rootTmpDir = './tests/data/tmp';
+
+function mkdir(path: string) {
+  return fs.mkdir(path, { recursive: true });
+}
 
 async function newTmpDir(name: string): Promise<string> {
   const path = nodepath.join(rootTmpDir, name);
