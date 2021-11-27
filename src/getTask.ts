@@ -6,12 +6,11 @@ function findTask(config: Config, path: string[]): Task {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-explicit-any
   let obj = config.tasks as any;
   for (const arg of path) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    obj = obj[arg];
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (!obj[arg]) {
+    if (!obj) {
       break;
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      obj = obj[arg];
     }
   }
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
@@ -43,7 +42,7 @@ export default function getTask(
   const task = findTask(config, path);
   if (task.__isPrivate && !allowPrivate) {
     throw new Error(
-      `Task "${path.toString()}" is private, it can only be triggered by other tasks`,
+      `Task "${path.toString()}" is private, it can only be triggered by other tasks.`,
     );
   }
   return task;

@@ -64,34 +64,39 @@ class ArgsBuilder {
           break;
         }
         default: {
-          throw new Error(`Unknown option \`${s}\``);
+          throw new Error(`Unknown option \`${s}\`.`);
         }
       } // end of switch (s).
     } else {
       // eslint-disable-next-line no-lonely-if
       if (nextValue === BuilderNextValue.configFile) {
         result.configFile = s;
+        this.nextValue = BuilderNextValue.taskPath;
       } else if (nextValue === BuilderNextValue.taskPath) {
         result.taskPath = s.split('-');
+        this.nextValue = BuilderNextValue.taskArgs;
       }
     }
     return true;
   }
 
   getResult(): ArgsResult {
-    const { nextValue } = this;
+    const { result, nextValue } = this;
+    if (result.command !== Command.run) {
+      return result;
+    }
     if (nextValue === BuilderNextValue.configFile) {
       this.throwConfigFileNotSet();
     }
     if (nextValue === BuilderNextValue.taskPath) {
-      throw new Error('No task path specified');
+      throw new Error('No task path specified.');
     }
-    return this.result;
+    return result;
   }
 
   // eslint-disable-next-line class-methods-use-this
   private throwConfigFileNotSet() {
-    throw new Error("`--config` doesn't have a valid value set");
+    throw new Error("`--config` doesn't have a valid value set.");
   }
 }
 
