@@ -30,6 +30,17 @@ hi
   );
 });
 
+it('Single cmd (no run)', async () => {
+  await t(
+    confBasic,
+    'single_cmd_no_run',
+    `>> #single_cmd_no_run
+>> echo hi
+hi
+`,
+  );
+});
+
 it('Single cmd as a string', async () => {
   await t(
     confBasic,

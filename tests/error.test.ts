@@ -10,7 +10,7 @@ it('Not found (root)', async () => {
   a: 'AAA',
   b: 'BBB'
 }
-The task you specified does not exist
+Task "xyz" doesn't exist.
 `,
     { hasError: true },
   );
@@ -20,7 +20,7 @@ it('Not found (with aliases)', async () => {
   await t(
     'notFoundWithAliasConf',
     'xyz',
-    `The task you specified does not exist
+    `Task "xyz" doesn't exist.
 `,
     { hasError: true },
   );
@@ -34,7 +34,7 @@ it('Not found (in private)', async () => {
   a: 'AAA',
   b: 'BBB'
 }
-Task "priB" is private, it can only be triggered by other tasks
+Task "priB" is private, it can only be triggered by other tasks.
 `,
     { hasError: true },
   );
@@ -64,7 +64,7 @@ it('Not found (in private, not a valid task)', async () => {
   a: 'AAA',
   b: 'BBB'
 }
-Task "priA" is private, it can only be triggered by other tasks
+Task "priA" is private, it can only be triggered by other tasks.
 `,
     { hasError: true },
   );
@@ -73,12 +73,12 @@ Task "priA" is private, it can only be triggered by other tasks
 it('Child not found (root)', async () => {
   await t(
     conf,
-    'a private xyz',
+    'a-private-xyz',
     `Loaded default environment variables: {
   a: 'AAA',
   b: 'BBB'
 }
-No \`run\` field found in task "#a private"
+Task "a,private,xyz" doesn't exist.
 `,
     { hasError: true },
   );
@@ -87,13 +87,13 @@ No \`run\` field found in task "#a private"
 it('Child not found (in private)', async () => {
   await t(
     conf,
-    'a trigger_err',
+    'a-trigger_err',
     `Loaded default environment variables: {
   a: 'AAA',
   b: 'BBB'
 }
->> #a trigger_err
-No \`run\` field found in task "#priA b xyz"
+>> #a-trigger_err
+Error running command "#priA-b-xyz": Task "priA,b,xyz" doesn't exist.
 `,
     { hasError: true },
   );

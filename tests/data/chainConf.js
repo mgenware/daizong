@@ -14,6 +14,7 @@ export default {
         stop: {
           run: 'echo priA stopped',
         },
+        run: 'echo priA',
       },
       priB: {
         run: 'echo priB',
@@ -35,14 +36,14 @@ export default {
       run: 'echo a stopped',
     },
     trigger_err: {
-      run: '#priA b xyz',
+      run: '#priA-b-xyz',
     },
     private: {
       start: {
-        run: '#priA b start',
+        run: '#priA-b-start',
       },
       stop: {
-        run: '#priA stop',
+        run: '#priA-stop',
       },
     },
   },

@@ -12,6 +12,7 @@ export default {
   single_cmd_str: {
     run: 'node ./tests/data/delay.js 1000 haha',
   },
+  single_cmd_no_run: 'echo hi',
   multiple_cmds: {
     run: ['echo 1', 'echo 2'],
   },
