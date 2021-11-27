@@ -1,102 +1,107 @@
-/* eslint-disable no-param-reassign */
-const configFlag = '--config=';
-const quotesSet = new Set<string>(['"', '"']);
-
 export enum Command {
   version,
   help,
   run,
 }
 
-export interface Result {
+export interface ArgsResult {
   command: Command;
   configFile?: string;
-  args?: string[];
   verbose?: boolean;
   private?: boolean;
+  taskPath: string[];
+  taskArgs: string[];
 }
 
-function trimString(s: string, chars: Set<string>): string {
-  let start = 0;
-  let end = s.length;
-
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  while (start < end && chars.has(s[start]!)) {
-    ++start;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  while (end > start && chars.has(s[end - 1]!)) {
-    --end;
-  }
-
-  return start > 0 || end < s.length ? s.substring(start, end) : s;
+enum BuilderNextValue {
+  taskPath,
+  configFile,
+  taskArgs,
 }
 
-function trimFlagValue(s: string): string {
-  return trimString(s, quotesSet);
-}
+class ArgsBuilder {
+  private result: ArgsResult = {
+    command: Command.run,
+    taskPath: [],
+    taskArgs: [],
+  };
 
-function handleFlag(r: Result, flag: string) {
-  let switchHandled = true;
-  // eslint-disable-next-line default-case
-  switch (flag) {
-    case '-v':
-    case '--version': {
-      r.command = Command.version;
-      break;
-    }
-    case '--help': {
-      r.command = Command.help;
-      break;
-    }
-    case '--verbose': {
-      r.verbose = true;
-      break;
-    }
-    case '--private': {
-      r.private = true;
-      break;
-    }
-    default: {
-      switchHandled = false;
-    }
-  }
-  if (switchHandled) {
-    return;
-  }
-  if (flag.startsWith(configFlag)) {
-    r.configFile = trimFlagValue(flag.substr(configFlag.length));
-  } else {
-    console.warn(`[WARNING] Unknown flag: ${flag}`);
-  }
-}
+  private nextValue = BuilderNextValue.taskPath;
 
-export function parseArgs(args: string[]): Result {
-  // Dash arguments after a task name are considered
-  // arguments to the task instead of daizong.
-  // Example:
-  // a b --version -> run task "a b" with "--version".
-  const r: Result = { command: Command.run };
-  let i = 0;
-  for (; i < args.length; i++) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const arg = args[i]!;
-    if (arg.startsWith('-')) {
-      handleFlag(r, arg);
+  // Returns if args parsing should continue.
+  handleArg(s: string): boolean {
+    const { result, nextValue } = this;
+
+    // If task path is already set, all following arguments are task arguments.
+    if (nextValue === BuilderNextValue.taskArgs) {
+      result.taskArgs.push(s);
+      return true;
+    }
+    if (s.startsWith('-')) {
+      if (nextValue === BuilderNextValue.configFile) {
+        this.throwConfigFileNotSet();
+      }
+      switch (s) {
+        case '-v':
+        case '--version': {
+          result.command = Command.version;
+          return false;
+        }
+        case '--help': {
+          result.command = Command.help;
+          return false;
+        }
+        case '--verbose': {
+          result.verbose = true;
+          break;
+        }
+        case '--private': {
+          result.private = true;
+          break;
+        }
+        case '--config': {
+          this.nextValue = BuilderNextValue.configFile;
+          break;
+        }
+        default: {
+          throw new Error(`Unknown option \`${s}\``);
+        }
+      } // end of switch (s).
     } else {
+      // eslint-disable-next-line no-lonely-if
+      if (nextValue === BuilderNextValue.configFile) {
+        result.configFile = s;
+      } else if (nextValue === BuilderNextValue.taskPath) {
+        result.taskPath = s.split('-');
+      }
+    }
+    return true;
+  }
+
+  getResult(): ArgsResult {
+    const { nextValue } = this;
+    if (nextValue === BuilderNextValue.configFile) {
+      this.throwConfigFileNotSet();
+    }
+    if (nextValue === BuilderNextValue.taskPath) {
+      throw new Error('No task path specified');
+    }
+    return this.result;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private throwConfigFileNotSet() {
+    throw new Error("`--config` doesn't have a valid value set");
+  }
+}
+
+export function parseArgs(args: string[]): ArgsResult {
+  const builder = new ArgsBuilder();
+  for (const s of args) {
+    const shouldContinue = builder.handleArg(s);
+    if (!shouldContinue) {
       break;
     }
   }
-  // Return the result if command is not `run`.
-  if (r.command !== Command.run) {
-    return r;
-  }
-  if (i >= args.length) {
-    throw new Error('No tasks specified');
-  }
-  // `args` now has daizong flags stripped.
-  args = args.splice(i);
-  r.args = args;
-  return r;
+  return builder.getResult();
 }

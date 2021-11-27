@@ -16,6 +16,20 @@
 - Allow continue-on-error
 - Actions (create directories, delete files / directories)
 
+## Breaking changes
+
+### 0.20.0
+
+To avoid ambiguity between task names and arguments passed to tasks. Starting from 0.20.0, task names have to be separated by `-`. Example:
+
+```sh
+# Prior to 0.20.0
+daizong build windows --args
+
+# 0.20.0+
+daizong build-windows --args
+```
+
 ## Installation
 
 ```sh

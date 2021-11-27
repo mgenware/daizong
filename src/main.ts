@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import { inspect } from 'util';
 import pMap from 'p-map';
 import { readFile } from 'fs/promises';
-import nodepath from 'path';
+import nodePath from 'path';
 import { fileURLToPath } from 'url';
 import errMsg from './errMsg.js';
 import spawnProcess from './spawn.js';
@@ -23,10 +23,10 @@ process.on('uncaughtException', (err) => {
   handleProcessError(err.message);
 });
 
-const dirname = nodepath.dirname(fileURLToPath(import.meta.url));
+const dirname = nodePath.dirname(fileURLToPath(import.meta.url));
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const pkg = JSON.parse(
-  await readFile(nodepath.join(dirname, '../package.json'), 'utf8'),
+  await readFile(nodePath.join(dirname, '../package.json'), 'utf8'),
 );
 
 const cmd = parseArgs(process.argv.slice(2));
@@ -34,14 +34,16 @@ if (cmd.command === Command.help) {
   // eslint-disable-next-line no-console
   console.log(`
   Usage
-    $ ${pkg.name} <task>
+    $ ${pkg.name} [options] <task-path> [task arguments]
 
   Options
-    --config       Explicitly specify the config file, --config=./config.js
+    --config       Explicitly specify the config file, \`--config config.js\`
     --verbose      Print verbose information during execution
     --private      Allow private tasks to be called from CLI
     --version, -v  Print version information
     
+  Examples
+    $ ${pkg.name} --verbose test-browser --script-arg1 --script-arg2
 `);
   process.exit(0);
 }
@@ -76,24 +78,12 @@ async function runCommandString(
         throw new Error(`"${command}" is not a valid task name`);
       }
       let innerTask: Task;
-      let matchedArgs: string[] = [];
-      let unmatchedArgs: string[] = [];
       try {
-        [innerTask, matchedArgs, unmatchedArgs] = getTask(
-          config,
-          cmdName.split(' '),
-          true,
-        );
-        if (unmatchedArgs.length) {
-          // eslint-disable-next-line no-param-reassign
-          args += ` ${unmatchedArgs.join(' ')}`;
-        }
+        innerTask = getTask(config, cmdName.split('-'), true);
       } catch (getTaskErr) {
         isTaskNotFoundErr = true;
         throw new Error(
-          `Error running command "${command}": ${errMsg(
-            getTaskErr,
-          )} [task "${matchedArgs.join(' ')}"]`,
+          `Error running command "${command}": ${errMsg(getTaskErr)}`,
         );
       }
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -188,11 +178,6 @@ async function runTask(
   }
 }
 
-const inputArgs = cmd.args;
-if (!inputArgs?.length) {
-  throw new Error('No tasks specified');
-}
-
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
   try {
@@ -213,16 +198,12 @@ if (!inputArgs?.length) {
         })}`,
       );
     }
-    const [taskObj, matchedArgs, unmatchedArgs] = getTask(
-      config,
-      inputArgs,
-      cmd.private || false,
-    );
+    const taskObj = getTask(config, cmd.taskPath, cmd.private || false);
     await runTask(
       config,
-      `#${matchedArgs.join(' ')}`,
+      `#${cmd.taskPath.join('-')}`,
       taskObj,
-      unmatchedArgs.join(' '),
+      cmd.taskArgs.join(' '),
       {},
     );
   } catch (err) {
