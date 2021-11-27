@@ -63,7 +63,8 @@ export async function t(
     if (opt?.hasError) {
       // Split output into lines to avoid newline difference among different platforms.
       checkStrings(
-        splitString(err.stdout ?? ''),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        splitString(typeof err.stdout === 'string' ? err.stdout : ''),
         splitString(expected),
         opt.checkPrefixes,
       );
