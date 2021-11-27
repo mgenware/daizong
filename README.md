@@ -20,7 +20,7 @@
 
 #### 0.20.0+
 
-To avoid ambiguity between task names and arguments passed to tasks. Starting from 0.20.0, a task path have to be separated by `-` instead of a space:
+To avoid ambiguity between task names and arguments passed to tasks. Starting from 0.20.0, a task path has to be separated by `-` instead of a space:
 
 ```sh
 # Prior to 0.20.0
@@ -38,7 +38,7 @@ npm i daizong -D
 
 ## Usage
 
-Add daizong to `package.json` scripts (`r` stands for "run"):
+Add daizong to `package.json` scripts (`r` is short for "run"):
 
 ```json
 {
