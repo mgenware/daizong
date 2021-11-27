@@ -20,11 +20,11 @@
 
 ### 0.20.0
 
-To avoid ambiguity between task names and arguments passed to tasks. Starting from 0.20.0, task names have to be separated by `-`. Example:
+To avoid ambiguity between task names and arguments passed to tasks. Starting from 0.20.0, a task path have to be separated by `-` instead of a space:
 
 ```sh
 # Prior to 0.20.0
-daizong build windows --args
+daizong build windows --args # Don't use, deprecated.
 
 # 0.20.0+
 daizong build-windows --args
@@ -48,7 +48,7 @@ Add daizong to `package.json` scripts (`r` stands for "run"):
 }
 ```
 
-Create a `daizong.config.js` at the root of your project. You can run `npm run r <task>` or `yarn r <task>` to start a task.
+Create a `daizong.config.js` at the root of your project. Use `npm run r <task>` or `yarn r <task>` to start a task.
 
 ## Examples / Comparison with `package.json` scripts
 
@@ -66,9 +66,7 @@ daizong:
 
 ```js
 export default {
-  dev: {
-    run: 'tsc -b src -w',
-  },
+  dev: 'tsc -b src -w',
 };
 ```
 
@@ -88,9 +86,7 @@ daizong:
 
 ```js
 export default {
-  dev: {
-    run: ['touch a.md', 'touch b.md'],
-  },
+  dev: ['touch a.md', 'touch b.md'],
 };
 ```
 
@@ -109,6 +105,24 @@ In `package.json`, to support all major systems, you need to use 3rd-party libra
 ```
 
 daizong supports it out of the box:
+
+<blockquote>
+Full task definition: Since we're using more advanced features of a task, the shorthand task definition is no longer suited. We switch to the full task definition in the following example.
+
+```js
+export default {
+  // Shorthand: task value is either a string or an array of strings.
+  task1: 'echo hi',
+
+  // Full: task value is an object with a `run` field.
+  task2: {
+    run: 'echo hi',
+    /* More task settings can be used here. */
+  },
+};
+```
+
+</blockquote>
 
 ```js
 export default {
@@ -141,13 +155,37 @@ export default {
     run: ['#touch1', '#touch2'],
     parallel: true,
   },
-  touch1: {
-    run: 'touch a.md',
-  },
-  touch2: {
-    run: 'touch b.md',
+  touch1: 'touch a.md',
+  touch2: 'touch b.md',
+};
+```
+
+### Nested tasks
+
+Tasks can be nested to significantly improve readability.
+
+```js
+export default {
+  build: {
+    win: {
+      run: 'echo Windows build started',
+    },
+    linux: {
+      run: 'echo Linux build started',
+    },
+    all: {
+      run: '#build win', '#build linux',
+      parallel: true,
+    }
   },
 };
+```
+
+To run a specific nested task, you specified the task path separated by `-`:
+
+```sh
+npm run r build-linux
+npm run r build-all
 ```
 
 ### Environment variables
@@ -184,7 +222,7 @@ export default {
 };
 ```
 
-You can also define default environment variables, which will be automatically applied to all tasks:
+Default environment variables are also supported. Once configured, they will be automatically applied to all tasks:
 
 ```js
 export default {
@@ -249,7 +287,7 @@ export default {
 
 #### Environment variable definitions precedence
 
-Smaller number means higher precedence.
+Smaller numbers indicate higher precedence.
 
 1. `Task.env`
 2. `Task.envGroups` (last group overwrites preceding groups like `Object.assign`)
@@ -300,32 +338,6 @@ export default {
 };
 ```
 
-### Task groups
-
-```js
-export default {
-  build: {
-    win: {
-      run: 'echo Windows build started',
-    },
-    linux: {
-      run: 'echo Linux build started',
-    },
-    all: {
-      run: '#build win', '#build linux',
-      parallel: true,
-    }
-  },
-};
-```
-
-To run a specific task:
-
-```sh
-npm run r build linux
-npm run r build all
-```
-
 ### Actions
 
 Actions are a set of commonly used commands you can choose to run before or after a task:
@@ -367,7 +379,7 @@ export default {
 };
 ```
 
-Actions can be reused by simply wrapping them in `run` field:
+Actions can be reused by simply wrapping them in `run`:
 
 ```js
 export default {
@@ -441,16 +453,19 @@ You can set an alias for a public task:
 
 ```js
 export default {
-  build-all: {
+  build: {
     run: ['#build-windows', '#build-macos', '#build-linux'],
-    alias: 'b-all',
+    parallel: true,
+    alias: 'b',
   },
 };
 ```
 
-Now you can start the `build-all` task by `npm run r b-all`.
+Now you can start the task by using either `build` or its alias form `b`.
 
 ### Pass arguments to task command
+
+Just append the arguments to the task path:
 
 ```js
 export default {
@@ -474,11 +489,14 @@ echo hello i am zzz
 
 ```sh
   Usage
-    $ daizong <task>
+    $ daizong [options] <task-path> [task arguments]
 
   Options
-    --config       Explicitly specify the config file, --config=./config.js
+    --config       Explicitly specify the config file, `--config config.js`
     --verbose      Print verbose information during execution
     --private      Allow private tasks to be called from CLI
     --version, -v  Print version information
+
+  Examples
+    $ daizong --verbose test-browser --script-arg1 --script-arg2
 ```
