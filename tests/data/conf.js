@@ -16,6 +16,7 @@ export default {
   multiple_cmds: {
     run: ['echo 1', 'echo 2'],
   },
+  multiple_cmds_no_run: ['echo 1', 'echo 2'],
   delay1: {
     run: 'node ./tests/data/delay.js 1000 haha',
   },

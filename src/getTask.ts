@@ -20,10 +20,13 @@ function findTask(config: Config, path: string[]): Task {
   if (typeof obj === 'string') {
     return { run: obj };
   }
+  if (Array.isArray(obj)) {
+    return { run: obj };
+  }
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!obj.run) {
     throw new Error(
-      `A valid task is either a string or an object with a "run" field. Got ${JSON.stringify(
+      `A valid task could only be a string, an array of strings, or an object with a "run" field. Got ${JSON.stringify(
         obj,
       )}`,
     );

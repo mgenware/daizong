@@ -65,6 +65,19 @@ it('Multiple cmds', async () => {
   );
 });
 
+it('Multiple cmds (no run)', async () => {
+  await t(
+    confBasic,
+    'multiple_cmds_no_run',
+    `>> #multiple_cmds_no_run
+>> echo 1
+1
+>> echo 2
+2
+`,
+  );
+});
+
 it('Delay', async () => {
   await t(
     confBasic,
