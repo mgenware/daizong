@@ -11,6 +11,6 @@ export default {
     },
   },
   printAll: {
-    run: ['#print', 'node ./tests/data/args.js __', '#group-group2'],
+    run: ['#print', 'node ./tests/data/args.js __', 'node ./tests/data/args.js', '#group-group2'],
   },
 };

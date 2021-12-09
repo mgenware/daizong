@@ -67,6 +67,8 @@ it('Args are not passed to referenced tasks', async () => {
 []
 >> node ./tests/data/args.js __ a b
 [ '__', 'a', 'b' ]
+>> node ./tests/data/args.js a b
+[ 'a', 'b' ]
 >> #group-group2
 >> node ./tests/data/args.js a b
 [ 'a', 'b' ]
