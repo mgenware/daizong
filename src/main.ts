@@ -73,7 +73,7 @@ async function runCommandString(
     // Check if this command is calling another command.
     let promise: Promise<void>;
     if (command.startsWith('#')) {
-      const cmdName = command.substr(1);
+      const cmdName = command.substring(1);
       if (!cmdName) {
         throw new Error(`"${command}" is not a valid task name`);
       }
@@ -86,11 +86,16 @@ async function runCommandString(
           `Error running command "${command}": ${errMsg(getTaskErr)}`,
         );
       }
+      // NOTE: user specified arguments are not passed to the referenced task.
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      promise = runTask(config, command, innerTask, args, inheritedEnv);
+      promise = runTask(config, command, innerTask, '', inheritedEnv);
     } else {
+      let displayCmd = command;
+      if (args) {
+        displayCmd += ` ${args}`;
+      }
       // eslint-disable-next-line no-console
-      console.log(`>> ${chalk.yellow(command)}`);
+      console.log(`>> ${chalk.yellow(displayCmd)}`);
       promise = spawnProcess(command, args, inheritedEnv);
     }
     await promise;

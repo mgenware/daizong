@@ -2,7 +2,7 @@ import { t } from './common.js';
 
 const conf = 'argsConf';
 
-it('No args (1)', async () => {
+it('Call `print`', async () => {
   await t(
     conf,
     'print',
@@ -13,7 +13,7 @@ it('No args (1)', async () => {
   );
 });
 
-it('No args (2)', async () => {
+it('Call `printWithArgs`', async () => {
   await t(
     conf,
     'printWithArgs',
@@ -24,46 +24,52 @@ it('No args (2)', async () => {
   );
 });
 
-it('With args (1)', async () => {
+it('Call `print` with args', async () => {
   await t(
     conf,
     'print c -d --e',
     `>> #print
->> node ./tests/data/args.js
+>> node ./tests/data/args.js c -d --e
 [ 'c', '-d', '--e' ]
 `,
   );
 });
 
-it('With args (2)', async () => {
+it('Call `printWithArgs` with args', async () => {
   await t(
     conf,
     'printWithArgs c -d --e',
     `>> #printWithArgs
->> node ./tests/data/args.js a b
+>> node ./tests/data/args.js a b c -d --e
 [ 'a', 'b', 'c', '-d', '--e' ]
 `,
   );
 });
 
-it('With args (3)', async () => {
+it('Passing args in a nested task', async () => {
   await t(
     conf,
     'group-group2 c -d --e',
     `>> #group-group2
->> node ./tests/data/args.js a b
+>> node ./tests/data/args.js a b c -d --e
 [ 'a', 'b', 'c', '-d', '--e' ]
 `,
   );
 });
 
-it('With args (4)', async () => {
+it('Args are not passed to referenced tasks', async () => {
   await t(
     conf,
-    'group-group2 c -d --e',
-    `>> #group-group2
+    'printAll a b',
+    `>> #printAll
+>> #print
+>> node ./tests/data/args.js
+[]
+>> node ./tests/data/args.js __ a b
+[ '__', 'a', 'b' ]
+>> #group-group2
 >> node ./tests/data/args.js a b
-[ 'a', 'b', 'c', '-d', '--e' ]
+[ 'a', 'b' ]
 `,
   );
 });
