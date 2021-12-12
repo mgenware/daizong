@@ -4,7 +4,7 @@
 [![npm version](https://img.shields.io/npm/v/daizong.svg?style=flat-square)](https://npmjs.com/package/daizong)
 [![Node.js Version](http://img.shields.io/node/v/daizong.svg?style=flat-square)](https://nodejs.org/en/)
 
-`package.json` scripts runner. daizong supports the following features out of the box:
+`package.json` script runner for ES Modules. daizong supports the following features out of the box:
 
 - Run tasks sequentially or in parallel
 - Environment variables
@@ -500,3 +500,5 @@ echo hello i am zzz
   Examples
     $ daizong --verbose test-browser --script-arg1 --script-arg2
 ```
+
+## Use daizong in a CommonJS module
