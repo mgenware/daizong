@@ -502,3 +502,15 @@ echo hello i am zzz
 ```
 
 ## Use daizong in a CommonJS module
+
+Use `daizong.config.mjs` instead of `daizong.config.js`.
+
+Do this in `package.json`:
+
+```json
+{
+  "scripts": {
+    "r": "daizong --config daizong.config.mjs"
+  }
+}
+```
