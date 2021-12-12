@@ -13,7 +13,7 @@ export default {
   printAll: {
     run: [
       '#print',
-      'node ./tests/data/args.js __',
+      'node ./tests/data/args.js -a b --c',
       'node ./tests/data/args.js',
       '#group-group2',
     ],

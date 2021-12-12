@@ -57,7 +57,7 @@ it('Passing args in a nested task', async () => {
   );
 });
 
-it('Args are not passed to referenced tasks', async () => {
+it('Only first non-referenced sub-task receives input arguments', async () => {
   await t(
     conf,
     'printAll -d e --f',
@@ -65,13 +65,13 @@ it('Args are not passed to referenced tasks', async () => {
 >> #print
 >> node ./tests/data/args.js
 []
->> node ./tests/data/args.js __ -d e --f
-[ '__', 'a', 'b' ]
->> node ./tests/data/args.js -a b --c
-[ 'a', 'b' ]
+>> node ./tests/data/args.js -a b --c -d e --f
+[ '-a', 'b', '--c', '-d', 'e', '--f' ]
+>> node ./tests/data/args.js
+[]
 >> #group-group2
 >> node ./tests/data/args.js -a b --c
-[ 'a', 'b' ]
+[ '-a', 'b', '--c' ]
 `,
   );
 });

@@ -64,7 +64,7 @@ function verboseLog(s: string) {
 async function runCommandString(
   config: Config,
   command: string,
-  args: string,
+  args: string | null,
   inheritedEnv: Record<string, string | undefined>,
   ignoreError: boolean,
 ): Promise<void> {
@@ -110,7 +110,9 @@ async function runTask(
   config: Config,
   cmdDisplayName: string,
   task: Task,
-  args: string,
+  // If this task has multiple sub-tasks, arguments only apply to first sub-task that
+  // is not a referenced task.
+  args: string | null,
   // Env from parent tasks when called by another tasks.
   parentEnv: Record<string, string | undefined>,
 ): Promise<void> {
@@ -160,9 +162,20 @@ async function runTask(
     await runCommandString(config, runValue, args, env, !!ignoreError);
   } else if (Array.isArray(runValue)) {
     try {
+      const subTasksContext = runValue.map((t) => ({ run: t, args: '' }));
+      // Determine if a sub-task should have args.
+      if (args) {
+        for (const ctx of subTasksContext) {
+          if (!ctx.run.startsWith('#')) {
+            ctx.args = args;
+            break;
+          }
+        }
+      }
+
       await pMap(
-        runValue,
-        (subCmd) => runCommandString(config, subCmd, args, env, false),
+        subTasksContext,
+        (st) => runCommandString(config, st.run, st.args, env, false),
         {
           concurrency: parallel ? undefined : 1,
           stopOnError: !continueOnChildError,

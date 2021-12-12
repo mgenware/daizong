@@ -2,7 +2,7 @@ import { spawn } from 'child_process';
 
 export default async function spawnMain(
   cmd: string,
-  args: string,
+  args: string | null,
   env: Record<string, string | undefined> | undefined,
 ): Promise<void> {
   if (!cmd || !cmd.length) {
