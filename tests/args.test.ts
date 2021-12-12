@@ -18,8 +18,8 @@ it('Call `printWithArgs`', async () => {
     conf,
     'printWithArgs',
     `>> #printWithArgs
->> node ./tests/data/args.js a b
-[ 'a', 'b' ]
+>> node ./tests/data/args.js -a b --c
+[ '-a', 'b', '--c' ]
 `,
   );
 });
@@ -38,10 +38,10 @@ it('Call `print` with args', async () => {
 it('Call `printWithArgs` with args', async () => {
   await t(
     conf,
-    'printWithArgs c -d --e',
+    'printWithArgs -d e --f',
     `>> #printWithArgs
->> node ./tests/data/args.js a b c -d --e
-[ 'a', 'b', 'c', '-d', '--e' ]
+>> node ./tests/data/args.js -a b --c -d e --f
+[ '-a', 'b', '--c', '-d', 'e', '--f' ]
 `,
   );
 });
@@ -51,8 +51,8 @@ it('Passing args in a nested task', async () => {
     conf,
     'group-group2 c -d --e',
     `>> #group-group2
->> node ./tests/data/args.js a b c -d --e
-[ 'a', 'b', 'c', '-d', '--e' ]
+>> node ./tests/data/args.js -a b --c c -d --e
+[ '-a', 'b', '--c', 'c', '-d', '--e' ]
 `,
   );
 });
@@ -60,17 +60,17 @@ it('Passing args in a nested task', async () => {
 it('Args are not passed to referenced tasks', async () => {
   await t(
     conf,
-    'printAll a b',
+    'printAll -d e --f',
     `>> #printAll
 >> #print
 >> node ./tests/data/args.js
 []
->> node ./tests/data/args.js __ a b
+>> node ./tests/data/args.js __ -d e --f
 [ '__', 'a', 'b' ]
->> node ./tests/data/args.js a b
+>> node ./tests/data/args.js -a b --c
 [ 'a', 'b' ]
 >> #group-group2
->> node ./tests/data/args.js a b
+>> node ./tests/data/args.js -a b --c
 [ 'a', 'b' ]
 `,
   );
