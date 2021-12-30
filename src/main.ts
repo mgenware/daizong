@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import { inspect } from 'util';
 import pMap from 'p-map';
 import { readFile } from 'fs/promises';
-import nodePath from 'path';
+import np from 'path';
 import { fileURLToPath } from 'url';
 import errMsg from './errMsg.js';
 import spawnProcess from './spawn.js';
@@ -23,10 +23,10 @@ process.on('uncaughtException', (err) => {
   handleProcessError(err.message);
 });
 
-const dirname = nodePath.dirname(fileURLToPath(import.meta.url));
+const dirname = np.dirname(fileURLToPath(import.meta.url));
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const pkg = JSON.parse(
-  await readFile(nodePath.join(dirname, '../package.json'), 'utf8'),
+  await readFile(np.join(dirname, '../package.json'), 'utf8'),
 );
 
 const cmd = parseArgs(process.argv.slice(2));

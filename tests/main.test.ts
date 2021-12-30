@@ -1,13 +1,13 @@
 import { readFile } from 'fs/promises';
-import nodepath from 'path';
+import np from 'path';
 import { fileURLToPath } from 'url';
 import { t } from './common.js';
 
 const confBasic = 'conf';
-const dirname = nodepath.dirname(fileURLToPath(import.meta.url));
+const dirname = np.dirname(fileURLToPath(import.meta.url));
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const pkg = JSON.parse(
-  await readFile(nodepath.join(dirname, '../package.json'), 'utf8'),
+  await readFile(np.join(dirname, '../package.json'), 'utf8'),
 );
 
 it('-v', async () => {

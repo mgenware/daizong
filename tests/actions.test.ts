@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import * as assert from 'assert';
-import * as nodepath from 'path';
+import * as np from 'path';
 import { t } from './common.js';
 
 const conf = 'fsConf';
@@ -11,7 +11,7 @@ function mkdir(path: string) {
 }
 
 async function newTmpDir(name: string): Promise<string> {
-  const path = nodepath.join(rootTmpDir, name);
+  const path = np.join(rootTmpDir, name);
   await mkdir(path);
   return path;
 }
@@ -27,8 +27,8 @@ export async function isFile(path: string): Promise<boolean | null> {
 
 it('Actions(before), del with glob, mkdir', async () => {
   const path = await newTmpDir('before1');
-  await fs.writeFile(nodepath.join(path, 'a.txt'), 'haha');
-  await fs.writeFile(nodepath.join(path, 'a.json'), 'haha');
+  await fs.writeFile(np.join(path, 'a.txt'), 'haha');
+  await fs.writeFile(np.join(path, 'a.json'), 'haha');
 
   await t(
     conf,
@@ -47,9 +47,9 @@ hi
 
 it('Multiple inputs', async () => {
   const path = await newTmpDir('del-multiple');
-  await fs.writeFile(nodepath.join(path, 'a.txt'), 'haha');
-  await fs.writeFile(nodepath.join(path, 'b.txt'), 'haha');
-  await fs.writeFile(nodepath.join(path, 'c.txt'), 'haha');
+  await fs.writeFile(np.join(path, 'a.txt'), 'haha');
+  await fs.writeFile(np.join(path, 'b.txt'), 'haha');
+  await fs.writeFile(np.join(path, 'c.txt'), 'haha');
 
   await t(
     conf,
@@ -65,8 +65,8 @@ it('Multiple inputs', async () => {
 
 it('Actions(after), del with multiple args', async () => {
   const path = await newTmpDir('after1');
-  await fs.writeFile(nodepath.join(path, 'a.txt'), 'haha');
-  await fs.writeFile(nodepath.join(path, 'a.json'), 'haha');
+  await fs.writeFile(np.join(path, 'a.txt'), 'haha');
+  await fs.writeFile(np.join(path, 'a.json'), 'haha');
 
   await t(
     conf,
@@ -83,8 +83,8 @@ hi
 
 it('Run actions', async () => {
   const path = await newTmpDir('run1');
-  await fs.writeFile(nodepath.join(path, 'a.txt'), 'haha');
-  await fs.writeFile(nodepath.join(path, 'a.json'), 'haha');
+  await fs.writeFile(np.join(path, 'a.txt'), 'haha');
+  await fs.writeFile(np.join(path, 'a.json'), 'haha');
 
   await t(
     conf,
@@ -102,7 +102,7 @@ it('Run actions', async () => {
 it('Action order 1', async () => {
   const path = await newTmpDir('order1');
   // Create a file inside `order1`.
-  await fs.writeFile(nodepath.join(path, 'a.txt'), 'haha');
+  await fs.writeFile(np.join(path, 'a.txt'), 'haha');
 
   await t(
     conf,
@@ -135,7 +135,7 @@ it('Action order 2', async () => {
 it('mkdirDel 1', async () => {
   const path = await newTmpDir('mkdirDel1');
   // Create a file inside `mkdirDel1`.
-  await fs.writeFile(nodepath.join(path, 'a.txt'), 'haha');
+  await fs.writeFile(np.join(path, 'a.txt'), 'haha');
 
   await t(
     conf,

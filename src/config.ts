@@ -1,10 +1,10 @@
 import * as fs from 'fs';
-import * as nodepath from 'path';
+import * as np from 'path';
 import { fileURLToPath } from 'url';
 import { Task } from './task.js';
 
 const settingsKey = '_';
-const dirname = nodepath.dirname(fileURLToPath(import.meta.url));
+const dirname = np.dirname(fileURLToPath(import.meta.url));
 
 interface SettingsDefinition {
   defaultEnv?: Record<string, string | undefined>;
@@ -38,9 +38,9 @@ async function fileExists(file: string) {
 
 function normalizeImport(path: string): string {
   // eslint-disable-next-line no-param-reassign
-  path = nodepath.relative(dirname, path);
+  path = np.relative(dirname, path);
   if (process.platform === 'win32') {
-    return path.split(nodepath.sep).join(nodepath.posix.sep);
+    return path.split(np.sep).join(np.posix.sep);
   }
   return path;
 }
