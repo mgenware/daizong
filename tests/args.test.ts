@@ -75,3 +75,14 @@ it('Only first non-referenced sub-task receives input arguments', async () => {
 `,
   );
 });
+
+it('Call `printWithArgs` with args and spaces', async () => {
+  await t(
+    conf,
+    'printWithArgs -d e " aaa b cc" --f',
+    `>> #printWithArgs
+>> node ./tests/data/args.js -a b --c -d e " aaa b cc" --f
+[ '-a', 'b', '--c', '-d', 'e', ' aaa b cc', '--f' ]
+`,
+  );
+});
