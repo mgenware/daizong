@@ -13,15 +13,10 @@ import getTask from './getTask.js';
 import { runActions } from './actions.js';
 import { parseArgs, Command } from './argsParser.js';
 
-function handleProcessError(msg: string) {
+function log(s: unknown) {
   // eslint-disable-next-line no-console
-  console.log(chalk.red(msg));
-  process.exit(1);
+  console.log(s);
 }
-
-process.on('uncaughtException', (err) => {
-  handleProcessError(err.message);
-});
 
 const dirname = np.dirname(fileURLToPath(import.meta.url));
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -31,8 +26,7 @@ const pkg = JSON.parse(
 
 const cmd = parseArgs(process.argv.slice(2));
 if (cmd.command === Command.help) {
-  // eslint-disable-next-line no-console
-  console.log(`
+  log(`
   Usage
     $ ${pkg.name} [options] <task-path> [task arguments]
 
@@ -49,16 +43,21 @@ if (cmd.command === Command.help) {
 }
 
 if (cmd.command === Command.version) {
-  // eslint-disable-next-line no-console
-  console.log(pkg.version);
+  log(pkg.version);
   process.exit(0);
 }
 
-function verboseLog(s: string) {
-  if (cmd.verbose) {
-    // eslint-disable-next-line no-console
-    console.log(`🚙 ${s}`);
+function verboseLog(s: unknown) {
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  if (cmd.verbose && s) {
+    log(`[DEBUG] ${s}`);
   }
+}
+
+function handleProcessError(msg: string, error: Error) {
+  log(chalk.red(msg));
+  verboseLog(error.stack);
+  process.exit(1);
 }
 
 function getArgsDisplayString(args: string[]) {
@@ -106,8 +105,7 @@ async function runCommandString(
       if (args.length) {
         displayCmd += ` ${getArgsDisplayString(args)}`;
       }
-      // eslint-disable-next-line no-console
-      console.log(`>> ${chalk.yellow(displayCmd)}`);
+      log(`>> ${chalk.yellow(displayCmd)}`);
       promise = spawnProcess(command, args, inheritedEnv);
     }
     await promise;
@@ -135,8 +133,7 @@ async function runTask(
   }
 
   if (cmdDisplayName) {
-    // eslint-disable-next-line no-console
-    console.log(`>> ${cmdDisplayName}`);
+    log(`>> ${cmdDisplayName}`);
   }
 
   const { settings } = config;
@@ -218,13 +215,12 @@ async function runTask(
     const { settings } = config;
 
     verboseLog(
-      `Loaded config file at "${config?.path}"
+      `Loaded config file at "${config.path}"
   ${JSON.stringify(config)}
   `,
     );
     if (settings.defaultEnv) {
-      // eslint-disable-next-line no-console
-      console.log(
+      log(
         `Loaded default environment variables: ${inspect(settings.defaultEnv, {
           compact: false,
           sorted: true,
@@ -240,6 +236,6 @@ async function runTask(
       {},
     );
   } catch (err) {
-    handleProcessError(errMsg(err));
+    handleProcessError(errMsg(err), err as Error);
   }
 })();
