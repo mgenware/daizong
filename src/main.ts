@@ -6,7 +6,7 @@ import { readFile } from 'fs/promises';
 import np from 'path';
 import { fileURLToPath } from 'url';
 import errMsg from './errMsg.js';
-import spawnProcess from './spawn.js';
+import exec from './exec.js';
 import { Task } from './task.js';
 import { loadConfig, Config } from './config.js';
 import getTask from './getTask.js';
@@ -106,7 +106,7 @@ async function runCommandString(
         displayCmd += ` ${getArgsDisplayString(args)}`;
       }
       log(`>> ${chalk.yellow(displayCmd)}`);
-      promise = spawnProcess(command, args, inheritedEnv);
+      promise = exec(command, args, inheritedEnv);
     }
     await promise;
   } catch (err) {
