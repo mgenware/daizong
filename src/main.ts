@@ -61,10 +61,22 @@ function verboseLog(s: string) {
   }
 }
 
+function getArgsDisplayString(args: string[]) {
+  return args
+    .map((s) => {
+      // If current argument has spaces, surround it with quotes.
+      if (s.includes(' ')) {
+        return `"${s}"`;
+      }
+      return s;
+    })
+    .join(' ');
+}
+
 async function runCommandString(
   config: Config,
   command: string,
-  args: string | null,
+  args: string[],
   inheritedEnv: Record<string, string | undefined>,
   ignoreError: boolean,
 ): Promise<void> {
@@ -88,11 +100,11 @@ async function runCommandString(
       }
       // NOTE: user specified arguments are not passed to the referenced task.
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      promise = runTask(config, command, innerTask, '', inheritedEnv);
+      promise = runTask(config, command, innerTask, [], inheritedEnv);
     } else {
       let displayCmd = command;
-      if (args) {
-        displayCmd += ` ${args}`;
+      if (args.length) {
+        displayCmd += ` ${getArgsDisplayString(args)}`;
       }
       // eslint-disable-next-line no-console
       console.log(`>> ${chalk.yellow(displayCmd)}`);
@@ -112,7 +124,7 @@ async function runTask(
   task: Task,
   // If this task has multiple sub-tasks, arguments only apply to first sub-task that
   // is not a referenced task.
-  args: string | null,
+  args: string[],
   // Env from parent tasks when called by another tasks.
   parentEnv: Record<string, string | undefined>,
 ): Promise<void> {
@@ -162,9 +174,12 @@ async function runTask(
     await runCommandString(config, runValue, args, env, !!ignoreError);
   } else if (Array.isArray(runValue)) {
     try {
-      const subTasksContext = runValue.map((t) => ({ run: t, args: '' }));
+      const subTasksContext = runValue.map((t) => ({
+        run: t,
+        args: [] as string[],
+      }));
       // Determine if a sub-task should have args.
-      if (args) {
+      if (args.length) {
         for (const ctx of subTasksContext) {
           if (!ctx.run.startsWith('#')) {
             ctx.args = args;
@@ -221,7 +236,7 @@ async function runTask(
       config,
       `#${cmd.taskPath.join('-')}`,
       taskObj,
-      cmd.taskArgs.join(' '),
+      cmd.taskArgs,
       {},
     );
   } catch (err) {
