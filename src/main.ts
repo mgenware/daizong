@@ -110,6 +110,7 @@ async function runCommandString(
     }
     await promise;
   } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!ignoreError || isTaskNotFoundErr) {
       throw err;
     }

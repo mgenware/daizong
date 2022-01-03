@@ -1,11 +1,11 @@
-import { spawn } from 'cross-spawn';
+import spawn from 'cross-spawn';
 
 export default async function spawnMain(
   cmd: string,
   args: string[],
   env: Record<string, string | undefined> | undefined,
 ): Promise<void> {
-  if (!cmd || !cmd.length) {
+  if (!cmd.length) {
     throw new Error('Argument "cmd" cannot be empty');
   }
 

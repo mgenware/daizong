@@ -51,7 +51,7 @@ export async function t(
     }
     cmd += ` ${taskName}`;
     const output = await execAsync(cmd);
-    const outputString = output.stdout ?? '';
+    const outputString = output.stdout;
     // Split output into lines to avoid newline difference among different platforms.
     checkStrings(
       splitString(outputString),

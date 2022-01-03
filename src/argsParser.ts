@@ -68,13 +68,22 @@ class ArgsBuilder {
         }
       } // end of switch (s).
     } else {
-      // eslint-disable-next-line no-lonely-if
-      if (nextValue === BuilderNextValue.configFile) {
-        result.configFile = s;
-        this.nextValue = BuilderNextValue.taskPath;
-      } else if (nextValue === BuilderNextValue.taskPath) {
-        result.taskPath = s.split('-');
-        this.nextValue = BuilderNextValue.taskArgs;
+      switch (nextValue) {
+        case BuilderNextValue.configFile: {
+          result.configFile = s;
+          this.nextValue = BuilderNextValue.taskPath;
+          break;
+        }
+
+        case BuilderNextValue.taskPath: {
+          result.taskPath = s.split('-');
+          this.nextValue = BuilderNextValue.taskArgs;
+          break;
+        }
+
+        default: {
+          throw new Error(`Unexpected value ${nextValue}`);
+        }
       }
     }
     return true;
