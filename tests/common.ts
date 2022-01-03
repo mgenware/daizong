@@ -6,7 +6,9 @@ import * as assert from 'assert';
 const execAsync = promisify(exec);
 
 function splitString(str: string): string[] {
-  return str.split(/\r?\n/);
+  // Remove all double quotes (`echo` command with `cross-spawn` on windows
+  // produces a lot of quotes in output string).
+  return str.split(/\r?\n/).map((s) => s.replace(/"/g, ''));
 }
 
 function checkStrings(

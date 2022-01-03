@@ -184,7 +184,7 @@ it('Stops on error', async () => {
 1
 >> node ./tests/data/err.js
 error
-spawn node ./tests/data/err.js ENOENT
+Command failed with code 1 (node)
 `,
     { hasError: true },
   );
@@ -199,7 +199,7 @@ it('Stops on error on parallel tasks', async () => {
 1
 >> node ./tests/data/err.js 300
 error
-spawn node ./tests/data/err.js 300 ENOENT
+Command failed with code 1 (node)
 `,
     { hasError: true },
   );
