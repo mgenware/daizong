@@ -101,11 +101,10 @@ async function runCommandString(
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       promise = runTask(config, command, innerTask, [], inheritedEnv);
     } else {
-      let displayCmd = command;
-      if (args.length) {
-        displayCmd += ` ${getArgsDisplayString(args)}`;
-      }
-      log(`>> ${chalk.yellow(displayCmd)}`);
+      const argsText = args.length
+        ? ` ${chalk.cyan(getArgsDisplayString(args))}`
+        : '';
+      log(`>> ${chalk.yellow(command)}${argsText}`);
       promise = exec(command, args, inheritedEnv);
     }
     await promise;
