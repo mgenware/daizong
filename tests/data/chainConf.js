@@ -8,11 +8,11 @@ export default {
       priA: {
         b: {
           start: {
-            run: 'echo priA b started',
+            run: 'echo priA-b-started',
           },
         },
         stop: {
-          run: 'echo priA stopped',
+          run: 'echo priA-stopped',
         },
         run: 'echo priA',
       },
@@ -23,17 +23,17 @@ export default {
   },
   zzz: {
     start: {
-      run: 'echo a b started',
+      run: 'echo a-b-started',
     },
   },
   a: {
     b: {
       start: {
-        run: 'echo a b started',
+        run: 'echo a-b-started',
       },
     },
     stop: {
-      run: 'echo a stopped',
+      run: 'echo a-stopped',
     },
     trigger_err: {
       run: '#priA-b-xyz',

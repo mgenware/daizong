@@ -81,7 +81,7 @@ it('Call `printWithArgs` with args and spaces', async () => {
     conf,
     'printWithArgs -d e " aaa b cc" --f " \\(a"',
     `>> #printWithArgs
->> node ./tests/data/args.js -a b --c -d e  aaa b cc --f  \\(a
+>> node ./tests/data/args.js -a b --c -d e " aaa b cc" --f " \\(a"
 [ '-a', 'b', '--c', '-d', 'e', ' aaa b cc', '--f', ' \\\\(a' ]
 `,
   );

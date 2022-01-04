@@ -5,10 +5,16 @@ import * as assert from 'assert';
 
 const execAsync = promisify(exec);
 
+// `cross-spawn` causes windows echo to spit text in quotes.
+function stripQuotes(s: string) {
+  if (s.startsWith('"') && s.endsWith('"')) {
+    return s.substring(1, s.length - 1);
+  }
+  return s;
+}
+
 function splitString(str: string): string[] {
-  // Remove all double quotes (`echo` command with `cross-spawn` on windows
-  // produces a lot of quotes in output string).
-  return str.split(/\r?\n/).map((s) => s.replace(/"/g, ''));
+  return str.split(/\r?\n/).map((s) => stripQuotes(s));
 }
 
 function checkStrings(
