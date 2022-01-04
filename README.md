@@ -48,7 +48,21 @@ Add daizong to `package.json` scripts (`r` is short for "run"):
 }
 ```
 
-Create a `daizong.config.js` at the root of your project. Use `npm run r <task>` or `yarn r <task>` to start a task.
+Create a `daizong.config.js` at the root of your project. Use `npm run r <task>` or `yarn r <task>` to start a daizong task.
+
+It's strongly recommended to use [`daizong-cli`](https://github.com/mgenware/daizong-cli) to start daizong tasks in a shorter way.
+
+Install:
+
+```sh
+npm i -g daizong-cli
+```
+
+Usage:
+
+```sh
+dz build-linux # Much shorter than `npm run r build-linux`
+```
 
 ## Examples / Comparison with `package.json` scripts
 
@@ -184,8 +198,8 @@ export default {
 To run a specific nested task, you specified the task path separated by `-`:
 
 ```sh
-npm run r build-linux
-npm run r build-all
+dz build-linux
+dz build-all
 ```
 
 ### Environment variables
@@ -476,13 +490,13 @@ export default {
 ```
 
 ```sh
-npm run r hello i am zzz
+dz hello i am zzz --arg1 --arg2
 ```
 
 Which runs:
 
 ```sh
-echo hello i am zzz
+echo hello i am zzz --arg1 --arg2
 ```
 
 ## CLI Usage
