@@ -106,9 +106,7 @@ export default {
 
 ### Run tasks in parallel
 
-In `package.json`, to support all major systems, you need to use 3rd-party libraries like([concurrently](https://github.com/kimmobrunfeldt/concurrently)) to achieve this.
-
-`package.json`:
+We'll need 3rd-party libraries like([concurrently](https://github.com/kimmobrunfeldt/concurrently)) to achieve this in `package.json`:
 
 ```json
 {
@@ -121,15 +119,26 @@ In `package.json`, to support all major systems, you need to use 3rd-party libra
 daizong supports it out of the box:
 
 <blockquote>
-Full task definition: Since we're using more advanced features of a task, the shorthand task definition is no longer suited. We switch to the full task definition in the following example.
+
+### Shorthand and full task definitions
+
+Most tasks you see above are defined as a command string or an array of command strings:
 
 ```js
 export default {
-  // Shorthand: task value is either a string or an array of strings.
+  dev: ['touch a.md', 'touch b.md'],
+};
+```
+
+This is a shorthand task definition. As we're moving on to more advanced task features, the shorthand task definition is no longer suited and we can switch to its full definition:
+
+```js
+export default {
+  // Shorthand task definition is either a string or an array of strings.
   task1: 'echo hi',
 
-  // Full: task value is an object with a `run` field.
-  task2: {
+  // The `task1` above can be written in its full form.
+  task1: {
     run: 'echo hi',
     /* More task settings can be used here. */
   },
@@ -166,6 +175,7 @@ daizong:
 ```js
 export default {
   dev: {
+    // Use `#<task_name>` to call an existing task.
     run: ['#touch1', '#touch2'],
     parallel: true,
   },
@@ -174,9 +184,9 @@ export default {
 };
 ```
 
-### Nested tasks
+### Grouped tasks
 
-Tasks can be nested to significantly improve readability.
+Tasks can be grouped to improve readability.
 
 ```js
 export default {
@@ -188,14 +198,14 @@ export default {
       run: 'echo Linux build started',
     },
     all: {
-      run: '#build win', '#build linux',
+      run: '#build-win', '#build-linux',
       parallel: true,
     }
   },
 };
 ```
 
-To run a specific nested task, you specified the task path separated by `-`:
+To run a specified task in a group, separate all parent groups with `-`:
 
 ```sh
 dz build-linux
@@ -204,7 +214,7 @@ dz build-all
 
 ### Environment variables
 
-To support all major systems, you need to use 3rd-party libraries like([cross-env](https://github.com/kentcdodds/cross-env)) to achieve this in `package.json` scripts.
+To support all major operating systems, you need to use 3rd-party libraries like([cross-env](https://github.com/kentcdodds/cross-env)) to achieve this in `package.json` scripts.
 
 `package.json`:
 
@@ -223,6 +233,7 @@ daizong supports it out of the box:
 export default {
   build: {
     run: 'tsc -b src',
+    // Use `env` to specify environment variables.
     env: {
       NODE_ENV: 'production',
     },
@@ -269,10 +280,11 @@ export default {
     defaultEnv: {
       NODE_ENV: 'development',
     },
+    // Use `envGroups` to define multiple groups of environment variables.
     envGroups: {
       production: {
         NODE_ENV: 'production',
-        compression_level: 'max
+        compression_level: 'max',
       },
     },
   },
@@ -475,11 +487,11 @@ export default {
 };
 ```
 
-Now you can start the task by using either `build` or its alias form `b`.
+Now you can start the task by using either `build` or its alias `b`.
 
-### Pass arguments to task command
+### Pass arguments to a task
 
-Just append the arguments to the task path:
+Just append the arguments to task path:
 
 ```js
 export default {
@@ -498,6 +510,18 @@ Which runs:
 ```sh
 echo hello i am zzz --arg1 --arg2
 ```
+
+<blockquote>
+
+NOTE: Arguments specified before task name are considered daizong arguments, not task arguments. Example:
+
+```sh
+dz --config <val> build-clean --config <val>
+```
+
+The first `--config` argument applies to the daizong CLI, while the second `--config` argument gets passed to task command.
+
+</blockquote>
 
 ## CLI Usage
 
