@@ -30,41 +30,33 @@ daizong build windows --args # Don't use, deprecated.
 daizong build-windows --args
 ```
 
-## Installation
-
-```sh
-npm i daizong -D
-```
-
 ## Usage
 
-Add daizong to `package.json` scripts (`r` is short for "run"):
+- Install daizong as a dev dependency `npm i -D daizong` (you can skip this if you want daizong to be installed globally).
+- Create a `daizong.config.js` to define tasks (see examples below).
+- Use `npx daizong <task> --arg1 --arg2` to run a specific task.
 
-```json
-{
-  "scripts": {
-    "r": "daizong"
-  }
-}
-```
+<blockquote>
 
-Create a `daizong.config.js` at the root of your project. Use `npm run r <task>` or `yarn r <task>` to start a daizong task.
+It's also strongly recommended to use [`daizong-cli`](https://github.com/mgenware/daizong-cli) to start tasks in a shorter way.
 
-It's strongly recommended to use [`daizong-cli`](https://github.com/mgenware/daizong-cli) to start daizong tasks in a shorter way.
-
-Install:
+Installation:
 
 ```sh
 npm i -g daizong-cli
 ```
 
-Usage:
+Now instead of `npx daizong <task>`, you can do:
 
 ```sh
-dz build-linux # Much shorter than `npm run r build-linux`
+dz task
 ```
 
-## Examples / Comparison with `package.json` scripts
+Note that `daizong-cli` works regardless of whether daizong is installed locally or not.
+
+</blockquote>
+
+## Examples (daizong vs npm scripts)
 
 `package.json`:
 
