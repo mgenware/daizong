@@ -1,6 +1,6 @@
 {
   "name": "daizong",
-  "version": "0.22.3",
+  "version": "0.22.4",
   "description": "`package.json` script runner for ES Modules",
   "type": "module",
   "exports": "./dist/main.js",
