@@ -60,17 +60,14 @@ if (cmd.command === Command.version) {
   process.exit(0);
 }
 
-function verboseLog(s: unknown) {
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-  if (cmd.verbose && s) {
-    log(`[DEBUG] ${s}`);
-  }
-}
+const verboseLog: ((s: unknown) => void) | null = cmd.verbose
+  ? (s) => log(`[DEBUG] ${s}`)
+  : null;
 
 function processError(err: unknown) {
   if (err instanceof Error) {
     logError(err.message);
-    verboseLog(err.stack);
+    verboseLog?.(err.stack);
   } else {
     logError(`${err}`);
   }
@@ -122,7 +119,7 @@ async function runCommandString(
         ? ` ${chalk.cyan(getArgsDisplayString(args))}`
         : '';
       log(`>> ${chalk.yellow(command)}${argsText}`);
-      promise = spawn(command, args, inheritedEnv);
+      promise = spawn(command, args, inheritedEnv, verboseLog);
     }
     await promise;
   } catch (err) {
@@ -231,7 +228,7 @@ async function runTask(
     const config = await loadConfig(cmd.configFile);
     const { settings } = config;
 
-    verboseLog(
+    verboseLog?.(
       `Loaded config file at "${config.path}"
   ${JSON.stringify(config)}
   `,

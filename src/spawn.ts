@@ -22,11 +22,14 @@ export default async function spawn(
   inputCmd: string,
   inputArgs: string[],
   env: Record<string, string | undefined> | undefined,
+  logger: ((s: unknown) => void) | null,
 ): Promise<void> {
   if (!inputCmd.length) {
     throw new Error('Argument "cmd" cannot be empty');
   }
 
+  logger?.(`[spawn-input] ${inputCmd} | ${inputArgs}`);
+  logger?.(`[spawn-input-env] ${env}`);
   const tokens = parseCommand(inputCmd);
   if (!tokens[0]) {
     throw new Error(`Unexpected empty command parsed from "${inputCmd}"`);
@@ -35,14 +38,16 @@ export default async function spawn(
   const args = tokens.slice(1);
   args.push(...inputArgs);
 
-  const newEnv = {
+  const mergedEnv = {
     ...process.env,
     ...env,
   };
 
+  logger?.(`[spawn-run] ${cmd} | ${args}`);
+  logger?.(`[spawn-run-env] ${mergedEnv}`);
   return new Promise((resolve, reject) => {
     const process = nodeSpawn(cmd, args, {
-      env: newEnv,
+      env: mergedEnv,
       stdio: 'inherit',
     });
     process.on('close', (code) => {
