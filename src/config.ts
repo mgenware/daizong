@@ -51,7 +51,7 @@ export async function loadConfig(
   // eslint-disable-next-line no-param-reassign
   configFile = configFile ?? 'daizong.config.js';
   if (!(await fileExists(configFile))) {
-    throw new Error(`Config file "${configFile}" does not exist`);
+    throw new Error(`Config file "${configFile}" does not exist.`);
   }
   const rawConfig = (await import(normalizeImport(configFile)))
     ?.default as ConfigDefinition;

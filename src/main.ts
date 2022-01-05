@@ -18,13 +18,26 @@ function log(s: unknown) {
   console.log(s);
 }
 
+function logError(s: unknown) {
+  return log(chalk.red(s));
+}
+
 const dirname = np.dirname(fileURLToPath(import.meta.url));
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const pkg = JSON.parse(
   await readFile(np.join(dirname, '../package.json'), 'utf8'),
 );
 
-const cmd = parseArgs(process.argv.slice(2));
+const cliArgs = process.argv.slice(2);
+if (!cliArgs.length) {
+  logError('Missing task path.\nTry `daizong --help` for help.');
+  process.exit(1);
+}
+const cmd = parseArgs(cliArgs);
+if (cmd.error) {
+  logError(cmd.error);
+  process.exit(1);
+}
 if (cmd.command === Command.help) {
   log(`
   Usage
@@ -54,9 +67,13 @@ function verboseLog(s: unknown) {
   }
 }
 
-function handleProcessError(msg: string, error: Error) {
-  log(chalk.red(msg));
-  verboseLog(error.stack);
+function processError(err: unknown) {
+  if (err instanceof Error) {
+    logError(err.message);
+    verboseLog(err.stack);
+  } else {
+    logError(`${err}`);
+  }
   process.exit(1);
 }
 
@@ -236,6 +253,6 @@ async function runTask(
       {},
     );
   } catch (err) {
-    handleProcessError(errMsg(err), err as Error);
+    processError(err);
   }
 })();

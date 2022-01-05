@@ -10,8 +10,7 @@ it('Create and del a dir outside of WD', async () => {
 >> mkdir
 >> echo hi
 hi
->> del
-`,
+>> del`,
     { checkPrefixes: true },
   );
 });

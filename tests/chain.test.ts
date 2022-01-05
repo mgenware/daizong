@@ -12,8 +12,7 @@ it('Chain', async () => {
 }
 >> #a-b-start
 >> echo a-b-started
-a-b-started
-`,
+a-b-started`,
   );
 });
 
@@ -27,8 +26,7 @@ it('Chain 2', async () => {
 }
 >> #a-stop
 >> echo a-stopped
-a-stopped
-`,
+a-stopped`,
   );
 });
 
@@ -43,8 +41,7 @@ it('Chain (private)', async () => {
 >> #a-private-start
 >> #priA-b-start
 >> echo priA-b-started
-priA-b-started
-`,
+priA-b-started`,
   );
 });
 
@@ -59,7 +56,6 @@ it('Chain 2 (private)', async () => {
 >> #a-private-stop
 >> #priA-stop
 >> echo priA-stopped
-priA-stopped
-`,
+priA-stopped`,
   );
 });

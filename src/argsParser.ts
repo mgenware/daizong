@@ -11,6 +11,7 @@ export interface ArgsResult {
   private?: boolean;
   taskPath: string[];
   taskArgs: string[];
+  error?: string;
 }
 
 enum BuilderNextValue {
@@ -98,7 +99,7 @@ class ArgsBuilder {
       this.throwConfigFileNotSet();
     }
     if (nextValue === BuilderNextValue.taskPath) {
-      throw new Error('No task path specified.');
+      throw new Error('No task specified.');
     }
     return result;
   }
@@ -110,12 +111,21 @@ class ArgsBuilder {
 }
 
 export function parseArgs(args: string[]): ArgsResult {
-  const builder = new ArgsBuilder();
-  for (const s of args) {
-    const shouldContinue = builder.handleArg(s);
-    if (!shouldContinue) {
-      break;
+  try {
+    const builder = new ArgsBuilder();
+    for (const s of args) {
+      const shouldContinue = builder.handleArg(s);
+      if (!shouldContinue) {
+        break;
+      }
     }
+    return builder.getResult();
+  } catch (err) {
+    return {
+      error: err instanceof Error ? err.message : `${err}`,
+      command: Command.version,
+      taskPath: [],
+      taskArgs: [],
+    };
   }
-  return builder.getResult();
 }

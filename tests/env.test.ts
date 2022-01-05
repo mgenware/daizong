@@ -11,8 +11,7 @@ it('Default ENV', async () => {
 >> #parentTask
 >> #childTask
 >> node ./tests/data/env.js b
-BBB
-`,
+BBB`,
   );
 });
 
@@ -35,8 +34,7 @@ d
 group:a
 undefined
 b
-a
-`,
+a`,
   );
 });
 
@@ -60,7 +58,6 @@ d
 group:a
 parent:a
 b
-a
-`,
+a`,
   );
 });

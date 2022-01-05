@@ -57,22 +57,25 @@ export async function t(
     if (opt.args) {
       cmd += ` ${opt.args}`;
     }
-    cmd += ` ${taskName}`;
+    if (taskName.length) {
+      cmd += ` ${taskName}`;
+    }
     const output = await execAsync(cmd);
     const outputString = output.stdout;
     // Split output into lines to avoid newline difference among different platforms.
     checkStrings(
-      splitString(outputString),
+      splitString(outputString.trimEnd()),
       splitString(expected),
       opt.checkPrefixes,
     );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     if (opt?.hasError) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const output: string = typeof err.stdout === 'string' ? err.stdout : '';
       // Split output into lines to avoid newline difference among different platforms.
       checkStrings(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        splitString(typeof err.stdout === 'string' ? err.stdout : ''),
+        splitString(output.trimEnd()),
         splitString(expected),
         opt.checkPrefixes,
       );

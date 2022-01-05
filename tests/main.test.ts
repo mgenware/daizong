@@ -1,23 +1,6 @@
-import { readFile } from 'fs/promises';
-import np from 'path';
-import { fileURLToPath } from 'url';
 import { t } from './common.js';
 
 const confBasic = 'conf';
-const dirname = np.dirname(fileURLToPath(import.meta.url));
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const pkg = JSON.parse(
-  await readFile(np.join(dirname, '../package.json'), 'utf8'),
-);
-
-it('-v', async () => {
-  await t(
-    null,
-    '-v',
-    `${pkg.version}
-`,
-  );
-});
 
 it('Single cmd', async () => {
   await t(
@@ -25,8 +8,7 @@ it('Single cmd', async () => {
     'single_cmd',
     `>> #single_cmd
 >> echo hi
-hi
-`,
+hi`,
   );
 });
 
@@ -36,8 +18,7 @@ it('Single cmd (no run)', async () => {
     'single_cmd_no_run',
     `>> #single_cmd_no_run
 >> echo hi
-hi
-`,
+hi`,
   );
 });
 
@@ -47,8 +28,7 @@ it('Single cmd as a string', async () => {
     'single_cmd_str',
     `>> #single_cmd_str
 >> node ./tests/data/delay.js 1000 haha
-haha
-`,
+haha`,
   );
 });
 
@@ -60,8 +40,7 @@ it('Multiple cmds', async () => {
 >> echo 1
 1
 >> echo 2
-2
-`,
+2`,
   );
 });
 
@@ -73,8 +52,7 @@ it('Multiple cmds (no run)', async () => {
 >> echo 1
 1
 >> echo 2
-2
-`,
+2`,
   );
 });
 
@@ -84,8 +62,7 @@ it('Delay', async () => {
     'delay1',
     `>> #delay1
 >> node ./tests/data/delay.js 1000 haha
-haha
-`,
+haha`,
   );
 });
 
@@ -102,8 +79,7 @@ start
 >> echo hi
 hi
 >> echo end
-end
-`,
+end`,
   );
 });
 
@@ -115,8 +91,7 @@ it('Nested 2', async () => {
 >> #s3
 >> #single_cmd
 >> echo hi
-hi
-`,
+hi`,
   );
 });
 
@@ -127,8 +102,7 @@ it('Nested 3', async () => {
     `>> #s3
 >> #single_cmd
 >> echo hi
-hi
-`,
+hi`,
   );
 });
 
@@ -146,8 +120,7 @@ it('Parallel', async () => {
 >> echo hi
 hi
 haha
-slowest
-`,
+slowest`,
   );
 });
 
@@ -157,8 +130,7 @@ it('ENV set in config', async () => {
     'env1',
     `>> #env1
 >> node ./tests/data/env.js aaa
-123
-`,
+123`,
   );
 });
 
@@ -170,8 +142,7 @@ it('ENV cascading', async () => {
 >> #env2
 >> node ./tests/data/env.js a b
 1
-3
-`,
+3`,
   );
 });
 
@@ -184,8 +155,7 @@ it('Stops on error', async () => {
 1
 >> node ./tests/data/err.js
 error
-Command failed with code 1 (node)
-`,
+Command failed with code 1 (node)`,
     { hasError: true },
   );
 });
@@ -199,8 +169,7 @@ it('Stops on error on parallel tasks', async () => {
 1
 >> node ./tests/data/err.js 300
 error
-Command failed with code 1 (node)
-`,
+Command failed with code 1 (node)`,
     { hasError: true },
   );
 });
@@ -216,8 +185,7 @@ it('Ignore error', async () => {
 >> node ./tests/data/err.js 100
 error
 >> echo 2
-2
-`,
+2`,
   );
 });
 
@@ -232,8 +200,7 @@ it('Ignore error on parallel tasks', async () => {
 >> node ./tests/data/delay.js 1000 slowest
 error
 500
-slowest
-`,
+slowest`,
   );
 });
 
@@ -244,8 +211,7 @@ it('Private task', async () => {
     `>> #runPrivate
 >> #pri1
 >> echo private
-private
-`,
+private`,
   );
 });
 
@@ -260,7 +226,6 @@ it('Alias', async () => {
 >> #p
 >> #childTask
 >> node ./tests/data/env.js b
-BBB
-`,
+BBB`,
   );
 });

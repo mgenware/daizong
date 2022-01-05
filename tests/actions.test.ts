@@ -37,8 +37,7 @@ it('Actions(before), del with glob, mkdir', async () => {
 >> mkdir "tests/data/tmp/before1-new"
 >> del "tests/data/tmp/before1/*.txt"
 >> echo hi
-hi
-`,
+hi`,
   );
   assert.strictEqual(await isFile('tests/data/tmp/before1-new'), false);
   assert.strictEqual(await isFile('tests/data/tmp/before1/a.txt'), null);
@@ -55,8 +54,7 @@ it('Multiple inputs', async () => {
     conf,
     'delMultiple',
     `>> #delMultiple
->> del ["tests/data/tmp/del-multiple/a.txt","tests/data/tmp/del-multiple/b.txt"]
-`,
+>> del ["tests/data/tmp/del-multiple/a.txt","tests/data/tmp/del-multiple/b.txt"]`,
   );
   assert.strictEqual(await isFile('tests/data/tmp/del-multiple/a.txt'), null);
   assert.strictEqual(await isFile('tests/data/tmp/del-multiple/b.txt'), null);
@@ -74,8 +72,7 @@ it('Actions(after), del with multiple args', async () => {
     `>> #after
 >> echo hi
 hi
->> del ["tests/data/tmp/after1/*.*","!tests/data/tmp/after1/a.txt"]
-`,
+>> del ["tests/data/tmp/after1/*.*","!tests/data/tmp/after1/a.txt"]`,
   );
   assert.strictEqual(await isFile('tests/data/tmp/after1/a.txt'), true);
   assert.strictEqual(await isFile('tests/data/tmp/after1/a.json'), null);
@@ -91,8 +88,7 @@ it('Run actions', async () => {
     'runActions',
     `>> #runActions
 >> mkdir "tests/data/tmp/run1-new"
->> del "tests/data/tmp/run1/*.txt"
-`,
+>> del "tests/data/tmp/run1/*.txt"`,
   );
   assert.strictEqual(await isFile('tests/data/tmp/run1-new'), false);
   assert.strictEqual(await isFile('tests/data/tmp/run1/a.txt'), null);
@@ -109,8 +105,7 @@ it('Action order 1', async () => {
     'order1',
     `>> #order1
 >> del "tests/data/tmp/order1"
->> mkdir "tests/data/tmp/order1"
-`,
+>> mkdir "tests/data/tmp/order1"`,
   );
 
   // `order1` should be cleaned.
@@ -124,8 +119,7 @@ it('Action order 2', async () => {
     'order2',
     `>> #order2
 >> del "tests/data/tmp/order2"
->> mkdir "tests/data/tmp/order2"
-`,
+>> mkdir "tests/data/tmp/order2"`,
   );
 
   // `order2` should be created.
@@ -141,8 +135,7 @@ it('mkdirDel 1', async () => {
     conf,
     'mkdirDel1',
     `>> #mkdirDel1
->> mkdirDel "tests/data/tmp/mkdirDel1"
-`,
+>> mkdirDel "tests/data/tmp/mkdirDel1"`,
   );
 
   // `mkdirDel1` should be cleaned.
@@ -155,8 +148,7 @@ it('mkdirDel 2', async () => {
     conf,
     'mkdirDel2',
     `>> #mkdirDel2
->> mkdirDel "tests/data/tmp/mkdirDel2"
-`,
+>> mkdirDel "tests/data/tmp/mkdirDel2"`,
   );
 
   // `mkdirDel2` should be created.
