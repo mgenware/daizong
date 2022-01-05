@@ -1,4 +1,4 @@
-import { spawn } from 'cross-spawn';
+import { spawn as nodeSpawn } from 'cross-spawn';
 
 // Source: https://github.com/sindresorhus/execa/blob/main/lib/command.js
 const SPACES_REGEXP = / +/g;
@@ -18,7 +18,7 @@ function parseCommand(command: string) {
   return tokens;
 }
 
-export default async function exec(
+export default async function spawn(
   inputCmd: string,
   inputArgs: string[],
   env: Record<string, string | undefined> | undefined,
@@ -41,7 +41,7 @@ export default async function exec(
   };
 
   return new Promise((resolve, reject) => {
-    const process = spawn(cmd, args, {
+    const process = nodeSpawn(cmd, args, {
       env: newEnv,
       stdio: 'inherit',
     });
