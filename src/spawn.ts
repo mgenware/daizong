@@ -1,21 +1,7 @@
-import { spawn as nodeSpawn } from 'cross-spawn';
+import { spawn as nodeSpawn } from 'child_process';
 
-// Source: https://github.com/sindresorhus/execa/blob/main/lib/command.js
-const SPACES_REGEXP = / +/g;
-function parseCommand(command: string) {
-  const tokens: string[] = [];
-  for (const token of command.trim().split(SPACES_REGEXP)) {
-    // Allow spaces to be escaped by a backslash if not meant as a delimiter
-    const previousToken = tokens[tokens.length - 1];
-    if (previousToken && previousToken.endsWith('\\')) {
-      // Merge previous token with current one
-      tokens[tokens.length - 1] = `${previousToken.slice(0, -1)} ${token}`;
-    } else {
-      tokens.push(token);
-    }
-  }
-
-  return tokens;
+function escape(cmd: string) {
+  return `"${cmd.replace(/(["'$`\\])/g, '\\$1')}"`;
 }
 
 export default async function spawn(
@@ -30,23 +16,21 @@ export default async function spawn(
 
   logger?.(`[spawn-input] ${inputCmd} | ${inputArgs}`);
   logger?.(`[spawn-input-env] ${env}`);
-  const tokens = parseCommand(inputCmd);
-  if (!tokens[0]) {
-    throw new Error(`Unexpected empty command parsed from "${inputCmd}"`);
+  let cmd = inputCmd;
+  if (inputArgs.length) {
+    cmd += inputArgs.map((s) => ` ${escape(s)}`).join(' ');
   }
-  const cmd = tokens[0];
-  const args = tokens.slice(1);
-  args.push(...inputArgs);
 
   const mergedEnv = {
     ...process.env,
     ...env,
   };
 
-  logger?.(`[spawn-run] ${cmd} | ${args}`);
+  logger?.(`[spawn-run] ${cmd}`);
   logger?.(`[spawn-run-env] ${mergedEnv}`);
   return new Promise((resolve, reject) => {
-    const process = nodeSpawn(cmd, args, {
+    const process = nodeSpawn(cmd, {
+      shell: true,
       env: mergedEnv,
       stdio: 'inherit',
     });
