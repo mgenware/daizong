@@ -38,21 +38,19 @@ daizong build-windows --args
 
 <blockquote>
 
-It's also strongly recommended to use [`daizong-cli`](https://github.com/mgenware/daizong-cli) to start tasks in a shorter way.
-
-Installation:
+If you'd like to run daizong scripts in a shorter way, install daizong globally:
 
 ```sh
-npm i -g daizong-cli
+npm i -g daizong
 ```
 
 Now instead of `npx daizong <task>`, you can do:
 
 ```sh
-dz task
+dz <task>
 ```
 
-Note that `daizong-cli` works regardless of whether daizong is installed locally or not.
+Note that the global `dz` command works regardless of whether daizong is installed locally or not.
 
 </blockquote>
 

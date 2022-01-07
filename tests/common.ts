@@ -40,6 +40,7 @@ export interface TOptions {
   hasError?: boolean;
   args?: string;
   checkPrefixes?: boolean;
+  dz?: boolean;
 }
 
 export async function t(
@@ -50,7 +51,7 @@ export async function t(
 ): Promise<void> {
   try {
     opt = opt || {};
-    let cmd = 'node "./dist/main.js"';
+    let cmd = `node "./dist/${opt.dz ? 'dz' : 'main'}.js"`;
     if (configName) {
       cmd += ` --config "./tests/data/${configName}.js"`;
     }
