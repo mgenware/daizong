@@ -22,12 +22,6 @@ function logError(s: unknown) {
   return log(chalk.red(s));
 }
 
-const dirname = np.dirname(fileURLToPath(import.meta.url));
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const pkg = JSON.parse(
-  await readFile(np.join(dirname, '../package.json'), 'utf8'),
-);
-
 const cliArgs = process.argv.slice(2);
 if (!cliArgs.length) {
   logError('Missing task path.\nTry `daizong --help` for help.');
@@ -41,7 +35,7 @@ if (cmd.error) {
 if (cmd.command === Command.help) {
   log(`
   Usage
-    $ ${pkg.name} [options] <task-path> [task arguments]
+    $ daizong [options] <task-path> [task arguments]
 
   Options
     --config       Explicitly specify the config file, \`--config config.js\`
@@ -50,12 +44,17 @@ if (cmd.command === Command.help) {
     --version, -v  Print version information
     
   Examples
-    $ ${pkg.name} --verbose test-browser --script-arg1 --script-arg2
+    $ daizong --verbose test-browser --script-arg1 --script-arg2
 `);
   process.exit(0);
 }
 
 if (cmd.command === Command.version) {
+  const dirname = np.dirname(fileURLToPath(import.meta.url));
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const pkg = JSON.parse(
+    await readFile(np.join(dirname, '../package.json'), 'utf8'),
+  );
   log(pkg.version);
   process.exit(0);
 }
