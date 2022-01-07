@@ -13,7 +13,7 @@
   ],
   "bin": {
     "daizong": "./dist/main.js",
-    "dz": "./dist/cli.js"
+    "dz": "./dist/dz.js"
   },
   "repository": {
     "type": "git",
