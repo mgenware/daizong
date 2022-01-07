@@ -12,7 +12,8 @@
     "task runner"
   ],
   "bin": {
-    "daizong": "./dist/main.js"
+    "daizong": "./dist/main.js",
+    "dz": "./dist/cli.js"
   },
   "repository": {
     "type": "git",
