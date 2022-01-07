@@ -11,5 +11,6 @@ it('Verify package.json bin field', async () => {
   ).bin;
   assert.deepStrictEqual(binObj, {
     daizong: './dist/main.js',
+    dz: './dist/cli.js',
   });
 });
