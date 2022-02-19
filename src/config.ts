@@ -45,14 +45,23 @@ function normalizeImport(path: string): string {
   return path;
 }
 
+async function getConfigPath(files: string[]): Promise<string> {
+  for (const file of files) {
+    // eslint-disable-next-line no-await-in-loop
+    if (await fileExists(file)) {
+      return file;
+    }
+  }
+  throw new Error(`Config file "${files[0]}" does not exist.`);
+}
+
 export async function loadConfig(
   configFile: string | undefined,
 ): Promise<Config> {
   // eslint-disable-next-line no-param-reassign
-  configFile = configFile ?? 'daizong.config.js';
-  if (!(await fileExists(configFile))) {
-    throw new Error(`Config file "${configFile}" does not exist.`);
-  }
+  configFile = await getConfigPath(
+    configFile ? [configFile] : ['daizong.config.js', 'daizong.config.mjs'],
+  );
   const rawConfig = (await import(normalizeImport(configFile)))
     ?.default as ConfigDefinition;
   const rawSettings = (rawConfig[settingsKey] ||
