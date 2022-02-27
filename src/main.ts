@@ -159,17 +159,24 @@ async function runTask(
     continueOnChildError,
     envGroups,
   } = task;
-  let envGroupNames: string[] = [];
+  let envGroupNames: unknown[] = [];
   if (envGroups !== undefined) {
     envGroupNames = typeof envGroups === 'string' ? [envGroups] : envGroups;
   }
   const groupEnv: Record<string, string> = {};
   for (const groupName of envGroupNames) {
-    const vars = settings.envGroups[groupName];
-    if (vars === undefined) {
-      throw new Error(`Env group "${groupName}" is not defined`);
+    if (typeof groupName !== 'string') {
+      throw new Error(
+        `Env group names must be strings, got ${JSON.stringify(groupName)}.`,
+      );
     }
-    Object.assign(groupEnv, vars);
+    if (groupName) {
+      const vars = settings.envGroups[groupName];
+      if (vars === undefined) {
+        throw new Error(`Env group "${groupName}" is not defined`);
+      }
+      Object.assign(groupEnv, vars);
+    }
   }
   const env = {
     ...settings.defaultEnv,

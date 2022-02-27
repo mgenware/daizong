@@ -26,6 +26,26 @@ export default {
     },
     envGroups: ['group1', 'group2'],
   },
+  childTaskWithEmptyEnvGroups: {
+    run: 'node ./tests/data/env.js defA defB defC defD grpA prtA prtB a',
+    env: {
+      defB: 'b',
+      defD: 'd',
+      prtB: 'b',
+      a: 'a',
+    },
+    envGroups: ['group1', '', 'group2', ''],
+  },
+  childTaskWithInvalidEnvGroups: {
+    run: 'node ./tests/data/env.js defA defB defC defD grpA prtA prtB a',
+    env: {
+      defB: 'b',
+      defD: 'd',
+      prtB: 'b',
+      a: 'a',
+    },
+    envGroups: ['group1', 123, 'group2'],
+  },
   parentTask: {
     run: '#childTask',
     env: {

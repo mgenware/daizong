@@ -61,3 +61,42 @@ b
 a`,
   );
 });
+
+it('ENV groups should ignore empty names', async () => {
+  await t(
+    'envConf',
+    'childTaskWithEmptyEnvGroups',
+    `Loaded default environment variables: {
+  defA: 'default:a',
+  defB: 'default:b',
+  defC: 'default:c',
+  defD: 'default:d'
+}
+>> #childTaskWithEmptyEnvGroups
+>> node ./tests/data/env.js defA defB defC defD grpA prtA prtB a
+default:a
+b
+group2:c
+d
+group:a
+undefined
+b
+a`,
+  );
+});
+
+it('Invalid group names', async () => {
+  await t(
+    'envConf',
+    'childTaskWithInvalidEnvGroups',
+    `Loaded default environment variables: {
+  defA: 'default:a',
+  defB: 'default:b',
+  defC: 'default:c',
+  defD: 'default:d'
+}
+>> #childTaskWithInvalidEnvGroups
+Env group names must be strings, got 123.`,
+    { hasError: true },
+  );
+});
