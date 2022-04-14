@@ -172,9 +172,15 @@ async function runTask(
       );
     }
     if (groupName) {
-      const vars = settings.envGroups[groupName] ?? envPreset(groupName);
-      if (vars === undefined) {
-        throw new Error(`Env group "${groupName}" is not defined`);
+      let vars = settings.envGroups[groupName];
+      if (!vars) {
+        const preset = envPreset(groupName);
+        if (preset) {
+          vars = preset;
+        }
+        if (!vars) {
+          throw new Error(`Env group "${groupName}" is not defined`);
+        }
       }
       Object.assign(groupEnv, vars);
     }
