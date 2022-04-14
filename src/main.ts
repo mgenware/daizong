@@ -12,6 +12,7 @@ import { loadConfig, Config } from './config.js';
 import getTask from './getTask.js';
 import { runActions } from './actions.js';
 import { parseArgs, Command } from './argsParser.js';
+import { envPreset } from './envPreset.js';
 
 function log(s: unknown) {
   // eslint-disable-next-line no-console
@@ -171,7 +172,7 @@ async function runTask(
       );
     }
     if (groupName) {
-      const vars = settings.envGroups[groupName];
+      const vars = settings.envGroups[groupName] ?? envPreset(groupName);
       if (vars === undefined) {
         throw new Error(`Env group "${groupName}" is not defined`);
       }

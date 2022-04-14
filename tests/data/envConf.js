@@ -56,4 +56,12 @@ export default {
       prtB: 'parent:b',
     },
   },
+  presetDev: {
+    run: 'node ./tests/data/env.js NODE_ENV',
+    envGroups: ['node:dev'],
+  },
+  presetProd: {
+    run: 'node ./tests/data/env.js NODE_ENV',
+    envGroups: ['node:prod'],
+  },
 };

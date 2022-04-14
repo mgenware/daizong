@@ -15,7 +15,7 @@ BBB`,
   );
 });
 
-it('ENV groups (1)', async () => {
+it('ENV cascading', async () => {
   await t(
     'envConf',
     'childTask',
@@ -38,7 +38,7 @@ a`,
   );
 });
 
-it('ENV groups (2)', async () => {
+it('ENV cascading (called from another task)', async () => {
   await t(
     'envConf',
     'parentTask',
@@ -98,5 +98,37 @@ it('Invalid group names', async () => {
 >> #childTaskWithInvalidEnvGroups
 Env group names must be strings, got 123.`,
     { hasError: true },
+  );
+});
+
+it('Preset: node:dev', async () => {
+  await t(
+    'envConf',
+    'presetDev',
+    `Loaded default environment variables: {
+  defA: 'default:a',
+  defB: 'default:b',
+  defC: 'default:c',
+  defD: 'default:d'
+}
+>> #presetDev
+>> node ./tests/data/env.js NODE_ENV
+development`,
+  );
+});
+
+it('Preset: node:prod', async () => {
+  await t(
+    'envConf',
+    'presetProd',
+    `Loaded default environment variables: {
+  defA: 'default:a',
+  defB: 'default:b',
+  defC: 'default:c',
+  defD: 'default:d'
+}
+>> #presetProd
+>> node ./tests/data/env.js NODE_ENV
+production`,
   );
 });
