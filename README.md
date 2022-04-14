@@ -301,6 +301,22 @@ export default {
 };
 ```
 
+There are predefined env groups:
+
+- `node:dev`: `NODE_ENV` = `development`
+- `node:prod`: `NODE_ENV` = `production`
+
+Example:
+
+```js
+export default {
+  build: {
+    run: 'tsc -b src',
+    envGroups: ['node:dev'],
+  },
+};
+```
+
 #### Environment variable definitions precedence
 
 Smaller numbers indicate higher precedence.
