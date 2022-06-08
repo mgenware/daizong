@@ -60,7 +60,9 @@ export async function loadConfig(
 ): Promise<Config> {
   // eslint-disable-next-line no-param-reassign
   configFile = await getConfigPath(
-    configFile ? [configFile] : ['daizong.config.js', 'daizong.config.mjs'],
+    configFile
+      ? [configFile]
+      : ['daizong.config.js', 'daizong.config.mjs', 'daizong.config.cjs'],
   );
   const rawConfig = (await import(normalizeImport(configFile)))
     ?.default as ConfigDefinition;
