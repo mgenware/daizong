@@ -4,14 +4,21 @@ import pMap from 'p-map';
 import { mkdir as nodeMkdir } from 'fs/promises';
 
 export interface Actions {
-  mkdir?: string;
+  mkdir?: string | string[];
   del?: string | string[];
-  mkdirDel?: string;
+  mkdirDel?: string | string[];
   parallel?: boolean;
 }
 
 function mkdir(path: string) {
   return nodeMkdir(path, { recursive: true });
+}
+
+function stringToList(input: string | string[]): string[] {
+  if (typeof input === 'string') {
+    return [input];
+  }
+  return input;
 }
 
 export async function runActions(actions: Actions): Promise<void> {
@@ -25,16 +32,20 @@ export async function runActions(actions: Actions): Promise<void> {
       if (prop === 'mkdir' && mkdirInput) {
         // eslint-disable-next-line no-console
         console.log(`>> ${chalk.gray(`mkdir "${mkdirInput}"`)}`);
-        await mkdir(mkdirInput);
-      } else if (prop === 'del' && delInput !== undefined) {
+        await Promise.all(stringToList(mkdirInput).map((s) => mkdir(s)));
+      } else if (prop === 'del' && delInput) {
         // eslint-disable-next-line no-console
         console.log(`>> ${chalk.gray(`del ${JSON.stringify(delInput)}`)}`);
         await del(delInput, { force: true });
       } else if (prop === 'mkdirDel' && mkdirDel) {
         // eslint-disable-next-line no-console
         console.log(`>> ${chalk.gray(`mkdirDel "${mkdirDel}"`)}`);
-        await del(mkdirDel);
-        await mkdir(mkdirDel);
+        await Promise.all(
+          stringToList(mkdirDel).map(async (s) => {
+            await del(s);
+            await mkdir(s);
+          }),
+        );
       }
     },
     { concurrency },
