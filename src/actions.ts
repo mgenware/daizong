@@ -1,4 +1,4 @@
-import del from 'del';
+import { deleteAsync } from 'del';
 import chalk from 'chalk';
 import pMap from 'p-map';
 import { mkdir as nodeMkdir } from 'fs/promises';
@@ -36,13 +36,13 @@ export async function runActions(actions: Actions): Promise<void> {
       } else if (prop === 'del' && delInput) {
         // eslint-disable-next-line no-console
         console.log(`>> ${chalk.gray(`del ${JSON.stringify(delInput)}`)}`);
-        await del(delInput, { force: true });
+        await deleteAsync(delInput, { force: true });
       } else if (prop === 'mkdirDel' && mkdirDel) {
         // eslint-disable-next-line no-console
         console.log(`>> ${chalk.gray(`mkdirDel "${mkdirDel}"`)}`);
         await Promise.all(
           stringToList(mkdirDel).map(async (s) => {
-            await del(s);
+            await deleteAsync(s);
             await mkdir(s);
           }),
         );
