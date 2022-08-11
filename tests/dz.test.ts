@@ -2,9 +2,7 @@ import { t } from './common.js';
 
 const conf = 'argsConf';
 
-const isNotWindows = process.platform !== 'win32';
-
-if (isNotWindows) {
+if (process.platform !== 'win32' && !process.env.CI) {
   it('No args', async () => {
     await t(
       conf,
