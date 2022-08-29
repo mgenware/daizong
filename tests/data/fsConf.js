@@ -54,4 +54,14 @@ export default {
       ],
     },
   },
+  runActionsMixed: {
+    run: [
+      'echo 1',
+      {
+        mkdir: 'tests/data/tmp/runActionsMixed-new',
+        del: 'tests/data/tmp/runActionsMixed-del/*.txt',
+      },
+      'echo 2',
+    ],
+  },
 };

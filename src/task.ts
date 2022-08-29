@@ -1,6 +1,6 @@
 import { BTCommands } from './btCmd.js';
 
-export type RunValueType = string | string[] | BTCommands;
+export type RunValueType = string | Array<string | BTCommands> | BTCommands;
 
 export interface Task {
   run?: RunValueType;

@@ -221,7 +221,7 @@ async function runTask(
       // Determine if a sub-task should have args.
       if (args.length) {
         for (const ctx of subTasksContext) {
-          if (!ctx.run.startsWith('#')) {
+          if (typeof ctx.run !== 'string' || !ctx.run.startsWith('#')) {
             ctx.args = args;
             break;
           }
@@ -230,7 +230,12 @@ async function runTask(
 
       await pMap(
         subTasksContext,
-        (st) => runCommandString(config, st.run, st.args, env, false),
+        (st) => {
+          if (typeof st.run === 'string') {
+            return runCommandString(config, st.run, st.args, env, false);
+          }
+          return runBTCommands(st.run);
+        },
         {
           concurrency: parallel ? undefined : 1,
           stopOnError: !continueOnChildError,

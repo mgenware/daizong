@@ -250,6 +250,29 @@ export default {
 };
 ```
 
+You can mix built-in commands and command strings in `run`:
+
+```js
+export default {
+  prepare: {
+    run: [
+      // 1. Run a built-in command.
+      {
+        mkdir: 'dist',
+      },
+      // 2. Run a command.
+      'echo working...',
+      // 3. Run another task.
+      '#build',
+      // 4. Run another built-in command.
+      {
+        del: 'tmp',
+      },
+    ],
+  },
+};
+```
+
 ### Groups
 
 Tasks can be grouped to improve readability.

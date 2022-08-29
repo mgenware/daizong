@@ -80,7 +80,7 @@ hi
   assert.strictEqual(await isFile('tests/data/tmp/after1/a.json'), null);
 });
 
-it('Run actions', async () => {
+it('Run BT commands', async () => {
   const path = await newTmpDir('run1');
   await fs.writeFile(np.join(path, 'a.txt'), 'haha');
   await fs.writeFile(np.join(path, 'a.json'), 'haha');
@@ -97,7 +97,7 @@ it('Run actions', async () => {
   assert.strictEqual(await isFile('tests/data/tmp/run1/a.json'), true);
 });
 
-it('Action order 1', async () => {
+it('BT command order 1', async () => {
   const path = await newTmpDir('order1');
   // Create a file inside `order1`.
   await fs.writeFile(np.join(path, 'a.txt'), 'haha');
@@ -115,7 +115,7 @@ it('Action order 1', async () => {
   assert.strictEqual(await isFile('tests/data/tmp/order1/a.txt'), null);
 });
 
-it('Action order 2', async () => {
+it('BT command order 2', async () => {
   await t(
     conf,
     'order2',
@@ -155,4 +155,31 @@ it('mkdirDel 2', async () => {
 
   // `mkdirDel2` should be created.
   assert.strictEqual(await isFile('tests/data/tmp/mkdirDel2'), false);
+});
+
+it('Run BT commands (mixed with string commands)', async () => {
+  const path = await newTmpDir('run1');
+  await fs.writeFile(np.join(path, 'a.txt'), 'haha');
+  await fs.writeFile(np.join(path, 'a.json'), 'haha');
+
+  await t(
+    conf,
+    'runActionsMixed',
+    `>> #runActionsMixed
+>> echo 1
+1
+>> mkdir "tests/data/tmp/runActionsMixed-new"
+>> del "tests/data/tmp/runActionsMixed-del/*.txt"
+>> echo 2
+2`,
+  );
+  assert.strictEqual(await isFile('tests/data/tmp/runActionsMixed-new'), false);
+  assert.strictEqual(
+    await isFile('tests/data/tmp/runActionsMixed-del/a.txt'),
+    null,
+  );
+  assert.strictEqual(
+    await isFile('tests/data/tmp/runActionsMixed-del/a.json'),
+    true,
+  );
 });
