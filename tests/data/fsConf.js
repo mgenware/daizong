@@ -20,8 +20,8 @@ export default {
   },
   runActions: {
     run: {
-      mkdir: 'tests/data/tmp/run1-new',
-      del: 'tests/data/tmp/run1/*.txt',
+      mkdir: 'tests/data/tmp/run-bt-cmds-new',
+      del: 'tests/data/tmp/run-bt-cmds/*.txt',
     },
   },
   order1: {
@@ -58,8 +58,8 @@ export default {
     run: [
       'echo 1',
       {
-        mkdir: 'tests/data/tmp/runActionsMixed-new',
-        del: 'tests/data/tmp/runActionsMixed-del/*.txt',
+        mkdir: 'tests/data/tmp/run-bt-cmds-mix-new',
+        del: 'tests/data/tmp/run-bt-cmds-mix/*.txt',
       },
       'echo 2',
     ],

@@ -81,7 +81,7 @@ hi
 });
 
 it('Run BT commands', async () => {
-  const path = await newTmpDir('run1');
+  const path = await newTmpDir('run-bt-cmds');
   await fs.writeFile(np.join(path, 'a.txt'), 'haha');
   await fs.writeFile(np.join(path, 'a.json'), 'haha');
 
@@ -89,12 +89,12 @@ it('Run BT commands', async () => {
     conf,
     'runActions',
     `>> #runActions
->> mkdir "tests/data/tmp/run1-new"
->> del "tests/data/tmp/run1/*.txt"`,
+>> mkdir "tests/data/tmp/run-bt-cmds-new"
+>> del "tests/data/tmp/run-bt-cmds/*.txt"`,
   );
-  assert.strictEqual(await isFile('tests/data/tmp/run1-new'), false);
-  assert.strictEqual(await isFile('tests/data/tmp/run1/a.txt'), null);
-  assert.strictEqual(await isFile('tests/data/tmp/run1/a.json'), true);
+  assert.strictEqual(await isFile('tests/data/tmp/run-bt-cmds-new'), false);
+  assert.strictEqual(await isFile('tests/data/tmp/run-bt-cmds/a.txt'), null);
+  assert.strictEqual(await isFile('tests/data/tmp/run-bt-cmds/a.json'), true);
 });
 
 it('BT command order 1', async () => {
@@ -158,7 +158,7 @@ it('mkdirDel 2', async () => {
 });
 
 it('Run BT commands (mixed with string commands)', async () => {
-  const path = await newTmpDir('run1');
+  const path = await newTmpDir('run-bt-cmds-mix');
   await fs.writeFile(np.join(path, 'a.txt'), 'haha');
   await fs.writeFile(np.join(path, 'a.json'), 'haha');
 
@@ -168,18 +168,18 @@ it('Run BT commands (mixed with string commands)', async () => {
     `>> #runActionsMixed
 >> echo 1
 1
->> mkdir "tests/data/tmp/runActionsMixed-new"
->> del "tests/data/tmp/runActionsMixed-del/*.txt"
+>> mkdir "tests/data/tmp/run-bt-cmds-mix-new"
+>> del "tests/data/tmp/run-bt-cmds-mix/*.txt"
 >> echo 2
 2`,
   );
   assert.strictEqual(await isFile('tests/data/tmp/runActionsMixed-new'), false);
   assert.strictEqual(
-    await isFile('tests/data/tmp/runActionsMixed-del/a.txt'),
+    await isFile('tests/data/tmp/run-bt-cmds-mix/a.txt'),
     null,
   );
   assert.strictEqual(
-    await isFile('tests/data/tmp/runActionsMixed-del/a.json'),
+    await isFile('tests/data/tmp/run-bt-cmds-mix/a.json'),
     true,
   );
 });
