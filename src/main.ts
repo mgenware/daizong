@@ -10,7 +10,7 @@ import spawn from './spawn.js';
 import { Task } from './task.js';
 import { loadConfig, Config } from './config.js';
 import getTask from './getTask.js';
-import { runActions } from './actions.js';
+import { runBTCommands } from './btCmd.js';
 import { parseArgs, Command } from './argsParser.js';
 import { envPreset } from './envPreset.js';
 
@@ -130,24 +130,33 @@ async function runCommandString(
   }
 }
 
+// Makes sure `before` or `after` only accepts `#<task_name>`.
+function checkBeforeOrAfterValue(value: string) {
+  if (!value.startsWith('#')) {
+    throw new Error(
+      `\`before\` or \`after\` only accepts other task names. Got "${value}"`,
+    );
+  }
+}
+
 async function runTask(
   config: Config,
-  cmdDisplayName: string,
+  displayName: string,
   task: Task,
   // If this task has multiple sub-tasks, arguments only apply to first sub-task that
   // is not a referenced task.
   args: string[],
   // Env from parent tasks when called by another tasks.
   parentEnv: Record<string, string | undefined>,
-): Promise<void> {
+) {
   const runValue = task.run;
   // Run the specified task.
   if (runValue === undefined) {
-    throw new Error(`No \`run\` field found in task "${cmdDisplayName}"`);
+    throw new Error(`No \`run\` field found in task "${displayName}"`);
   }
 
-  if (cmdDisplayName) {
-    log(`>> ${cmdDisplayName}`);
+  if (displayName) {
+    log(`>> ${displayName}`);
   }
 
   const { settings } = config;
@@ -192,7 +201,14 @@ async function runTask(
     ...taskEnv,
   };
   if (before) {
-    await runActions(before);
+    checkBeforeOrAfterValue(before);
+    await runTask(
+      config,
+      `${displayName} (before)`,
+      getTask(config, [before.substring(1)], true),
+      args,
+      parentEnv,
+    );
   }
   if (typeof runValue === 'string') {
     await runCommandString(config, runValue, args, env, !!ignoreError);
@@ -226,12 +242,19 @@ async function runTask(
       }
     }
   } else {
-    // `runValue` is an object of actions.
-    await runActions(runValue);
+    // `runValue` is an object of BT commands.
+    await runBTCommands(runValue);
   }
 
   if (after) {
-    await runActions(after);
+    checkBeforeOrAfterValue(after);
+    await runTask(
+      config,
+      `${displayName} (after)`,
+      getTask(config, [after.substring(1)], true),
+      args,
+      parentEnv,
+    );
   }
 }
 
@@ -254,11 +277,11 @@ async function runTask(
         })}`,
       );
     }
-    const taskObj = getTask(config, cmd.taskPath, cmd.private || false);
+    const startingTask = getTask(config, cmd.taskPath, cmd.private || false);
     await runTask(
       config,
       `#${cmd.taskPath.join('-')}`,
-      taskObj,
+      startingTask,
       cmd.taskArgs,
       {},
     );

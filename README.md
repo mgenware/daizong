@@ -14,7 +14,8 @@
 - Define tasks in groups
 - Private tasks
 - Allow continue-on-error
-- Actions (create directories, delete files / directories)
+- Build-in commands (create directories, delete files and directories)
+- `before` and `after` fields
 
 ### Breaking changes
 
@@ -174,7 +175,82 @@ export default {
 };
 ```
 
-### Grouped tasks
+### Built-in commands
+
+`run` also accepts an object. In that case, you are running daizong built-in commands:
+
+- `mkdir`: `string` creates a directory and its parents if needed.
+- `del`: `string | string[]` deletes files or directories based on the given paths or globs. See [del](https://github.com/sindresorhus/del#usage) for details.
+  - Examples: `del: 'dist/*.js.map'`, `del: ['a.txt', 'b.txt']`.
+- `mkdirDel`: `string` = `del <dir>` + `mkdir <dir>`.
+
+Example:
+
+```js
+export default {
+  prepare: {
+    run: {
+      mkdir: 'dist',
+      del: 'cache',
+    },
+  },
+  dev: {
+    run: ['#prepare', 'echo dev'],
+  },
+  build: {
+    run: ['#prepare', 'echo build'],
+  },
+};
+```
+
+Parallel mode:
+
+```js
+export default {
+  prepare: {
+    run: {
+      mkdir: 'dist',
+      del: 'cache',
+      parallel: true,
+    },
+  },
+  dev: {
+    run: ['#prepare', 'echo dev'],
+  },
+  build: {
+    run: ['#prepare', 'echo build'],
+  },
+};
+```
+
+Note that when `parallel` is false (which is the default value), **built-in commands are executed sequentially in declaring order**:
+
+```js
+export default {
+  prepare: {
+    run: {
+      // `del dist` runs first!
+      del: 'dist',
+      mkdir: 'dist',
+    },
+  },
+};
+```
+
+The above example is equivalent to:
+
+```js
+export default {
+  prepare: {
+    run: {
+      // `mkdirDel` deletes and then creates the specified directory.
+      mkdirDel: 'dist',
+    },
+  },
+};
+```
+
+### Groups
 
 Tasks can be grouped to improve readability.
 
@@ -370,111 +446,45 @@ export default {
 };
 ```
 
-### Actions
+### Before / After
 
-Actions are a set of commonly used commands you can choose to run before or after a task:
+`before` and `after` fields allow you to specify which task to run before or after the current one.
 
 ```js
 export default {
-  task: {
+  build: {
     run: 'echo hi',
-    before: {
-      // Actions ...
-    },
-    after: {
-      // Actions ...
-    },
+    before: '#prepare',
+    after: '#clean',
   },
+  prepare: 'echo preparing',
+  clean: 'rm -rf out',
 };
 ```
 
-daizong currently supports the following actions:
-
-- `mkdir`: `string` creates a directory and its parents if needed.
-- `del`: `string | string[]` deletes files or directories based on the given paths or globs. See [del](https://github.com/sindresorhus/del#usage) for details.
-  - Examples: `del: 'dist/*.js.map'`, `del: ['a.txt', 'b.txt']`.
-- `mkdirDel`: `string` = `del <dir>` + `mkdir <dir>`.
-
-For example, to create a `/dist` directory before running task `dev`, and delete all `js.map` files when it's done:
+`before` and `after` fields come handy when you need to mix sequential and parallel commands:
 
 ```js
 export default {
-  dev: {
-    run: 'echo dev',
-    before: {
-      mkdir: 'dist',
-    },
-    after: {
-      del: 'dist/*.js.map',
-    },
-  },
-};
-```
-
-Actions can be reused by simply wrapping them in `run`:
-
-```js
-export default {
-  prepare: {
-    run: {
-      mkdir: 'dist',
-      del: 'cache',
-    },
-  },
-  dev: {
-    run: ['#prepare', 'echo dev'],
-  },
   build: {
-    run: ['#prepare', 'echo build'],
+    run: ['cmd1', 'cmd2', '#task1', '#task2'],
+    before: '#prepare',
+    after: '#clean',
   },
+  prepare: 'echo preparing',
+  clean: 'rm -rf out',
 };
 ```
 
-Actions also support parallel execution:
+It runs as:
 
-```js
-export default {
-  prepare: {
-    run: {
-      mkdir: 'dist',
-      del: 'cache',
-      parallel: true,
-    },
-  },
-  dev: {
-    run: ['#prepare', 'echo dev'],
-  },
-  build: {
-    run: ['#prepare', 'echo build'],
-  },
-};
 ```
-
-Note that when `parallel` is false (which is the default value), **actions are executed sequentially in insertion order**:
-
-```js
-export default {
-  prepare: {
-    run: {
-      // `del dist` always runs first!
-      del: 'dist',
-      mkdir: 'dist',
-    },
-  },
-};
-```
-
-The above example is also equivalent to:
-
-```js
-export default {
-  prepare: {
-    run: {
-      // `mkdirDel` deletes and then creates the specified directory.
-      mkdirDel: 'dist',
-    },
-  },
-};
+prepare
+  |
+cmd1 | cmd2 | #task1 | #task2 (parallel)
+  |
+clean
+  |
 ```
 
 ### Aliases

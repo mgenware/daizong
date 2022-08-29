@@ -1,14 +1,14 @@
-import { Actions } from './actions.js';
+import { BTCommands } from './btCmd.js';
 
-export type TaskItemType = string | string[] | Actions;
+export type RunValueType = string | string[] | BTCommands;
 
 export interface Task {
-  run?: TaskItemType;
+  run?: RunValueType;
   parallel?: boolean;
   env?: Record<string, string>;
   ignoreError?: boolean;
-  before?: Actions;
-  after?: Actions;
+  before?: string;
+  after?: string;
   continueOnChildError?: boolean;
   alias?: string;
   envGroups?: string | string[];

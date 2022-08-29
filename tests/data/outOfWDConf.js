@@ -5,11 +5,17 @@ const tmpDir = path.join(os.tmpdir(), `daizong-${Date.now()}`);
 
 export default {
   t: {
-    before: {
+    before: '#beforeT',
+    run: 'echo hi',
+    after: '#afterT',
+  },
+  beforeT: {
+    run: {
       mkdir: tmpDir,
     },
-    run: 'echo hi',
-    after: {
+  },
+  afterT: {
+    run: {
       del: tmpDir,
     },
   },

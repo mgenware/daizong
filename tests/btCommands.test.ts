@@ -25,7 +25,7 @@ export async function isFile(path: string): Promise<boolean | null> {
   }
 }
 
-it('Actions(before), del with glob, mkdir', async () => {
+it('BTCommands (before), del with glob, mkdir', async () => {
   const path = await newTmpDir('before1');
   await fs.writeFile(np.join(path, 'a.txt'), 'haha');
   await fs.writeFile(np.join(path, 'a.json'), 'haha');
@@ -34,6 +34,7 @@ it('Actions(before), del with glob, mkdir', async () => {
     conf,
     'before',
     `>> #before
+>> #before (before)
 >> mkdir "tests/data/tmp/before1-new"
 >> del "tests/data/tmp/before1/*.txt"
 >> echo hi
@@ -72,6 +73,7 @@ it('Actions(after), del with multiple args', async () => {
     `>> #after
 >> echo hi
 hi
+>> #after (after)
 >> del ["tests/data/tmp/after1/*.*","!tests/data/tmp/after1/a.txt"]`,
   );
   assert.strictEqual(await isFile('tests/data/tmp/after1/a.txt'), true);
