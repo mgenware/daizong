@@ -173,7 +173,7 @@ it('Run BT commands (mixed with string commands)', async () => {
 >> echo 2
 2`,
   );
-  assert.strictEqual(await isFile('tests/data/tmp/runActionsMixed-new'), false);
+  assert.strictEqual(await isFile('tests/data/tmp/run-bt-cmds-mix-new'), false);
   assert.strictEqual(
     await isFile('tests/data/tmp/run-bt-cmds-mix/a.txt'),
     null,
