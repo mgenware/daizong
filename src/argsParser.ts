@@ -9,7 +9,7 @@ export interface ArgsResult {
   configFile?: string;
   verbose?: boolean;
   private?: boolean;
-  taskPath: string[];
+  taskName: string;
   taskArgs: string[];
   error?: string;
 }
@@ -23,7 +23,7 @@ enum BuilderNextValue {
 class ArgsBuilder {
   private result: ArgsResult = {
     command: Command.run,
-    taskPath: [],
+    taskName: '',
     taskArgs: [],
   };
 
@@ -77,7 +77,7 @@ class ArgsBuilder {
         }
 
         case BuilderNextValue.taskPath: {
-          result.taskPath = s.split('-');
+          result.taskName = s;
           this.nextValue = BuilderNextValue.taskArgs;
           break;
         }
@@ -124,7 +124,7 @@ export function parseArgs(args: string[]): ArgsResult {
     return {
       error: err instanceof Error ? err.message : `${err}`,
       command: Command.version,
-      taskPath: [],
+      taskName: '',
       taskArgs: [],
     };
   }

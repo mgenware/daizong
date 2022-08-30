@@ -104,7 +104,7 @@ async function runCommandString(
       }
       let innerTask: Task;
       try {
-        innerTask = getTask(config, cmdName.split('-'), true);
+        innerTask = getTask(config, cmdName, true);
       } catch (getTaskErr) {
         isTaskNotFoundErr = true;
         throw new Error(
@@ -196,7 +196,7 @@ async function runTask(
       await runTask(
         config,
         `${displayName} (before)`,
-        getTask(config, [before.substring(1)], true),
+        getTask(config, before.substring(1), true),
         args,
         parentEnv,
       );
@@ -250,7 +250,7 @@ async function runTask(
       await runTask(
         config,
         `${displayName} (after)`,
-        getTask(config, [after.substring(1)], true),
+        getTask(config, after.substring(1), true),
         args,
         parentEnv,
       );
@@ -279,14 +279,8 @@ async function runTask(
         })}`,
       );
     }
-    const startingTask = getTask(config, cmd.taskPath, cmd.private || false);
-    await runTask(
-      config,
-      `#${cmd.taskPath.join('-')}`,
-      startingTask,
-      cmd.taskArgs,
-      {},
-    );
+    const startingTask = getTask(config, cmd.taskName, cmd.private || false);
+    await runTask(config, `#${cmd.taskName}`, startingTask, cmd.taskArgs, {});
   } catch (err) {
     processError(err);
   }

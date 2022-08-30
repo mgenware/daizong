@@ -36,10 +36,11 @@ function findTask(config: Config, path: string[]): Task {
 
 export default function getTask(
   config: Config,
-  path: string[],
+  name: string,
   allowPrivate: boolean,
 ): Task {
-  if (!path.length) {
+  const path = name.split('-');
+  if (!name || !path.length) {
     throw new Error('No tasks specified');
   }
   const task = findTask(config, path);
