@@ -130,15 +130,6 @@ async function runCommandString(
   }
 }
 
-// Makes sure `before` or `after` only accepts `#<task_name>`.
-function checkBeforeOrAfterValue(value: string) {
-  if (!value.startsWith('#')) {
-    throw new Error(
-      `\`before\` or \`after\` only accepts other task names. Got "${value}"`,
-    );
-  }
-}
-
 async function runTask(
   config: Config,
   displayName: string,
@@ -201,14 +192,17 @@ async function runTask(
     ...taskEnv,
   };
   if (before) {
-    checkBeforeOrAfterValue(before);
-    await runTask(
-      config,
-      `${displayName} (before)`,
-      getTask(config, [before.substring(1)], true),
-      args,
-      parentEnv,
-    );
+    if (before.startsWith('#')) {
+      await runTask(
+        config,
+        `${displayName} (before)`,
+        getTask(config, [before.substring(1)], true),
+        args,
+        parentEnv,
+      );
+    } else {
+      await runCommandString(config, before, args, env, !!ignoreError);
+    }
   }
   if (typeof runValue === 'string') {
     await runCommandString(config, runValue, args, env, !!ignoreError);
@@ -252,14 +246,17 @@ async function runTask(
   }
 
   if (after) {
-    checkBeforeOrAfterValue(after);
-    await runTask(
-      config,
-      `${displayName} (after)`,
-      getTask(config, [after.substring(1)], true),
-      args,
-      parentEnv,
-    );
+    if (after.startsWith('#')) {
+      await runTask(
+        config,
+        `${displayName} (after)`,
+        getTask(config, [after.substring(1)], true),
+        args,
+        parentEnv,
+      );
+    } else {
+      await runCommandString(config, after, args, env, !!ignoreError);
+    }
   }
 }
 

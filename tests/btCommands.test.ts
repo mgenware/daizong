@@ -183,3 +183,17 @@ it('Run BT commands (mixed with string commands)', async () => {
     true,
   );
 });
+
+it('Command strings in before or after', async () => {
+  await t(
+    conf,
+    'beforeAfterCmds',
+    `>> #beforeAfterCmds
+>> echo 1
+1
+>> echo 2
+2
+>> echo 3
+3`,
+  );
+});

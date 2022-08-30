@@ -64,4 +64,9 @@ export default {
       'echo 2',
     ],
   },
+  beforeAfterCmds: {
+    before: 'echo 1',
+    run: 'echo 2',
+    after: 'echo 3',
+  },
 };

@@ -426,7 +426,7 @@ Smaller numbers indicate higher precedence.
 
 ### Continue on error
 
-- `ignoreError` available on all tasks, defaults to `false`. If `true`, task failure is ignored and won't stop execution.
+- `ignoreError` available on all tasks, defaults to `false`. If `true`, task errors are ignored.
 - `continueOnChildError` only available on tasks with multiple subtasks. It controls if pending subtasks continue to run when one subtask fails. Defaults to `false`.
 
 Example:
