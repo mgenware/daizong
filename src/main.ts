@@ -162,7 +162,7 @@ async function runTaskByName(ctx: Context, nameWithPrefix: string) {
   if (!name) {
     throw new Error('"#" is not a valid task name');
   }
-  const task = getTask(ctx.config, name, false);
+  const task = getTask(ctx.config, name, true);
   log(`>> ${nameWithPrefix}`);
   return runTask(ctx, task);
 }

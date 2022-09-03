@@ -209,7 +209,9 @@ it('Private task (error)', async () => {
     confBasic,
     'runPrivate',
     `>> #runPrivate
-Task #pri1 is private. It can only be called by other tasks.`,
+>> #pri1
+>> echo private
+private`,
     { hasError: true },
   );
 });
