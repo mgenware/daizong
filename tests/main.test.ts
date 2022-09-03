@@ -155,7 +155,7 @@ it('Stops on error', async () => {
 1
 >> node ./tests/data/err.js
 error
-Command failed with code 1 (node ./tests/data/err.js)`,
+Command failed with exit code 1: node ./tests/data/err.js`,
     { hasError: true },
   );
 });
@@ -169,7 +169,7 @@ it('Stops on error on parallel tasks', async () => {
 1
 >> node ./tests/data/err.js 300
 error
-Command failed with code 1 (node ./tests/data/err.js 300)`,
+Command failed with exit code 1: node ./tests/data/err.js 300`,
     { hasError: true },
   );
 });

@@ -92,7 +92,7 @@ async function runString(
 
   const argsText = args ? ` ${chalk.cyan(lib.getArgsDisplayString(args))}` : '';
   log(`>> ${chalk.yellow(value)}${argsText}`);
-  await spawn(value, args ?? [], ctx.inheritedEnv, verboseLog);
+  return spawn(value, args ?? [], ctx.inheritedEnv, verboseLog);
 }
 
 async function runTask(ctx: Context, task: Task, args?: string[]) {

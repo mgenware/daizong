@@ -471,21 +471,20 @@ export default {
 
 ### Before / After
 
-`before` and `after` fields allow you to specify which task to run before or after the current one.
+`before` and `after` allow you to specify what to run before or after a certain task.
 
 ```js
 export default {
   build: {
     run: 'echo hi',
-    before: '#prepare',
+    before: ['echo prepare step 1', 'echo prepare step 1'],
     after: '#clean',
   },
-  prepare: 'echo preparing',
   clean: 'rm -rf out',
 };
 ```
 
-`before` and `after` fields come handy when you need to mix sequential and parallel commands:
+`before` and `after` come handy when you need to mix sequential and parallel commands:
 
 ```js
 export default {

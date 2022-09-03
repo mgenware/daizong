@@ -1,4 +1,4 @@
-import { spawn as nodeSpawn } from 'child_process';
+import { execa } from 'execa';
 
 function escape(cmd: string) {
   return `"${cmd.replace(/(["'$`\\])/g, '\\$1')}"`;
@@ -28,21 +28,6 @@ export default async function spawn(
 
   logger?.(`[spawn-run] ${cmd}`);
   logger?.(`[spawn-run-env] ${mergedEnv}`);
-  return new Promise((resolve, reject) => {
-    const process = nodeSpawn(cmd, {
-      shell: true,
-      env: mergedEnv,
-      stdio: 'inherit',
-    });
-    process.on('close', (code) => {
-      if (code) {
-        reject(new Error(`Command failed with code ${code} (${cmd})`));
-      } else {
-        resolve();
-      }
-    });
-    process.on('error', (err) => {
-      reject(err);
-    });
-  });
+
+  await execa(cmd, { shell: true, env: mergedEnv, stdio: 'inherit' });
 }
