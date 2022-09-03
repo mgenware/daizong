@@ -34,9 +34,11 @@ it('BTCommands (before), del with glob, mkdir', async () => {
     conf,
     'before',
     `>> #before
->> #before (before)
+>> [before]
+>> #beforeT
 >> mkdir "tests/data/tmp/before1-new"
 >> del "tests/data/tmp/before1/*.txt"
+>> [main]
 >> echo hi
 hi`,
   );
@@ -71,9 +73,11 @@ it('Actions(after), del with multiple args', async () => {
     conf,
     'after',
     `>> #after
+>> [main]
 >> echo hi
 hi
->> #after (after)
+>> [after]
+>> #afterT
 >> del ["tests/data/tmp/after1/*.*","!tests/data/tmp/after1/a.txt"]`,
   );
   assert.strictEqual(await isFile('tests/data/tmp/after1/a.txt'), true);
@@ -189,10 +193,13 @@ it('Command strings in before or after', async () => {
     conf,
     'beforeAfterCmds',
     `>> #beforeAfterCmds
+>> [before]
 >> echo 1
 1
+>> [main]
 >> echo 2
 2
+>> [after]
 >> echo 3
 3`,
   );

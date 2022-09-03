@@ -38,7 +38,7 @@ function checkStrings(
 
 export interface TOptions {
   hasError?: boolean;
-  args?: string;
+  dzArgs?: string;
   checkPrefixes?: boolean;
   dz?: boolean;
 }
@@ -55,8 +55,8 @@ export async function t(
     if (configName) {
       cmd += ` --config "./tests/data/${configName}.js"`;
     }
-    if (opt.args) {
-      cmd += ` ${opt.args}`;
+    if (opt.dzArgs) {
+      cmd += ` ${opt.dzArgs}`;
     }
     if (taskName.length) {
       cmd += ` ${taskName}`;

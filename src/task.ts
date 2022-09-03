@@ -1,18 +1,14 @@
-import { BTCommands } from './btCmd.js';
-
-export type RunValueType = string | Array<string | BTCommands> | BTCommands;
-
 export interface Task {
-  run?: RunValueType;
+  run?: unknown;
   parallel?: boolean;
   env?: Record<string, string>;
   ignoreError?: boolean;
-  before?: string;
-  after?: string;
   continueOnChildError?: boolean;
   alias?: string;
   envGroups?: string | string[];
+  before?: unknown;
+  after?: unknown;
 
-  // An internal flag indicating if a task is defined as private.
+  // Internal flag indicating if a task is defined as private.
   __isPrivate?: boolean;
 }

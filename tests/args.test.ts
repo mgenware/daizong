@@ -52,24 +52,6 @@ it('Passing args in a nested task', async () => {
   );
 });
 
-it('Only first non-referenced sub-task receives input arguments', async () => {
-  await t(
-    conf,
-    'printAll -d e --f',
-    `>> #printAll
->> #print
->> node ./tests/data/args.js
-[]
->> node ./tests/data/args.js -a "b  1" --c -d e --f
-["-a","b  1","--c","-d","e","--f"]
->> node ./tests/data/args.js
-[]
->> #group-group2
->> node ./tests/data/args.js -a "b  1" --c
-["-a","b  1","--c"]`,
-  );
-});
-
 it('Call `printWithArgs` with args and spaces', async () => {
   await t(
     conf,

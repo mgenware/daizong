@@ -1,18 +1,25 @@
 #!/usr/bin/env node
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import chalk from 'chalk';
 import { inspect } from 'util';
 import pMap from 'p-map';
 import { readFile } from 'fs/promises';
 import np from 'path';
 import { fileURLToPath } from 'url';
-import errMsg from './errMsg.js';
 import spawn from './spawn.js';
 import { Task } from './task.js';
 import { loadConfig, Config } from './config.js';
 import getTask from './getTask.js';
-import { runBTCommands } from './btCmd.js';
+import { BTCommands, runBTCommands } from './btCmd.js';
 import { parseArgs, Command } from './argsParser.js';
 import { envPreset } from './envPreset.js';
+import * as lib from './lib.js';
+
+interface Context {
+  config: Config;
+  // Env from parent tasks when called by another tasks.
+  inheritedEnv: Record<string, string>;
+}
 
 function log(s: unknown) {
   // eslint-disable-next-line no-console
@@ -74,92 +81,28 @@ function processError(err: unknown) {
   process.exit(1);
 }
 
-function getArgsDisplayString(args: string[]) {
-  return args
-    .map((s) => {
-      // If current argument has spaces, surround it with quotes.
-      if (s.includes(' ')) {
-        return `"${s}"`;
-      }
-      return s;
-    })
-    .join(' ');
-}
-
-async function runCommandString(
-  config: Config,
-  command: string,
-  args: string[],
-  inheritedEnv: Record<string, string | undefined>,
-  ignoreError: boolean,
+async function runString(
+  ctx: Context,
+  value: string,
+  args?: string[],
 ): Promise<void> {
-  let isTaskNotFoundErr = false;
-  try {
-    // Check if this command is calling another command.
-    let promise: Promise<void>;
-    if (command.startsWith('#')) {
-      const cmdName = command.substring(1);
-      if (!cmdName) {
-        throw new Error(`"${command}" is not a valid task name`);
-      }
-      let innerTask: Task;
-      try {
-        innerTask = getTask(config, cmdName, true);
-      } catch (getTaskErr) {
-        isTaskNotFoundErr = true;
-        throw new Error(
-          `Error running command "${command}": ${errMsg(getTaskErr)}`,
-        );
-      }
-      // NOTE: user specified arguments are not passed to the referenced task.
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      promise = runTask(config, command, innerTask, [], inheritedEnv);
-    } else {
-      const argsText = args.length
-        ? ` ${chalk.cyan(getArgsDisplayString(args))}`
-        : '';
-      log(`>> ${chalk.yellow(command)}${argsText}`);
-      promise = spawn(command, args, inheritedEnv, verboseLog);
-    }
-    await promise;
-  } catch (err) {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!ignoreError || isTaskNotFoundErr) {
-      throw err;
-    }
+  if (value.startsWith('#')) {
+    return runTaskByName(ctx, value);
   }
+
+  const argsText = args ? ` ${chalk.cyan(lib.getArgsDisplayString(args))}` : '';
+  log(`>> ${chalk.yellow(value)}${argsText}`);
+  await spawn(value, args ?? [], ctx.inheritedEnv, verboseLog);
 }
 
-async function runTask(
-  config: Config,
-  displayName: string,
-  task: Task,
-  // If this task has multiple sub-tasks, arguments only apply to first sub-task that
-  // is not a referenced task.
-  args: string[],
-  // Env from parent tasks when called by another tasks.
-  parentEnv: Record<string, string | undefined>,
-) {
+async function runTask(ctx: Context, task: Task, args?: string[]) {
   const runValue = task.run;
-  // Run the specified task.
   if (runValue === undefined) {
-    throw new Error(`No \`run\` field found in task "${displayName}"`);
+    throw new Error(`No \`run\` field found in task "${JSON.stringify(task)}"`);
   }
 
-  if (displayName) {
-    log(`>> ${displayName}`);
-  }
-
-  const { settings } = config;
-  const {
-    parallel,
-    env: taskEnv,
-    ignoreError,
-    before,
-    after,
-    continueOnChildError,
-    envGroups,
-  } = task;
+  const { settings } = ctx.config;
+  const { env: taskEnv, envGroups, before, after } = task;
   let envGroupNames: unknown[] = [];
   if (envGroups !== undefined) {
     envGroupNames = typeof envGroups === 'string' ? [envGroups] : envGroups;
@@ -187,77 +130,77 @@ async function runTask(
   }
   const env = {
     ...settings.defaultEnv,
-    ...parentEnv,
+    ...ctx.inheritedEnv,
     ...groupEnv,
     ...taskEnv,
-  };
+  } as Record<string, string>;
+  const hasBeforeOrAfter = before || after;
   if (before) {
-    if (before.startsWith('#')) {
-      await runTask(
-        config,
-        `${displayName} (before)`,
-        getTask(config, before.substring(1), true),
-        args,
-        parentEnv,
-      );
-    } else {
-      await runCommandString(config, before, args, env, !!ignoreError);
-    }
+    log('>> [before]');
+    await runUnknown(ctx, before, null);
   }
-  if (typeof runValue === 'string') {
-    await runCommandString(config, runValue, args, env, !!ignoreError);
-  } else if (Array.isArray(runValue)) {
-    try {
-      const subTasksContext = runValue.map((t) => ({
-        run: t,
-        args: [] as string[],
-      }));
-      // Determine if a sub-task should have args.
-      if (args.length) {
-        for (const ctx of subTasksContext) {
-          if (typeof ctx.run !== 'string' || !ctx.run.startsWith('#')) {
-            ctx.args = args;
-            break;
-          }
-        }
-      }
 
-      await pMap(
-        subTasksContext,
-        (st) => {
-          if (typeof st.run === 'string') {
-            return runCommandString(config, st.run, st.args, env, false);
-          }
-          return runBTCommands(st.run);
-        },
-        {
-          concurrency: parallel ? undefined : 1,
-          stopOnError: !continueOnChildError,
-        },
-      );
-    } catch (err) {
-      if (!ignoreError) {
-        throw err;
-      }
+  if (hasBeforeOrAfter) {
+    log('>> [main]');
+  }
+  try {
+    await runUnknown({ ...ctx, inheritedEnv: env }, runValue, task, args);
+  } catch (err) {
+    if (!task.ignoreError) {
+      throw err;
     }
-  } else {
-    // `runValue` is an object of BT commands.
-    await runBTCommands(runValue);
   }
 
   if (after) {
-    if (after.startsWith('#')) {
-      await runTask(
-        config,
-        `${displayName} (after)`,
-        getTask(config, after.substring(1), true),
-        args,
-        parentEnv,
-      );
-    } else {
-      await runCommandString(config, after, args, env, !!ignoreError);
-    }
+    log('>> [after]');
+    await runUnknown(ctx, after, null);
   }
+}
+
+async function runTaskByName(ctx: Context, nameWithPrefix: string) {
+  const name = nameWithPrefix.substring(1);
+  if (!name) {
+    throw new Error('"#" is not a valid task name');
+  }
+  const task = getTask(ctx.config, name, false);
+  log(`>> ${nameWithPrefix}`);
+  return runTask(ctx, task);
+}
+
+// Runs the given value of a `run` field. It could be the following cases:
+// - A string of task name, `#another_task`
+// - A command string, `echo hi`
+// - A object indicating a built-in command, `{ del: ['a', 'b'] }`
+// - An array representing a series of child commands. It could be executed
+//     sequentially or in parallel depending on the `parallel` field.
+// `task`: if available, this is called by a task. Otherwise, it's called
+// within another run value (nested in a task run value).
+async function runUnknown(
+  ctx: Context,
+  value: unknown,
+  task: Task | null,
+  args?: string[],
+) {
+  if (!value) {
+    throw new Error(`Empty run field ${JSON.stringify(value)}`);
+  }
+  if (typeof value === 'string') {
+    return runString(ctx, value, args);
+  }
+  if (Array.isArray(value)) {
+    await pMap(value, (childVal) => runUnknown(ctx, childVal, null), {
+      concurrency: task?.parallel ? undefined : 1,
+      stopOnError:
+        task?.continueOnChildError !== undefined
+          ? !task.continueOnChildError
+          : true,
+    });
+    return Promise.resolve();
+  }
+  if (typeof value === 'object') {
+    return runBTCommands(value as BTCommands);
+  }
+  throw new Error(`Invalid run field ${JSON.stringify(value)}`);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -279,8 +222,14 @@ async function runTask(
         })}`,
       );
     }
-    const startingTask = getTask(config, cmd.taskName, cmd.private || false);
-    await runTask(config, `#${cmd.taskName}`, startingTask, cmd.taskArgs, {});
+
+    const task = getTask(config, cmd.taskName, cmd.private ?? false);
+    log(`>> #${cmd.taskName}`);
+    const ctx: Context = {
+      config,
+      inheritedEnv: {},
+    };
+    await runTask(ctx, task, cmd.taskArgs.length ? cmd.taskArgs : undefined);
   } catch (err) {
     processError(err);
   }

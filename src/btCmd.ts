@@ -21,7 +21,7 @@ function stringToList(input: string | string[]): string[] {
   return input;
 }
 
-export async function runBTCommands(cmds: BTCommands): Promise<void> {
+export async function runBTCommands(cmds: BTCommands) {
   const { mkdir: mkdirInput, del: delInput, parallel, mkdirDel } = cmds;
   const concurrency = parallel ? undefined : 1;
 

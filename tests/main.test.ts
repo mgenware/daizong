@@ -204,14 +204,13 @@ slowest`,
   );
 });
 
-it('Private task', async () => {
+it('Private task (error)', async () => {
   await t(
     confBasic,
     'runPrivate',
     `>> #runPrivate
->> #pri1
->> echo private
-private`,
+Task #pri1 is private. It can only be called by other tasks.`,
+    { hasError: true },
   );
 });
 

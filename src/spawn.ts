@@ -11,7 +11,7 @@ export default async function spawn(
   logger: ((s: unknown) => void) | null,
 ): Promise<void> {
   if (!inputCmd.length) {
-    throw new Error('Argument "cmd" cannot be empty');
+    throw new Error('The argument "inputCmd" cannot be empty');
   }
 
   logger?.(`[spawn-input] ${inputCmd} | ${inputArgs}`);
