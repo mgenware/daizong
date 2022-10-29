@@ -209,6 +209,7 @@ async function runUnknown(
     const config = await loadConfig(cmd.configFile);
     const { settings } = config;
 
+    verboseLog?.(`CWD: ${process.cwd()}`);
     verboseLog?.(
       `Loaded config file at "${config.path}"
   ${JSON.stringify(config)}
