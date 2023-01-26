@@ -10,13 +10,13 @@ it('Not found (root)', async () => {
   a: 'AAA',
   b: 'BBB'
 }
-Task #xyz doesn't exist.`,
+The task #xyz doesn't exist.`,
     { hasError: true },
   );
 });
 
 it('Not found (with aliases)', async () => {
-  await t('notFoundWithAliasConf', 'xyz', "Task #xyz doesn't exist.", {
+  await t('notFoundWithAliasConf', 'xyz', "The task #xyz doesn't exist.", {
     hasError: true,
   });
 });
@@ -29,7 +29,7 @@ it('Not found (in private)', async () => {
   a: 'AAA',
   b: 'BBB'
 }
-Task #priB is private. It can only be called by other tasks.`,
+The task #priB is private. It can only be called by other tasks.`,
     { hasError: true },
   );
 });
@@ -57,7 +57,7 @@ it('Not found (in private, not a valid task)', async () => {
   a: 'AAA',
   b: 'BBB'
 }
-Task #priA is private. It can only be called by other tasks.`,
+The task #priA is private. It can only be called by other tasks.`,
     { hasError: true },
   );
 });
@@ -70,7 +70,7 @@ it('Child not found (root)', async () => {
   a: 'AAA',
   b: 'BBB'
 }
-Task #a-private-xyz doesn't exist.`,
+The task #a-private-xyz doesn't exist.`,
     { hasError: true },
   );
 });
@@ -84,7 +84,7 @@ it('Child not found (in private)', async () => {
   b: 'BBB'
 }
 >> #a-trigger_err
-Task #priA-b-xyz doesn't exist.`,
+The task #priA-b-xyz doesn't exist.`,
     { hasError: true },
   );
 });
