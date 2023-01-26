@@ -134,7 +134,9 @@ async function runTask(ctx: Context, task: Task, args?: string[]) {
     ...groupEnv,
     ...taskEnv,
   } as Record<string, string>;
-  const hasBeforeOrAfter = before || after;
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  const hasBeforeOrAfter = !!(before || after);
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (before) {
     log('>> [before]');
     await runUnknown(ctx, before, null);
@@ -151,6 +153,7 @@ async function runTask(ctx: Context, task: Task, args?: string[]) {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (after) {
     log('>> [after]');
     await runUnknown(ctx, after, null);
@@ -173,7 +176,7 @@ async function runTaskByName(ctx: Context, nameWithPrefix: string) {
 // - A object indicating a built-in command, `{ del: ['a', 'b'] }`
 // - An array representing a series of child commands. It could be executed
 //     sequentially or in parallel depending on the `parallel` field.
-// `task`: if available, this is called by a task. Otherwise, it's called
+// `task`: if available, it is being called by another task. Otherwise, it's called
 // within another run value (nested in a task run value).
 async function runUnknown(
   ctx: Context,
@@ -181,6 +184,7 @@ async function runUnknown(
   task: Task | null,
   args?: string[],
 ) {
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!value) {
     throw new Error(`Empty run field ${JSON.stringify(value)}`);
   }

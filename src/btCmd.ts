@@ -29,14 +29,17 @@ export async function runBTCommands(cmds: BTCommands) {
   await pMap(
     Object.keys(cmds),
     async (prop: string) => {
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (prop === 'mkdir' && mkdirInput) {
         // eslint-disable-next-line no-console
         console.log(`>> ${chalk.gray(`mkdir "${mkdirInput}"`)}`);
         await Promise.all(stringToList(mkdirInput).map((s) => mkdir(s)));
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       } else if (prop === 'del' && delInput) {
         // eslint-disable-next-line no-console
         console.log(`>> ${chalk.gray(`del ${JSON.stringify(delInput)}`)}`);
         await deleteAsync(delInput, { force: true });
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       } else if (prop === 'mkdirDel' && mkdirDel) {
         // eslint-disable-next-line no-console
         console.log(`>> ${chalk.gray(`mkdirDel "${mkdirDel}"`)}`);
