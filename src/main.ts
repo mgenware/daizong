@@ -95,7 +95,12 @@ async function runString(
   return spawn(value, args ?? [], ctx.inheritedEnv, verboseLog);
 }
 
-async function runTask(ctx: Context, task: Task, args?: string[]) {
+async function runTask(
+  ctx: Context,
+  task: Task,
+  args: string[] | undefined,
+  taskName: string | undefined,
+) {
   const runValue = task.run;
   if (runValue === undefined) {
     throw new Error(`No \`run\` field found in task "${JSON.stringify(task)}"`);
@@ -138,12 +143,12 @@ async function runTask(ctx: Context, task: Task, args?: string[]) {
   const hasBeforeOrAfter = !!(before || after);
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (before) {
-    log('>> [before]');
+    log(`>> #${taskName} [before]`);
     await runUnknown(ctx, before, null);
   }
 
   if (hasBeforeOrAfter) {
-    log('>> [main]');
+    log(`>> #${taskName} [run]`);
   }
   try {
     await runUnknown({ ...ctx, inheritedEnv: env }, runValue, task, args);
@@ -155,7 +160,7 @@ async function runTask(ctx: Context, task: Task, args?: string[]) {
 
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (after) {
-    log('>> [after]');
+    log(`>> #${taskName} [after]`);
     await runUnknown(ctx, after, null);
   }
 }
@@ -167,7 +172,7 @@ async function runTaskByName(ctx: Context, nameWithPrefix: string) {
   }
   const task = getTask(ctx.config, name, true);
   log(`>> ${nameWithPrefix}`);
-  return runTask(ctx, task);
+  return runTask(ctx, task, undefined, name);
 }
 
 // Runs the given value of a `run` field. It could be the following cases:
@@ -234,7 +239,12 @@ async function runUnknown(
       config,
       inheritedEnv: {},
     };
-    await runTask(ctx, task, cmd.taskArgs.length ? cmd.taskArgs : undefined);
+    await runTask(
+      ctx,
+      task,
+      cmd.taskArgs.length ? cmd.taskArgs : undefined,
+      cmd.taskName,
+    );
   } catch (err) {
     processError(err);
   }

@@ -34,11 +34,11 @@ it('BTCommands (before), del with glob, mkdir', async () => {
     conf,
     'before',
     `>> #before
->> [before]
+>> #before [before]
 >> #beforeT
 >> mkdir "tests/data/tmp/before1-new"
 >> del "tests/data/tmp/before1/*.txt"
->> [main]
+>> #before [run]
 >> echo hi
 hi`,
   );
@@ -73,10 +73,10 @@ it('Actions(after), del with multiple args', async () => {
     conf,
     'after',
     `>> #after
->> [main]
+>> #after [run]
 >> echo hi
 hi
->> [after]
+>> #after [after]
 >> #afterT
 >> del ["tests/data/tmp/after1/*.*","!tests/data/tmp/after1/a.txt"]`,
   );
@@ -193,13 +193,13 @@ it('Command strings in before or after', async () => {
     conf,
     'beforeAfterCmds',
     `>> #beforeAfterCmds
->> [before]
+>> #beforeAfterCmds [before]
 >> echo 1
 1
->> [main]
+>> #beforeAfterCmds [run]
 >> echo 2
 2
->> [after]
+>> #beforeAfterCmds [after]
 >> echo 3
 3`,
   );
