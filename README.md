@@ -7,6 +7,7 @@
 `package.json` script runner for ES Modules. daizong supports the following features out of the box:
 
 - Run tasks sequentially or in parallel
+- Built-in commands (create directories, delete files and directories)
 - Environment variables
   - Set environment variables for a specific task
   - Set default environment variables for all tasks
@@ -14,7 +15,6 @@
 - Define tasks in groups
 - Private tasks
 - Allow continue-on-error
-- Build-in commands (create directories, delete files and directories)
 - `before` and `after` fields
 
 ### Breaking changes
@@ -95,6 +95,35 @@ export default {
 };
 ```
 
+<blockquote>
+
+### Shorthand and full task definitions
+
+Most tasks you see above are defined as a command string or an array of command strings:
+
+```js
+export default {
+  dev: ['touch a.md', 'touch b.md'],
+};
+```
+
+This is a shorthand task definition. As we're moving to more daizong features, the shorthand task definition is no longer suited and we can switch to its full definition:
+
+```js
+export default {
+  // Shorthand task definition is either a string or an array of strings.
+  task1: 'echo hi',
+
+  // The `task1` above can be rewritten in its full form.
+  task1: {
+    run: 'echo hi',
+    /* More task settings can be used here. */
+  },
+};
+```
+
+</blockquote>
+
 ### Run tasks in parallel
 
 We'll need 3rd-party libraries like([concurrently](https://github.com/kimmobrunfeldt/concurrently)) to achieve this in `package.json`:
@@ -108,35 +137,6 @@ We'll need 3rd-party libraries like([concurrently](https://github.com/kimmobrunf
 ```
 
 daizong supports it out of the box:
-
-<blockquote>
-
-### Shorthand and full task definitions
-
-Most tasks you see above are defined as a command string or an array of command strings:
-
-```js
-export default {
-  dev: ['touch a.md', 'touch b.md'],
-};
-```
-
-This is a shorthand task definition. As we're moving on to more advanced task features, the shorthand task definition is no longer suited and we can switch to its full definition:
-
-```js
-export default {
-  // Shorthand task definition is either a string or an array of strings.
-  task1: 'echo hi',
-
-  // The `task1` above can be written in its full form.
-  task1: {
-    run: 'echo hi',
-    /* More task settings can be used here. */
-  },
-};
-```
-
-</blockquote>
 
 ```js
 export default {
@@ -177,7 +177,7 @@ export default {
 
 ### Built-in commands
 
-`run` also accepts an object. In that case, you are running daizong built-in commands:
+`run` also accepts an object. In that case, you are running daizong's built-in commands:
 
 - `mkdir`: `string` creates a directory and its parents if needed.
 - `del`: `string | string[]` deletes files or directories based on the given paths or globs. See [del](https://github.com/sindresorhus/del#usage) for details.
@@ -203,7 +203,7 @@ export default {
 };
 ```
 
-Parallel mode:
+Parallel mode is also supported in built-in commands:
 
 ```js
 export default {
@@ -294,7 +294,7 @@ export default {
 };
 ```
 
-To run a specified task in a group, separate all parent groups with `-`:
+To run a specified task in a group, separate its parent groups with `-`:
 
 ```sh
 dz build-linux
@@ -449,7 +449,7 @@ export default {
 
 ### Private tasks
 
-Tasks that are not intended to be called from outside, and can only be called by other tasks.
+Tasks that are not intended to be called from CLI, and can only be called by other tasks.
 
 ```js
 // You cannot call the "clean" task via `daizong clean`.
@@ -489,9 +489,10 @@ export default {
 ```js
 export default {
   build: {
-    run: ['cmd1', 'cmd2', '#task1', '#task2'],
     before: '#prepare',
     after: '#clean',
+    run: ['cmd1', 'cmd2', '#task1', '#task2'],
+    parallel: true,
   },
   prepare: 'echo preparing',
   clean: 'rm -rf out',
@@ -503,7 +504,7 @@ It runs as:
 ```
 prepare
   |
-cmd1 | cmd2 | #task1 | #task2 (parallel)
+cmd1 | cmd2 | #task1 | #task2  <-- parallel
   |
 clean
   |
@@ -525,11 +526,11 @@ export default {
 };
 ```
 
-Now you can start the task by using either `build` or its alias `b`.
+Now you can start the task by using either `dz build` or its alias `dz b`.
 
 ### Pass arguments to a task
 
-Just append the arguments to task path:
+Append the arguments to task path:
 
 ```js
 export default {
@@ -557,7 +558,7 @@ NOTE: Arguments specified before task name are considered daizong arguments, not
 dz --config <val> build-clean --config <val>
 ```
 
-The first `--config` argument applies to the daizong CLI, while the second `--config` argument gets passed to task command.
+The first `--config` argument applies to the daizong CLI, while the second `--config` argument gets passed to the task.
 
 </blockquote>
 
