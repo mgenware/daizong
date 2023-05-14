@@ -15,7 +15,7 @@ export default async function spawn(
   }
 
   logger?.(`[spawn-input] ${inputCmd} | ${inputArgs}`);
-  logger?.(`[spawn-input-env] ${env}`);
+  logger?.(`[spawn-input-env] ${JSON.stringify(env)}`);
   let cmd = inputCmd;
   if (inputArgs.length) {
     cmd += inputArgs.map((s) => ` ${escape(s)}`).join(' ');
@@ -27,7 +27,7 @@ export default async function spawn(
   };
 
   logger?.(`[spawn-run] ${cmd}`);
-  logger?.(`[spawn-run-env] ${mergedEnv}`);
+  logger?.(`[spawn-run-env] ${JSON.stringify(mergedEnv)}`);
 
   await execa(cmd, { shell: true, env: mergedEnv, stdio: 'inherit' });
 }

@@ -215,12 +215,14 @@ async function runUnknown(
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
   try {
+    verboseLog?.(`CWD: ${process.cwd()}`);
+    verboseLog?.(`Loading config "${cmd.configFile}"`);
+
     const config = await loadConfig(cmd.configFile);
     const { settings } = config;
 
-    verboseLog?.(`CWD: ${process.cwd()}`);
     verboseLog?.(
-      `Loaded config file at "${config.path}"
+      `Loaded config file at "${np.resolve(config.path)}"
   ${JSON.stringify(config)}
   `,
     );
