@@ -204,7 +204,7 @@ slowest`,
   );
 });
 
-it('Private task (error)', async () => {
+it('Private task', async () => {
   await t(
     confBasic,
     'runPrivate',
@@ -212,7 +212,6 @@ it('Private task (error)', async () => {
 >> #pri1
 >> echo private
 private`,
-    { hasError: true },
   );
 });
 

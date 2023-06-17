@@ -43,6 +43,10 @@ export interface TOptions {
   dz?: boolean;
 }
 
+function isExecError(err: unknown): err is { stderr: string; stdout: string } {
+  return err instanceof Error;
+}
+
 export async function t(
   configName: string | null,
   taskName: string,
@@ -50,12 +54,11 @@ export async function t(
   opt?: TOptions,
 ): Promise<void> {
   try {
-    opt = opt || {};
-    let cmd = `node "./dist/${opt.dz ? 'dz' : 'main'}.js"`;
+    let cmd = `node "./dist/${opt?.dz ? 'dz' : 'main'}.js"`;
     if (configName) {
       cmd += ` --config "./tests/data/${configName}.js"`;
     }
-    if (opt.dzArgs) {
+    if (opt?.dzArgs) {
       cmd += ` ${opt.dzArgs}`;
     }
     if (taskName.length) {
@@ -67,10 +70,15 @@ export async function t(
     checkStrings(
       splitString(outputString.trimEnd()),
       splitString(expected),
-      opt.checkPrefixes,
+      opt?.checkPrefixes,
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (err: any) {
+    if (opt?.hasError) {
+      throw new Error('Expected error');
+    }
+  } catch (err) {
+    if (!isExecError(err)) {
+      throw Error(`Unexpected non-error object: ${err}`);
+    }
     if (opt?.hasError) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const output: string = typeof err.stdout === 'string' ? err.stdout : '';
@@ -81,6 +89,7 @@ export async function t(
         opt.checkPrefixes,
       );
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-throw-literal
       throw err;
     }
   }
