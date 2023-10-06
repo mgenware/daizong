@@ -9,6 +9,7 @@ export default async function spawn(
   inputArgs: string[],
   env: Record<string, string | undefined> | undefined,
   logger: ((s: unknown) => void) | null,
+  workingDir: string | undefined,
 ): Promise<void> {
   if (!inputCmd.length) {
     throw new Error('The argument "inputCmd" cannot be empty');
@@ -29,5 +30,10 @@ export default async function spawn(
   logger?.(`[spawn-run] ${cmd}`);
   logger?.(`[spawn-run-env] ${JSON.stringify(mergedEnv)}`);
 
-  await execa(cmd, { shell: true, env: mergedEnv, stdio: 'inherit' });
+  await execa(cmd, {
+    shell: true,
+    env: mergedEnv,
+    stdio: 'inherit',
+    cwd: workingDir,
+  });
 }

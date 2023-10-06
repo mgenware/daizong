@@ -4,6 +4,7 @@ export interface Task {
   env?: Record<string, string>;
   ignoreError?: boolean;
   continueOnChildError?: boolean;
+  workingDir?: string;
   alias?: string;
   envGroups?: string | string[];
   before?: unknown;

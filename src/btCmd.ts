@@ -1,6 +1,7 @@
 import { deleteAsync } from 'del';
 import chalk from 'chalk';
 import pMap from 'p-map';
+import * as np from 'path';
 import { mkdir as nodeMkdir } from 'fs/promises';
 
 export interface BTCommands {
@@ -21,7 +22,17 @@ function stringToList(input: string | string[]): string[] {
   return input;
 }
 
-export async function runBTCommands(cmds: BTCommands) {
+function resolvePath(path: string, workingDir: string | undefined) {
+  if (workingDir) {
+    return np.join(workingDir, path);
+  }
+  return path;
+}
+
+export async function runBTCommands(
+  cmds: BTCommands,
+  workingDir: string | undefined,
+) {
   const { mkdir: mkdirInput, del: delInput, parallel, mkdirDel } = cmds;
   const concurrency = parallel ? undefined : 1;
 
@@ -33,20 +44,29 @@ export async function runBTCommands(cmds: BTCommands) {
       if (prop === 'mkdir' && mkdirInput) {
         // eslint-disable-next-line no-console
         console.log(`>> ${chalk.gray(`mkdir "${mkdirInput}"`)}`);
-        await Promise.all(stringToList(mkdirInput).map((s) => mkdir(s)));
+        await Promise.all(
+          stringToList(mkdirInput).map((s) =>
+            mkdir(resolvePath(s, workingDir)),
+          ),
+        );
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       } else if (prop === 'del' && delInput) {
         // eslint-disable-next-line no-console
         console.log(`>> ${chalk.gray(`del ${JSON.stringify(delInput)}`)}`);
-        await deleteAsync(delInput, { force: true });
+        const pList = typeof delInput === 'string' ? [delInput] : delInput;
+        await deleteAsync(
+          pList.map((s) => resolvePath(s, workingDir)),
+          { force: true },
+        );
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       } else if (prop === 'mkdirDel' && mkdirDel) {
         // eslint-disable-next-line no-console
         console.log(`>> ${chalk.gray(`mkdirDel "${mkdirDel}"`)}`);
         await Promise.all(
           stringToList(mkdirDel).map(async (s) => {
-            await deleteAsync(s);
-            await mkdir(s);
+            const p = resolvePath(s, workingDir);
+            await deleteAsync(p);
+            await mkdir(p);
           }),
         );
       }

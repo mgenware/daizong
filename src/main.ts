@@ -84,24 +84,33 @@ function processError(err: unknown) {
 async function runString(
   ctx: Context,
   value: string,
-  args?: string[],
+  args: string[] | undefined,
+  workingDir: string | undefined,
 ): Promise<void> {
   if (value.startsWith('#')) {
-    return runTaskByName(ctx, value);
+    return runTaskByName(ctx, value, workingDir);
   }
 
   const argsText = args ? ` ${chalk.cyan(lib.getArgsDisplayString(args))}` : '';
-  log(`>> ${chalk.yellow(value)}${argsText}`);
-  return spawn(value, args ?? [], ctx.inheritedEnv, verboseLog);
+  const workingDirText = workingDir ? ` [wd: ${workingDir}]` : '';
+  log(`>> ${chalk.yellow(value)}${argsText}${workingDirText}`);
+  return spawn(value, args ?? [], ctx.inheritedEnv, verboseLog, workingDir);
 }
 
 async function runTask(
   ctx: Context,
   task: Task,
-  args: string[] | undefined,
+  args: string[] | undefined, // Only applicable to [run] field!
   taskName: string | undefined,
+  // The working dir set by the parent task.
+  // Can be overridden by the current task's working dir.
+  workingDir: string | undefined,
 ) {
   const runValue = task.run;
+  if (task.workingDir) {
+    // eslint-disable-next-line prefer-destructuring, no-param-reassign
+    workingDir = task.workingDir;
+  }
   if (runValue === undefined) {
     throw new Error(`No \`run\` field found in task "${JSON.stringify(task)}"`);
   }
@@ -144,14 +153,20 @@ async function runTask(
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (before) {
     log(`>> #${taskName} [before]`);
-    await runUnknown(ctx, before, null);
+    await runUnknown(ctx, before, null, undefined, workingDir);
   }
 
   if (hasBeforeOrAfter) {
     log(`>> #${taskName} [run]`);
   }
   try {
-    await runUnknown({ ...ctx, inheritedEnv: env }, runValue, task, args);
+    await runUnknown(
+      { ...ctx, inheritedEnv: env },
+      runValue,
+      task,
+      args,
+      workingDir,
+    );
   } catch (err) {
     if (!task.ignoreError) {
       throw err;
@@ -161,18 +176,22 @@ async function runTask(
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (after) {
     log(`>> #${taskName} [after]`);
-    await runUnknown(ctx, after, null);
+    await runUnknown(ctx, after, null, undefined, workingDir);
   }
 }
 
-async function runTaskByName(ctx: Context, nameWithPrefix: string) {
+async function runTaskByName(
+  ctx: Context,
+  nameWithPrefix: string,
+  workingDir: string | undefined,
+) {
   const name = nameWithPrefix.substring(1);
   if (!name) {
     throw new Error('"#" is not a valid task name');
   }
   const task = getTask(ctx.config, name, true);
   log(`>> ${nameWithPrefix}`);
-  return runTask(ctx, task, undefined, name);
+  return runTask(ctx, task, undefined, name, workingDir);
 }
 
 // Runs the given value of a `run` field. It could be the following cases:
@@ -187,27 +206,32 @@ async function runUnknown(
   ctx: Context,
   value: unknown,
   task: Task | null,
-  args?: string[],
+  args: string[] | undefined, // Only applicable to string commands!
+  workingDir: string | undefined,
 ) {
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!value) {
     throw new Error(`Empty run field ${JSON.stringify(value)}`);
   }
   if (typeof value === 'string') {
-    return runString(ctx, value, args);
+    return runString(ctx, value, args, workingDir);
   }
   if (Array.isArray(value)) {
-    await pMap(value, (childVal) => runUnknown(ctx, childVal, null), {
-      concurrency: task?.parallel ? undefined : 1,
-      stopOnError:
-        task?.continueOnChildError !== undefined
-          ? !task.continueOnChildError
-          : true,
-    });
+    await pMap(
+      value,
+      (childVal) => runUnknown(ctx, childVal, null, undefined, workingDir),
+      {
+        concurrency: task?.parallel ? undefined : 1,
+        stopOnError:
+          task?.continueOnChildError !== undefined
+            ? !task.continueOnChildError
+            : true,
+      },
+    );
     return Promise.resolve();
   }
   if (typeof value === 'object') {
-    return runBTCommands(value as BTCommands);
+    return runBTCommands(value as BTCommands, workingDir);
   }
   throw new Error(`Invalid run field ${JSON.stringify(value)}`);
 }
@@ -246,6 +270,7 @@ async function runUnknown(
       task,
       cmd.taskArgs.length ? cmd.taskArgs : undefined,
       cmd.taskName,
+      undefined,
     );
   } catch (err) {
     processError(err);
