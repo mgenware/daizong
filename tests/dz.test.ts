@@ -1,8 +1,9 @@
+import isWsl from 'is-wsl';
 import { t } from './common.js';
 
 const conf = 'argsConf';
 
-if (process.platform !== 'win32' && !process.env.CI) {
+if (process.platform !== 'win32' && !isWsl && !process.env.CI) {
   it('No args', async () => {
     await t(
       conf,

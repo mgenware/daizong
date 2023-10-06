@@ -17,7 +17,8 @@ it('Working dir - Child dir', async () => {
   await t(
     conf,
     'child',
-    `>> #log
+    `>> #child
+>> #log
 >> node
 data`,
     { checkPrefixes: true },
