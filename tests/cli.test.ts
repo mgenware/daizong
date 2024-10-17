@@ -1,5 +1,5 @@
 import { readFile } from 'fs/promises';
-import np from 'path';
+import * as np from 'path';
 import { fileURLToPath } from 'url';
 import { t } from './common.js';
 

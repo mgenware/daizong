@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import { inspect } from 'util';
 import pMap from 'p-map';
 import { readFile } from 'fs/promises';
-import np from 'path';
+import * as np from 'path';
 import { fileURLToPath } from 'url';
 import spawn from './spawn.js';
 import { Task } from './task.js';
