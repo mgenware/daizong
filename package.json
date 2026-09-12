@@ -21,10 +21,10 @@
   },
   "license": "MIT",
   "scripts": {
-    "test": "pnpm run clean && pnpm run compile && pnpm run lint && pnpm run t",
+    "test": "npm run clean && npm run compile && npm run lint && npm run t",
     "t": "mocha --parallel --require source-map-support/register --timeout 10000 dist_tests/**/*.test.js",
     "compile": "tsc -b tests",
-    "dev": "pnpm run clean && tsc -b tests -w",
+    "dev": "npm run clean && tsc -b tests -w",
     "lint": "oxlint src tests",
     "clean": "rimraf dist dist_tests"
   },

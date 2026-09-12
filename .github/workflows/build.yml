@@ -15,8 +15,7 @@ jobs:
           - ubuntu-latest
           - windows-latest
         node_version:
-          - 18
-          - 20
+          - 24
         architecture:
           - x64
     name: Node ${{ matrix.node_version }} - ${{ matrix.architecture }} on ${{ matrix.os }}
@@ -27,10 +26,5 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
           architecture: ${{ matrix.architecture }}
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-          run_install: false
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run test
+      - run: npm i
+      - run: npm run test
