@@ -5,12 +5,16 @@ import * as assert from 'assert';
 
 const execAsync = promisify(exec);
 
-// `cross-spawn` causes windows echo to spit text in quotes.
+// `cross-spawn` causes windows echo to spit text in quotes. Different Node/execa
+// versions also report failed shell commands with either single or double quotes.
 function stripQuotes(s: string) {
   if (s.startsWith('"') && s.endsWith('"')) {
     return s.substring(1, s.length - 1);
   }
-  return s;
+  if (s.startsWith("'") && s.endsWith("'")) {
+    return s.substring(1, s.length - 1);
+  }
+  return s.replace(/: "([^"]*)"$/, ": '$1'");
 }
 
 function splitString(str: string): string[] {
