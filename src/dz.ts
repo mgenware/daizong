@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import { spawn } from 'child_process';
+import * as np from 'path';
+import { fileURLToPath } from 'url';
 
 async function pipedSpawn(
   cmd: string,
@@ -27,14 +29,13 @@ async function pipedSpawn(
 }
 
 const args = process.argv.slice(2);
+const thisFile = fileURLToPath(import.meta.url);
+const mainFile = np.join(np.dirname(thisFile), 'main.js');
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
   try {
-    await pipedSpawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', [
-      'daizong',
-      ...args,
-    ]);
+    await pipedSpawn(process.execPath, [mainFile, ...args]);
   } catch (err) {
     console.error(err instanceof Error ? err.message : `${err}`);
   }
